@@ -1,0 +1,3 @@
+Montserrat (Black) and Caveat (Bold) are from Google Fonts and are licensed under the
+SIL Open Font License 1.1 (https://openfontlicense.org). They may be bundled and redistributed.
+JetBrains Mono (used for HUD labels) is expected as an installed system font; any monospace font works as a fallback.

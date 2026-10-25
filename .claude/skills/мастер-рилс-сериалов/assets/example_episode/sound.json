@@ -1,0 +1,280 @@
+{
+ "ambience": [
+  {
+   "type": "room",
+   "start": 1.0,
+   "end": 8.85,
+   "fade_in": 0.3
+  },
+  {
+   "type": "wind",
+   "start": 8.6,
+   "end": "@02.5",
+   "fade_out": 0.45
+  },
+  {
+   "type": "room",
+   "start": 20.25,
+   "end": 22.9
+  },
+  {
+   "type": "storm",
+   "start": 22.7,
+   "end": 35.55,
+   "fade_out": 1.4
+  },
+  {
+   "type": "room",
+   "start": 35.55,
+   "end": 43.3,
+   "gain": 0.7
+  },
+  {
+   "type": "hum",
+   "start": 35.55,
+   "end": 38.45,
+   "hz": 50
+  },
+  {
+   "type": "rotor",
+   "start": 38.45,
+   "end": 40.95
+  },
+  {
+   "type": "wind",
+   "start": 38.35,
+   "end": 40.95,
+   "gain": 0.6
+  },
+  {
+   "type": "hum",
+   "start": 40.95,
+   "end": 43.3,
+   "hz": 50
+  },
+  {
+   "type": "room",
+   "start": 43.3,
+   "end": 71.35,
+   "fade_out": 0.6
+  },
+  {
+   "type": "hum",
+   "start": 43.3,
+   "end": "@05.7+0.9",
+   "hz": 60,
+   "gain": 0.3,
+   "fade_out": 0.05
+  },
+  {
+   "type": "room",
+   "start": 73.15,
+   "end": 120.2,
+   "fade_out": 1.6
+  },
+  {
+   "type": "drone",
+   "start": 43.3,
+   "end": 123.5,
+   "gain": 0.9
+  }
+ ],
+ "events": [
+  {
+   "type": "beep",
+   "t": 0.15
+  },
+  {
+   "type": "beep",
+   "t": 0.42
+  },
+  {
+   "type": "beep",
+   "t": 0.69
+  },
+  {
+   "type": "beep",
+   "t": 6.75
+  },
+  {
+   "type": "beep",
+   "t": 7.0
+  },
+  {
+   "type": "beep",
+   "t": 7.25
+  },
+  {
+   "type": "beep",
+   "t": 50.5
+  },
+  {
+   "type": "beep",
+   "t": 50.78
+  },
+  {
+   "type": "beep",
+   "t": 51.06
+  },
+  {
+   "type": "beep",
+   "t": 64.85
+  },
+  {
+   "type": "beep",
+   "t": 65.12
+  },
+  {
+   "type": "beep",
+   "t": 65.39
+  },
+  {
+   "type": "beep",
+   "t": 83.5
+  },
+  {
+   "type": "beep",
+   "t": 83.78
+  },
+  {
+   "type": "beep",
+   "t": 84.06
+  },
+  {
+   "type": "thump",
+   "t": 1.0
+  },
+  {
+   "type": "thump",
+   "t": 7.45
+  },
+  {
+   "type": "thump",
+   "t": 48.85
+  },
+  {
+   "type": "thump",
+   "t": 83.4
+  },
+  {
+   "type": "thump",
+   "t": 86.15
+  },
+  {
+   "type": "thump",
+   "t": 120.2
+  },
+  {
+   "type": "whoosh",
+   "t": 10.75
+  },
+  {
+   "type": "whoosh",
+   "t": 16.55
+  },
+  {
+   "type": "ping",
+   "t": "@02.2+1.2"
+  },
+  {
+   "type": "ping",
+   "t": "@02.2+1.7"
+  },
+  {
+   "type": "ping",
+   "t": "@02.2+2.25"
+  },
+  {
+   "type": "creak",
+   "t": 23.1
+  },
+  {
+   "type": "pop",
+   "t": "@05.7+0.9"
+  },
+  {
+   "type": "knock",
+   "t": 59.5
+  },
+  {
+   "type": "knock",
+   "t": 60.2
+  },
+  {
+   "type": "knock",
+   "t": 60.85
+  },
+  {
+   "type": "tick",
+   "t": 79.6
+  },
+  {
+   "type": "tick",
+   "t": 80.6
+  },
+  {
+   "type": "tick",
+   "t": 81.6
+  },
+  {
+   "type": "tick",
+   "t": 82.6
+  },
+  {
+   "type": "step",
+   "t": 23.6
+  },
+  {
+   "type": "step",
+   "t": 24.12
+  },
+  {
+   "type": "step",
+   "t": 24.64
+  },
+  {
+   "type": "step",
+   "t": 25.16
+  },
+  {
+   "type": "step",
+   "t": 25.68
+  },
+  {
+   "type": "step",
+   "t": 26.200000000000003
+  },
+  {
+   "type": "paper",
+   "t": 9.0
+  },
+  {
+   "type": "paper",
+   "t": 43.5
+  },
+  {
+   "type": "paper",
+   "t": 64.85
+  },
+  {
+   "type": "paper",
+   "t": 81.33
+  },
+  {
+   "type": "paper",
+   "t": 99.9
+  },
+  {
+   "type": "marker",
+   "t": "@08.1"
+  },
+  {
+   "type": "marker",
+   "t": "@08.2"
+  },
+  {
+   "type": "marker",
+   "t": "@08.3"
+  }
+ ]
+}
