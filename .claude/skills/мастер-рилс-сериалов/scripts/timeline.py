@@ -11,7 +11,8 @@ voice_config.json:
     {"id": "01", "start": 1.0,         # absolute start (first chunk) ...
      "phrases": ["Этот приёмник выключен.", "Шнур выдернут…", "Но он только что принял сигнал."]},
     {"id": "02", "gap": 0.8,           # ... or a gap after the previous chunk
-     "phrases": ["..."], "pauses": {"3": 0.9}}   # extra silence inserted AFTER phrase index 3
+     "phrases": ["..."], "pauses": {"3": 0.9},   # extra silence inserted AFTER phrase index 3
+     "min_sil": 0.35}                             # optional: shortest silence that splits phrases (default 0.15)
   ]
 }
 
@@ -32,8 +33,8 @@ def load(path):
                           '-ar', str(SR), '-f', 'f32le', '-'], capture_output=True).stdout
     return np.frombuffer(raw, np.float32).copy()
 
-def segments(path, dur):
-    err = subprocess.run(['ffmpeg', '-i', path, '-af', 'silencedetect=n=-38dB:d=0.15', '-f', 'null', '-'],
+def segments(path, dur, d=0.15):
+    err = subprocess.run(['ffmpeg', '-i', path, '-af', 'silencedetect=n=-38dB:d=%s' % d, '-f', 'null', '-'],
                          capture_output=True, text=True).stderr
     st = [float(x) for x in re.findall(r'silence_start: ([0-9.]+)', err)]
     en = [float(x) for x in re.findall(r'silence_end: ([0-9.]+)', err)]
@@ -53,7 +54,7 @@ def main(cfg_path, out):
     phrases, track, cursor = [], [], 0.0
     for ch in cfg['chunks']:
         cid = ch['id']; path = next(os.path.join(vo, f) for f in sorted(os.listdir(vo)) if f.startswith(cid + '.'))
-        a = load(path); dur = len(a) / SR; segs = segments(path, dur); texts = ch['phrases']
+        a = load(path); dur = len(a) / SR; segs = segments(path, dur, ch.get('min_sil', 0.15)); texts = ch['phrases']
         if len(segs) != len(texts):
             sys.exit(f'chunk {cid}: {len(segs)} speech segments {[[round(x,2) for x in s] for s in segs]} but {len(texts)} phrases')
         g0 = ch['start'] if 'start' in ch else cursor + ch.get('gap', .8)
