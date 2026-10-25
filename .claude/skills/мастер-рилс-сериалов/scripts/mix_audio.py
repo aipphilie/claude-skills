@@ -14,6 +14,7 @@ sound.json:
     {"type": "rotor", "start": 38.4, "end": 40.9},               # helicopter
     {"type": "office", ...}  # computers/fans + mains hum (dispatch room, office)
     {"type": "line", ...}    # old phone line: band-limited hiss + crackle (under a voice on the phone)
+    {"type": "fire", ...}    # fire roar + crackle (smoke/fire scenes, a crackling silent call)
     {"type": "siren", ...}   # distant ambulance wail;  {"type": "rumble", ...} engine rising toward a crash
   ],
   "events": [     # one-shots
@@ -96,6 +97,10 @@ def main(cfg_path, out):
             band = hi - onepole(hi, .02); bus += band * env * 1.4
             for c in rng.uniform(a, e, max(1, int((e - a) * 3))):
                 add(c, rng.standard_normal(int(.004*SR)) * np.exp(-np.arange(int(.004*SR)) / 40), .25 * g)
+        elif ty == 'fire':      # burning room behind a door / in the receiver: low roar + dry crackle pops ("rate" pops per second)
+            bus += lo * 1.1 * env * (.8 + .2 * np.sin(t * 3.1))
+            for c in rng.uniform(a, e, max(1, int((e - a) * b.get('rate', 9)))):
+                n = int(rng.uniform(.002, .009) * SR); add(c, rng.standard_normal(n) * np.exp(-np.arange(n) / (n / 4)), rng.uniform(.08, .35) * g)
         elif ty == 'siren':
             f = 750 + 280*np.sin(2*np.pi*.35*t); ph = np.cumsum(2*np.pi*f/SR); bus += onepole(np.sin(ph), .08) * env * .12
         elif ty == 'rumble':
