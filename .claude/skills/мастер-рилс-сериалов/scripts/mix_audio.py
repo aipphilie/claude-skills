@@ -131,6 +131,12 @@ def main(cfg_path, out):
         elif ty == 'step': add(at, noise(.09, .35, 40), .3*g)
         elif ty == 'pop': add(at, noise(.15, .5, 25), .55*g); add(at, tone(180, .08, 40), .4*g)
         elif ty == 'marker': add(at, noise(.4, .6, 6) * .5, .22*g)
+        elif ty == 'file':      # recorded/generated one-shot, e.g. {"type":"file","path":"sfx/cry.mp3","t":"@06.1+0.6","gain":2.2,"dur":2.6,"af":"highpass=f=180"}
+            raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', os.path.join(os.path.dirname(os.path.abspath(cfg_path)), ev['path'])] + (['-af', ev['af']] if ev.get('af') else []) +
+                                 ['-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'], capture_output=True).stdout
+            s = np.frombuffer(raw, np.float32).astype(np.float64)
+            if ev.get('dur'): n = int(ev['dur'] * SR); s = s[:n] * np.minimum(1, (n - np.arange(min(n, len(s)))) / (.15 * SR))
+            add(at, s, g)
         elif ty == 'creak':
             n = int(.9*SR); add(at, noise(.9, .02, 2) * np.sin(2*np.pi*np.linspace(90, 60, n)*np.arange(n)/SR), .45*g)
 

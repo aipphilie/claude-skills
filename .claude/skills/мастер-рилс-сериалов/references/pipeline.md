@@ -25,6 +25,9 @@ python3 timeline.py voice_config.json .        # → voice.wav, timeline.json, t
 PAGE=episode.html node render.js stills 2,8,12.6,18     # кадры для проверки → still_<t>.png
 ffmpeg -i still_2.png -i still_8.png ... -filter_complex "xstack=inputs=N:layout=...,scale=1800:-1" grid.jpg
 PAGE=episode.html node render.js video ep_noaudio.mp4 <TOTAL>   # фоном: ~15 мин на 2 мин видео
+# быстрее: 4 куска параллельно (по ядру на кусок), затем склейка без перекодирования
+#   START=<сек> PAGE=… node render.js video partK.mp4 <длина куска> &   …; wait
+#   ffmpeg -f concat -safe 0 -i parts.txt -c copy ep_noaudio.mp4
 python3 mix_audio.py sound.json .              # → mix.wav (−14 LUFS)
 ffmpeg -i ep_noaudio.mp4 -i mix.wav -c:v libx264 -preset fast -crf 21 -pix_fmt yuv420p \
        -c:a aac -b:a 192k -shortest -movflags +faststart episode.mp4
@@ -78,3 +81,8 @@ function safeOverlay(){ctx.save();ctx.fillStyle='rgba(255,60,60,.28)';
 Варианты персонажа и аватарок рендерятся той же связкой: страница с `renderFrame()`, рисующая
 на offscreen-канвасы, затем `toDataURL` → PNG. Всегда показывай аватарку и в реальном размере
 (110 px и 48 px): так её видят в профиле и комментариях.
+
+- **Длинное слово в субтитрах** («ВОСЕМНАДЦАТИЛЕТНИЙ») не влезает в 76 px: в `captions()` масштабируй строку
+  `k=min(1,840/maxLineWidth)` вокруг центра.
+- **Камера и подложка.** Если подложка сцены (`drawImage(BG)`) нарисована до `zoomAt`, а детали после, при наезде
+  детали «уезжают» с подложки. Рисуй подложку внутри того же `save/zoomAt/restore`.
