@@ -11,13 +11,17 @@ sound.json:
     {"type": "storm", "start": 22.9, "end": 35.5},              # strong wind
     {"type": "hum",   "start": 35.5, "end": 43.3, "hz": 50},     # generator / mains hum
     {"type": "drone", "start": 43.3, "end": 120, "gain": 0.8},   # low tension pad
-    {"type": "rotor", "start": 38.4, "end": 40.9}                # helicopter
+    {"type": "rotor", "start": 38.4, "end": 40.9},               # helicopter
+    {"type": "office", ...}  # computers/fans + mains hum (dispatch room, office)
+    {"type": "line", ...}    # old phone line: band-limited hiss + crackle (under a voice on the phone)
+    {"type": "siren", ...}   # distant ambulance wail;  {"type": "rumble", ...} engine rising toward a crash
   ],
   "events": [     # one-shots
     {"type": "beep", "t": 0.15}, {"type": "thump", "t": 1.0}, {"type": "whoosh", "t": 10.75},
     {"type": "ping", "t": 13.0}, {"type": "paper", "t": 9.0}, {"type": "knock", "t": 59.5},
     {"type": "tick", "t": 80.0}, {"type": "step", "t": 24.0}, {"type": "pop", "t": 74.2},
-    {"type": "marker", "t": 102.2}, {"type": "creak", "t": 23.1}
+    {"type": "marker", "t": 102.2}, {"type": "creak", "t": 23.1},
+    {"type": "ring"}, {"type": "busy"}, {"type": "click"}, {"type": "stamp"}, {"type": "crash"}   # phone/console/impact
   ]
 }
 Times may also be written as "@<phrase id>" (phrase start) or "@<phrase id>+0.3".
@@ -27,6 +31,7 @@ Mixing rules baked in (learned the hard way — see references/sound_design.md):
  * everything that is not voice (beds AND one-shots) dips by ~35% while the narrator speaks,
    with a soft attack/release so nothing "pumps";
  * one-shots are kept modest; put loud accents in the pauses between phrases;
+ * BED: the whole non-voice bus sits 2.5× lower than it used to (author, «112» ep.1: "background hurts the ears");
  * final loudness is normalised to −14 LUFS, true peak −1.5 dB.
 """
 import json, wave, sys, os, re, subprocess
@@ -42,6 +47,7 @@ except ImportError:  # slow fallback
 
 SR = 48000
 DUCK = 0.35          # how much non-voice sound dips under speech (0.30–0.40 sounds right)
+BED = 0.55 / 2.5    # background level vs voice: author asked for 2.5× quieter beds and effects (they hurt the ears)
 
 def main(cfg_path, out):
     cfg = json.load(open(cfg_path)); TL = json.load(open(os.path.join(out, 'timeline.json')))
@@ -84,6 +90,16 @@ def main(cfg_path, out):
             hz = b.get('hz', 50); bus += (np.sin(2*np.pi*hz*t)*.5 + np.sin(4*np.pi*hz*t)*.3 + np.sin(6*np.pi*hz*t)*.15) * env * .09
         elif ty == 'drone':
             bus += (np.sin(2*np.pi*55*t) + .5*np.sin(2*np.pi*82.4*t) + .25*np.sin(2*np.pi*110.3*t)) * env * .08
+        elif ty == 'office':
+            fan = onepole(w, .02) * 1.2; bus += (fan + (np.sin(2*np.pi*50*t)*.5 + np.sin(2*np.pi*100*t)*.25) * .06) * env * .55
+        elif ty == 'line':
+            band = hi - onepole(hi, .02); bus += band * env * 1.4
+            for c in rng.uniform(a, e, max(1, int((e - a) * 3))):
+                add(c, rng.standard_normal(int(.004*SR)) * np.exp(-np.arange(int(.004*SR)) / 40), .25 * g)
+        elif ty == 'siren':
+            f = 750 + 280*np.sin(2*np.pi*.35*t); ph = np.cumsum(2*np.pi*f/SR); bus += onepole(np.sin(ph), .08) * env * .12
+        elif ty == 'rumble':
+            ramp = np.clip((t - a) / max(.1, e - a), 0, 1) ** 2; bus += onepole(w, .004) * 6 * ramp * env
         elif ty == 'rotor':
             bus += (.5 + .5*np.sign(np.sin(2*np.pi*4.6*t))) * onepole(w, .05) * 3 * np.sin(np.clip((t-a)/(e-a), 0, 1)*np.pi) * env * .5
 
@@ -91,6 +107,15 @@ def main(cfg_path, out):
         at, g, ty = T(ev['t']), ev.get('gain', 1.), ev['type']
         if ty == 'beep':
             s = tone(1150, .13) + .25*tone(2300, .13); s *= np.minimum(1, (.13 - np.arange(len(s))/SR)/.006); add(at, s, .35*g)
+        elif ty == 'ring':
+            n = int(.42*SR); tt = np.arange(n)/SR; f = np.where(np.sin(2*np.pi*22*tt) > 0, 1020, 1280)
+            sig = np.sin(np.cumsum(2*np.pi*f/SR)) * np.minimum(1, tt/.01) * np.minimum(1, (.42-tt)/.02); add(at, sig, .22*g)
+        elif ty == 'busy': s = tone(425, .35); s *= np.minimum(1, (.35 - np.arange(len(s))/SR)/.01); add(at, s, .22*g)
+        elif ty == 'click': add(at, noise(.015, .7, 300), .5*g); add(at, tone(2400, .01), .1*g)
+        elif ty == 'stamp': add(at, thump(.35, 70), .7*g); add(at, noise(.05, .3, 60), .4*g)
+        elif ty == 'crash':
+            add(at, thump(1.2, 38), 1.2*g); add(at, noise(1.0, .3, 4), 1.0*g)
+            for k in range(26): add(at + .05 + rng.uniform(0, .9), tone(rng.uniform(2500, 6000), .12, 40), .05*g)
         elif ty == 'thump': add(at, thump(), .6*g)
         elif ty == 'whoosh':
             n = int(.5*SR); add(at, onepole(rng.standard_normal(n), .15) * np.sin(np.pi*np.arange(n)/n)**2, 1.1*g)
@@ -110,7 +135,7 @@ def main(cfg_path, out):
     lvl = onepole(np.abs(v), .002); speech = np.clip(lvl / (np.percentile(lvl[lvl > 1e-4], 60) + 1e-9), 0, 1)
     look = int(.12 * SR); speech = np.concatenate([speech[look:], np.zeros(look)])
     rel = onepole(speech, 1 / (.4 * SR)); duck = 1 - DUCK * np.clip(np.maximum(speech, rel), 0, 1)
-    mix = v + bus * .55 * duck
+    mix = v + bus * BED * duck
     tmp = os.path.join(out, '_mix_raw.wav')
     with wave.open(tmp, 'wb') as f:
         f.setnchannels(1); f.setsampwidth(2); f.setframerate(SR); f.writeframes((np.clip(mix * .7, -1, 1) * 32767).astype(np.int16).tobytes())
