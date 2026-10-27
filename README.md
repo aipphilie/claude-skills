@@ -4,7 +4,7 @@
 
 - `.claude/skills/` — скиллы: HyperFrames, ui-ux-pro-max, taste-skill, impeccable, emilkowalski/skills
 - `.claude/skills/идеи-сериалов`, `.claude/skills/мастер-рилс-сериалов` — мои скиллы: идеи мистических сериалов и производство рилсов (сценарий, озвучка, анимация, монтаж, звук)
-- `.claude/skills/Ярик/` — скиллы канала «Как работает Ярик»: `yarik-ideas` (идеи роликов), `yarik-montage` (монтаж Reels), `yarik-shared` (общий YARIK.md и полная концепция)
+- `.claude/skills/yarik-ideas`, `.claude/skills/yarik-montage` — скиллы канала «Как работает Ярик»: идеи роликов и монтаж Reels. В каждой папке лежит полная концепция `КОНЦЕПЦИЯ.md`
 - `.claude/skills/higgsfield-*` — скиллы Higgsfield (генерация картинок и видео)
 - `.claude/settings.json` — плагин Remotion (подтягивается из маркетплейса remotion-dev/claude-code-plugin) и автоустановка программы Higgsfield при старте сессии
 
