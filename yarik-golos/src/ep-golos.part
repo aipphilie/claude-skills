@@ -1,0 +1,135 @@
+// ---------- серия: Почему свой голос на записи бесит (сценарий v2 после петли вовлечённости) ----------
+const NIGHTB='#2E2A3E',RADIO='#B07A5E',VELVET='#7A2E3A';
+// из ep-primer: большой телефон, пузырь с текстом
+function phoneBig(g,t,fn){rr(g,-170,-300,340,600,46);fs(g,P.choc,P.choc,6);rr(g,-150,-270,300,540,28);fs(g,'#FBF5EA',null);g.save();rr(g,-150,-270,300,540,28);g.clip();fn&&fn(g,t);g.restore()}
+function bubbleTxt(g,s,size=48,col=P.cream){g.font=`900 ${size}px ${F}`;const w=g.measureText(s).width+60;rr(g,-w/2,-size,w,size*2,size*.6);fs(g,col,P.choc,6);
+  g.beginPath();g.moveTo(-20,size-2);g.lineTo(-44,size+40);g.lineTo(14,size-2);g.closePath();fs(g,col,null);g.strokeStyle=P.choc;g.lineWidth=6;g.beginPath();g.moveTo(-20,size);g.lineTo(-44,size+40);g.lineTo(14,size);g.stroke();txt(g,s,0,3,size,P.choc)}
+// голосовое сообщение: кнопка play + волна; k — сколько проиграно
+function voiceMsg(g,t,k=0,col=P.sage,w=250){rr(g,-w/2-50,-44,w+100,88,44);fs(g,col,P.choc,5);g.beginPath();g.arc(-w/2-6,0,30,0,7);fs(g,P.cream,P.choc,4);
+  g.beginPath();g.moveTo(-w/2-16,-14);g.lineTo(-w/2-16,14);g.lineTo(-w/2+10,0);g.closePath();g.fillStyle=P.choc;g.fill();
+  const n=18;for(let i=0;i<n;i++){const h=10+Math.abs(Math.sin(i*1.9+(i/n<k?t*14:0)))*30*(.5+.5*Math.abs(Math.sin(i*.7)));rr(g,-w/2+44+i*(w-50)/n,-h/2,7,h,3);g.fillStyle=i/n<k?P.choc:'rgba(74,47,36,.4)';g.fill()}}
+// микрофон
+function mic(g,on=1,t=0){if(on){g.save();g.globalCompositeOperation='lighter';glow(g,0,-60,170,'217,164,65',.25);g.restore()}
+  rr(g,-60,-190,120,210,60);fs(g,'#8C8A86',P.choc,7);g.strokeStyle='rgba(74,47,36,.55)';g.lineWidth=4;for(let y=-160;y<0;y+=26){g.beginPath();g.moveTo(-50,y);g.lineTo(50,y);g.stroke()}
+  rr(g,-74,-10,148,26,10);fs(g,'#6B6460',P.choc,5);rr(g,-10,16,20,170,6);fs(g,'#6B6460',P.choc,5);rr(g,-80,184,160,24,10);fs(g,'#6B6460',P.choc,5)}
+// табличка ON AIR
+function onAir(g,t){const on=Math.sin(t*9)>-.3;rr(g,-150,-50,300,100,18);fs(g,on?RED:'#7E4A40',P.choc,6);txt(g,'ON AIR',0,4,54,on?'#FBF5EA':'#C9A090')}
+// корона
+function crown(g){g.beginPath();g.moveTo(-90,40);g.lineTo(-90,-40);g.lineTo(-45,0);g.lineTo(0,-60);g.lineTo(45,0);g.lineTo(90,-40);g.lineTo(90,40);g.closePath();fs(g,P.mustard,P.choc,7);for(const x of [-45,0,45]){g.beginPath();g.arc(x,18,10,0,7);fs(g,P.terra,P.choc,3)}}
+// ухо в разрезе головы + улитка
+function earIn(g,lit=0){g.beginPath();g.ellipse(0,0,46,66,0,0,7);fs(g,P.peach,P.choc,6);at(g,4,0,.9,()=>swirl(g,lit?P.mustard:P.choc));
+  if(lit){g.save();g.globalCompositeOperation='lighter';glow(g,0,0,110,'217,164,65',.45);g.restore()}}
+// голова в разрезе (headCut из ep11) + ухо + кости черепа; mode: 0 — просто, 1 — воздух, 2 — кости, 3 — оба
+function skullHead(g,t,mode=0,talk=1){headCut(g,t,talk,0);const hot=mode>=2;
+  // кость черепа вдоль свода
+  g.save();if(hot){g.translate(Math.sin(t*60)*2,Math.cos(t*55)*2)}
+  g.strokeStyle=hot?P.mustard:'rgba(246,238,221,.85)';g.lineWidth=hot?20:14;g.lineCap='round';g.beginPath();g.moveTo(-150,-250);g.bezierCurveTo(40,-312,190,-230,198,-90);g.stroke();
+  g.beginPath();g.moveTo(-205,-60);g.bezierCurveTo(-250,-180,-220,-240,-150,-250);g.stroke();
+  // нижняя челюсть
+  g.beginPath();g.moveTo(200,180);g.quadraticCurveTo(140,236,40,236);g.lineTo(-40,200);g.stroke();g.restore();
+  at(g,-120,-40,1,()=>earIn(g,hot));
+  // голосовые связки
+  rr(g,-8,210,44,90,14);fs(g,P.terraL,P.choc,5);
+  if(talk)at(g,300,130,1.3,()=>waves(g,t,'rgba(246,238,221,.9)'));
+  if(mode===1||mode===3){// воздух: точки идут изо рта вокруг головы к уху
+    const path=k=>{const pts=[[300,130],[400,40],[400,-220],[150,-400],[-180,-380],[-330,-200],[-200,-40]];const n=pts.length-1,f=k*n,i=Math.min(n-1,Math.floor(f)),u=f-i;return [pts[i][0]+(pts[i+1][0]-pts[i][0])*u,pts[i][1]+(pts[i+1][1]-pts[i][1])*u]};
+    g.fillStyle=P.sage;for(let i=0;i<16;i++){const k=(t*.55+i/16)%1,[x,y]=path(k);g.globalAlpha=.4+.6*Math.sin(k*Math.PI);g.beginPath();g.arc(x,y,13,0,7);fs(g,'#BFD8B4',P.choc,3)}g.globalAlpha=1}
+  if(mode>=2){// кости: вибрация от связок к уху внутри головы
+    g.strokeStyle=P.mustard;g.lineWidth=12;g.lineCap='round';g.setLineDash([22,16]);g.lineDashOffset=-t*160;g.beginPath();g.moveTo(14,210);g.quadraticCurveTo(-20,80,-100,-10);g.stroke();g.setLineDash([]);
+    for(let i=0;i<4;i++){const j=Math.sin(t*50+i)*6;g.strokeStyle=P.mustard;g.lineWidth=6;g.beginPath();g.moveTo(-60+i*80,-330+j);g.lineTo(-60+i*80,-370+j);g.stroke()}}}
+// эквалайзер: низкие и высокие; low/high 0..1
+function eq(g,t,low=1,high=1,col=P.mustard){for(let i=0;i<10;i++){const v=(i<4?low:high)*(.55+.45*Math.abs(Math.sin(t*7+i*1.3)));const h=30+300*v;rr(g,-300+i*62,180-h,46,h,10);fs(g,i<4?col:'#9C8A7E',P.choc,4)}
+  txt(g,'НИЗКИЕ',-205,230,34,P.cream);txt(g,'ВЫСОКИЕ',165,230,34,P.cream)}
+// радиоприёмник
+function radio(g,t){rr(g,-200,-120,400,240,30);fs(g,RADIO,P.choc,7);g.beginPath();g.arc(-80,10,80,0,7);fs(g,'#8A5A44',P.choc,6);g.strokeStyle='rgba(74,47,36,.6)';g.lineWidth=4;for(let r=20;r<80;r+=18){g.beginPath();g.arc(-80,10,r,0,7);g.stroke()}
+  rr(g,40,-70,130,50,10);fs(g,P.cream,P.choc,4);g.strokeStyle=RED;g.lineWidth=4;g.beginPath();g.moveTo(80+Math.sin(t*2)*20,-66);g.lineTo(80+Math.sin(t*2)*20,-24);g.stroke();
+  for(const x of [70,140]){g.beginPath();g.arc(x,40,22,0,7);fs(g,P.mustard,P.choc,4)}g.strokeStyle=P.choc;g.lineWidth=6;g.beginPath();g.moveTo(150,-120);g.lineTo(220,-250);g.stroke()}
+// силуэт (тёмный человек)
+function shade(g,x,y,s){person(g,x,y,s,{shirt:'#1E1612',hair:'#1E1612',skin:'#1E1612'})}
+// мама: короткая стрижка, кофта
+function mom(g,x,y,s,t){person(g,x,y,s,{shirt:P.terraL,hair:'#6B4A3A',look:-.3})}
+// счётчик повторов
+function repeatBadge(g,n){g.beginPath();g.arc(0,0,90,0,7);fs(g,P.mustard,P.choc,7);txt(g,'×'+n,0,6,80,P.choc)}
+// палец, прищемлённый дверью
+function finger(g){rr(g,0,-26,170,52,26);fs(g,P.peach,P.choc,6);g.beginPath();g.ellipse(150,0,16,18,0,0,7);fs(g,'#F6E3D6',P.choc,3)}
+
+let SC=[
+ // 0 — холодный старт звуком: писклявое голосовое
+ {txt:'Пацаны, здарова!',bg:P.beige,est:1.6,cw:['Пацаны,','здарова!'],draw(g,t,d){shots(g,t,d,[
+   [.8,(g,t)=>{bgFill(g,P.cream);at(g,420,495,1.25,()=>phoneBig(g,t,(g)=>{g.fillStyle='#FBF5EA';g.fillRect(-150,-270,300,540);txt(g,'Пацаны 🔥',0,-220,30,P.choc,800);at(g,0,40,.62,()=>voiceMsg(g,t,eo(t/.8)))}))},{zoom:1.5,shake:3,flash:0}],
+   [.8,(g,t)=>{bgFill(g,P.terraL);yk(g,420,560,1.5,'shock',t,{shake:5,flush:.3});at(g,420,150,pop(t,.05),()=>stamp(g,'ЧТО ЭТО?!',0,0,P.choc,t,0,-.08,72))},{zoom:1.8,shake:8}]])}},
+ // 1 — хук
+ {txt:'[excited] Ярик впервые услышал себя в голосово́м. [scoffing] И захоте́л сменить имя, город и голос.',bg:P.beige,cw:['Ярик','услышал','И','имя,','город','голос.'],draw(g,t,d){shots(g,t,d,[
+   [1.2,(g,t)=>{bgFill(g,P.beige);yk(g,420,600,1.35,'shock',t,{look:.2});at(g,420,140,pop(t,.1),()=>plaque(g,'ПЕРВЫЙ РАЗ',P.mustard,64))},{zoom:1.6,shake:4}],
+   [1.3,(g,t)=>{bgFill(g,P.cream);yk(g,260,620,.75,'shock',t,{look:.6});at(g,610,470,1,()=>phoneBig(g,t,(g)=>{g.fillStyle='#FBF5EA';g.fillRect(-150,-270,300,540);at(g,0,0,.55,()=>voiceMsg(g,t,.3+t*.4))}));at(g,420,880,pop(t,.2),()=>plaque(g,'ГОЛОСОВОЕ',P.sage,54))},{zoom:1.3}],
+   [1.1,(g,t)=>{bgFill(g,P.terra);yk(g,420,620,1,'firm',t,{flush:.4});at(g,420,140,pop(t,.1),()=>plaque(g,'СМЕНИТЬ ВСЁ',P.cream,60))},{zoom:1.35,shake:3}],
+   [.6,(g,t)=>{bgFill(g,P.terra);stamp(g,'ИМЯ ✗',420,250,P.choc,t,0,-.1,96)},{zoom:1.2,shake:6,flash:0}],
+   [.6,(g,t)=>{bgFill(g,P.terra);stamp(g,'ИМЯ ✗',420,250,P.choc,9,0,-.1,96);stamp(g,'ГОРОД ✗',420,495,P.choc,t,0,.06,96)},{zoom:1.15,shake:6,flash:0}],
+   [1.2,(g,t)=>{bgFill(g,P.terra);stamp(g,'ИМЯ ✗',420,250,P.choc,9,0,-.1,96);stamp(g,'ГОРОД ✗',420,495,P.choc,9,0,.06,96);stamp(g,'ГОЛОС ✗',420,740,P.mustard,t,0,-.05,110)},{zoom:1.25,shake:10,flash:0}]])}},
+ // 2 — интрига: кто ещё слышит
+ {txt:'[whispering] Но самое стра́шное даже не это. [pause] А то, кто ещё слышит его вот так.',bg:P.darker,cw:['Но','даже','А','кто'],draw(g,t,d){shots(g,t,d,[
+   [1.6,(g,t)=>{bgFill(g,NIGHTB);g.save();g.globalCompositeOperation='lighter';glow(g,420,420,360,'246,238,221',.18);g.restore();yk(g,420,620,.85,'norm',t,{look:-.6+Math.sin(t*2)*.4});at(g,420,140,pop(t,.2),()=>plaque(g,'САМОЕ СТРАШНОЕ',P.terra,52,P.cream))},{zoom:1.3,push:.08}],
+   [1.0,(g,t)=>{bgFill(g,NIGHTB);yk(g,420,560,1.4,'shock',t,{look:-.8});at(g,420,860,pop(t,.1),()=>plaque(g,'ДАЖЕ НЕ ЭТО',P.cream,54))},{zoom:1.5,shake:3}],
+   [1.2,(g,t)=>{bgFill(g,NIGHTB);for(let i=0;i<3;i++)if(t>.1+i*.25)shade(g,190+i*230,330+(i%2)*40,.62);yk(g,420,700,.7,'shock',t,{look:.5})},{zoom:1.25}],
+   [1.6,(g,t)=>{bgFill(g,NIGHTB);for(let i=0;i<3;i++)shade(g,190+i*230,420,.7);at(g,420,170,pop(t,.05),()=>qmark(g,P.mustard,180));at(g,420,860,pop(t,.3),()=>plaque(g,'КТО ЕЩЁ?',P.mustard,64))},{zoom:1.4,shake:3}]])}},
+ // 3 — ожидание vs реальность
+ {txt:'[playful] Он думал, что звучит как диктор с радио. [chuckling] А звучит как пятикла́ссник, которому дверью прищеми́ли палец.',bg:P.cream,cw:['Он','диктор','А','пятиклассник,','дверью'],draw(g,t,d){shots(g,t,d,[
+   [1.2,(g,t)=>{bgFill(g,P.cream);rays(g,420,495,'rgba(217,164,65,.25)',t);yk(g,300,600,.8,'smile',t,{look:.5});at(g,640,560,.9,()=>mic(g,1,t));at(g,420,130,pop(t,.1),()=>plaque(g,'ПО ЕГО МНЕНИЮ',P.cream,50))},{zoom:1.3}],
+   [1.3,(g,t)=>{bgFill(g,P.mustard);rays(g,420,495,'rgba(246,238,221,.3)',t*2);at(g,420,560,1.4,()=>radio(g,t));notes(g,t,420,300,4,P.cream,400);at(g,420,140,pop(t,.1),()=>onAir(g,t))},{zoom:1.35}],
+   [1.0,(g,t)=>{bgFill(g,P.terraL);stamp(g,'А НА САМОМ ДЕЛЕ',420,495,P.choc,t,0,-.06,62)},{zoom:1.5,shake:6}],
+   [1.0,(g,t)=>{bgFill(g,P.sage);yk(g,420,620,1,'shock',t,{flush:.5,shake:2});at(g,420,140,pop(t,.1),()=>plaque(g,'5 «Б» КЛАСС',P.cream,60))},{zoom:1.4}],
+   [1.6,(g,t)=>{bgFill(g,P.terra);at(g,250,520,1.6,()=>door(g,t,1));at(g,330+Math.sin(t*50)*4,520,1,()=>finger(g));at(g,600,300,pop(t,.15),()=>bang(g,'АЙ!',P.mustard));yk(g,650,720,.55,'cry',t,{tears:eo(t/.8),shake:3})},{zoom:1.35,shake:7}]])}},
+ // 4 — переход внутрь + два пути
+ {txt:'[playful] А теперь заглянем к нему в башку́. [excited] Когда Ярик говорит, звук идёт к ушам двумя путями.',bg:P.darker,cw:['А','в','Когда','двумя'],draw(g,t,d){shots(g,t,d,[
+   [1.3,(g,t,sd)=>{bgFill(g,P.cream);const z=1+Math.pow(t/sd,2)*7;at(g,420,495,1.6*z,()=>eye(g,1));if(t>sd-.3){g.fillStyle=`rgba(42,30,24,${clamp((t-sd+.3)/.3)})`;g.fillRect(-200,-200,1240,1390)}},{zoom:1.05,flash:0}],
+   [.9,(g,t)=>{tunnel(g,t);at(g,420,860,pop(t,.1),()=>plaque(g,'В БАШКУ',P.mustard,64))},{zoom:1.2,speed:1}],
+   [1.6,(g,t)=>{brainIn(g,t,1);at(g,450,470,.74,()=>skullHead(g,t,0,1));at(g,420,900,pop(t,.2),()=>plaque(g,'ЯРИК ГОВОРИТ',P.cream,50))},{zoom:1.3}],
+   [1.6,(g,t)=>{brainIn(g,t,1);at(g,450,470,.74,()=>skullHead(g,t,3,1));at(g,420,900,pop(t,.2),()=>plaque(g,'ДВА ПУТИ',P.mustard,60))},{zoom:1.25,push:.05}]])}},
+ // 5 — путь 1 и путь 2
+ {txt:'Путь первый: через воздух. Как у всех. Путь второй: изнутри, через кости че́репа. Кости лучше передают ни́зкие частоты, и голос становится ниже и глубже.',bg:P.darker,cw:['Путь','через','Как','Путь','изнутри,','Кости','и','ниже'],draw(g,t,d){shots(g,t,d,[
+   [.8,(g,t)=>{bgFill(g,P.sage);rays(g,420,495,'rgba(246,238,221,.3)',t*3);stamp(g,'ПУТЬ 1',420,495,P.choc,t,0,-.08,130)},{zoom:1.5,shake:6}],
+   [1.8,(g,t)=>{brainIn(g,t,1);at(g,450,480,.74,()=>skullHead(g,t,1,1));at(g,420,900,pop(t,.2),()=>plaque(g,'ПО ВОЗДУХУ',P.sage,54))},{zoom:1.25}],
+   [1.2,(g,t)=>{bgFill(g,P.beige);crowd(g,t,0,8);at(g,420,880,pop(t,.1),()=>plaque(g,'КАК У ВСЕХ',P.cream,56))},{zoom:1.3}],
+   [.8,(g,t)=>{bgFill(g,P.mustard);rays(g,420,495,'rgba(246,238,221,.3)',t*3);stamp(g,'ПУТЬ 2',420,495,P.choc,t,0,.08,130)},{zoom:1.5,shake:6}],
+   [2.4,(g,t)=>{brainIn(g,t,1);at(g,450,480,.74,()=>skullHead(g,t,2,1));at(g,420,900,pop(t,.2),()=>plaque(g,'КОСТИ ЧЕРЕПА',P.mustard,54))},{zoom:1.25,shake:2}],
+   [2.0,(g,t)=>{bgFill(g,P.dark);at(g,420,470,1,()=>eq(g,t,1,.35));at(g,420,130,pop(t,.1),()=>plaque(g,'НИЗКИЕ ЧАСТОТЫ',P.mustard,52))},{zoom:1.25}],
+   [1.6,(g,t)=>{bgFill(g,VELVET);rays(g,420,495,'rgba(217,164,65,.2)',t);yk(g,420,620,.95,'smile',t,{blink:1});at(g,420,140,pop(t,.1),()=>plaque(g,'ГОЛОС В ГОЛОВЕ',P.mustard,56))},{zoom:1.3,push:.05}],
+   [1.2,(g,t)=>{bgFill(g,P.dark);at(g,420,470,1,()=>eq(g,t,1,.3));for(let i=0;i<3;i++)at(g,200+i*220,140+((t*200+i*60)%120),1,()=>arrow(g,90,P.mustard),Math.PI/2);at(g,420,860,pop(t,.1),()=>plaque(g,'НИЖЕ И ГЛУБЖЕ',P.mustard,56))},{zoom:1.35,shake:2}]])}},
+ // 6 — бас в голове vs микрофон
+ {txt:'Вот этот бархатный бас Ярик и считает своим голосом. [pause] А микрофон слышит только воздух. Без басов. Без бархата. [chuckling] Голый Ярик как есть.',bg:P.darker,cw:['Вот','Ярик','А','только','Без','Без','Голый'],draw(g,t,d){shots(g,t,d,[
+   [1.4,(g,t)=>{bgFill(g,VELVET);rays(g,420,495,'rgba(217,164,65,.28)',t);yk(g,420,620,.95,'smile',t,{blink:1});notes(g,t,420,320,4,P.mustard,500);at(g,420,130,pop(t,.1),()=>plaque(g,'БАРХАТНЫЙ БАС',P.mustard,54))},{zoom:1.3}],
+   [1.4,(g,t)=>{bgFill(g,P.cream);yk(g,420,680,.8,'smile',t,{look:-.3});at(g,420,230,pop(t,.1),()=>bubbleTxt(g,'ЭТО МОЙ ГОЛОС',46))},{zoom:1.3}],
+   [1.3,(g,t)=>{bgFill(g,P.dark);at(g,420,520,1.5,()=>mic(g,1,t));at(g,420,880,pop(t,.2),()=>plaque(g,'МИКРОФОН',P.cream,56))},{zoom:1.35,shake:2}],
+   [1.3,(g,t)=>{bgFill(g,P.dark);at(g,560,520,1.2,()=>mic(g,1,t));for(let i=0;i<10;i++){const k=(t*.9+i/10)%1;g.globalAlpha=Math.sin(k*Math.PI);g.beginPath();g.arc(80+k*400,420+Math.sin(k*9+i)*60,14,0,7);fs(g,'#BFD8B4',P.choc,3);g.globalAlpha=1}at(g,420,140,pop(t,.1),()=>plaque(g,'ТОЛЬКО ВОЗДУХ',P.sage,52))},{zoom:1.25}],
+   [.9,(g,t)=>{bgFill(g,P.dark);at(g,420,430,1,()=>eq(g,t,1-eo(t/.6)*.85,.5,P.terra));stamp(g,'БЕЗ БАСОВ',420,860,P.terra,t,.2,-.06,64)},{zoom:1.3,shake:4}],
+   [.9,(g,t)=>{bgFill(g,P.dark);at(g,420,430,1,()=>eq(g,t,.15,.5,P.terra));stamp(g,'БЕЗ БАСОВ',420,860,P.terra,9,0,-.06,64);stamp(g,'БЕЗ БАРХАТА',420,160,P.mustard,t,.05,.06,60)},{zoom:1.15,shake:4,flash:0}],
+   [1.6,(g,t)=>{bgFill(g,P.terraL);yk(g,420,620,1.1,'shock',t,{flush:eo(t/.8),shake:2});at(g,420,140,pop(t,.2),()=>stamp(g,'КАК ЕСТЬ',0,0,P.choc,t,0,-.08,80))},{zoom:1.5,shake:3}]])}},
+ // 7 — поворот: слышат все
+ {txt:'[scoffing] Так кто ещё слышит его вот так? [pause] Все. Пацаны, мама, бы́вшая. Для них это и есть Ярик. А Ярик двадцать лет думал, что он Шаля́пин.',bg:P.darker,cw:['Так','вот','Все.','Пацаны,','мама,','бывшая.','Для','А','что'],draw(g,t,d){shots(g,t,d,[
+   [1.5,(g,t)=>{bgFill(g,NIGHTB);for(let i=0;i<3;i++)shade(g,190+i*230,420,.7);at(g,420,160,1+.05*Math.sin(t*8),()=>qmark(g,P.mustard,180))},{zoom:1.3,push:.05}],
+   [1.0,(g,t)=>{bgFill(g,NIGHTB);for(let i=0;i<3;i++)shade(g,190+i*230,420,.7);yk(g,420,780,.5,'shock',t,{shake:2});at(g,420,140,pop(t,.05),()=>plaque(g,'ВОТ ТАК?',P.mustard,64))},{zoom:1.5,shake:4}],
+   [1.0,(g,t)=>{bgFill(g,P.mustard);rays(g,420,495,'rgba(246,238,221,.35)',t*3);stamp(g,'ВСЕ',420,495,P.choc,t,0,-.08,180)},{zoom:1.6,shake:8}],
+   [.8,(g,t)=>{bgFill(g,P.sage);friend(g,260,560,.55,'laugh',t);friend(g,580,560,.55,'laugh',t);at(g,420,130,pop(t,.05),()=>plaque(g,'ПАЦАНЫ',P.cream,60))},{zoom:1.3}],
+   [.8,(g,t)=>{bgFill(g,P.cream);mom(g,420,330,1.7,t);at(g,420,860,pop(t,.05),()=>plaque(g,'МАМА',P.mustard,64))},{zoom:1.3}],
+   [.9,(g,t)=>{bgFill(g,P.terraL);girl(g,420,560,.6,t);at(g,420,130,pop(t,.05),()=>plaque(g,'БЫВШАЯ',P.cream,64))},{zoom:1.3,shake:2}],
+   [1.6,(g,t)=>{bgFill(g,P.beige);friend(g,150,600,.38,'norm',t);mom(g,330,380,.95,t);girl(g,690,620,.38,t);yk(g,500,760,.42,'cry',t,{tears:.6});at(g,420,120,pop(t,.2),()=>plaque(g,'ЭТО И ЕСТЬ ЯРИК',P.mustard,50))},{zoom:1.25}],
+   [1.4,(g,t)=>{bgFill(g,VELVET);rays(g,420,495,'rgba(217,164,65,.3)',t);yk(g,420,660,.9,'smile',t,{blink:1});at(g,430,250,.9,()=>crown(g));bigNum(g,'20 ЛЕТ',420,880,P.mustard,t,.2,84)},{zoom:1.3}],
+   [1.6,(g,t)=>{bgFill(g,P.terra);yk(g,420,660,.9,'shock',t,{shake:3});const f=eo((t-.3)/.5);at(g,430+f*280,250+f*560,.9,()=>crown(g),f*1.8);at(g,420,140,pop(t,.1),()=>plaque(g,'ШАЛЯПИН?',P.cream,60));if(t>.8)at(g,420,140,pop(t,.8),()=>cross(g,110,P.choc))},{zoom:1.35,shake:3}]])}},
+ // 8 — лайфхак
+ {txt:'[softly] Как привыкнуть: послушай себя на записи несколько раз подряд. Мозг бесится от непривычки и со временем перестаёт.',bg:P.sage,lux:2,cw:['Как','послушай','несколько','Мозг','и'],draw(g,t,d){shots(g,t,d,[
+   [1.0,(g,t)=>{bgFill(g,P.sage);rays(g,420,495,'rgba(246,238,221,.3)',t*2);stamp(g,'КАК ПРИВЫКНУТЬ',420,495,P.choc,t,0,-.06,70)},{zoom:1.5,shake:5}],
+   [1.4,(g,t)=>{bgFill(g,P.sage);rays(g,420,495,'rgba(217,164,65,.22)',t);ykp(g,420,620,.9,'firm',t,{nod:1});at(g,420,140,pop(t,.1),()=>voiceMsg(g,t,(t*.5)%1,P.cream))},{zoom:1.3}],
+   [1.8,(g,t)=>{bgFill(g,P.sage);rays(g,420,495,'rgba(246,238,221,.3)',t);at(g,420,430,pop(t,0)*1.3,()=>repeatBadge(g,Math.min(5,1+Math.floor(t*3))));at(g,420,820,1,()=>voiceMsg(g,t,(t*.8)%1,P.cream));at(g,420,130,pop(t,.1),()=>plaque(g,'НЕСКОЛЬКО РАЗ ПОДРЯД',P.cream,42))},{zoom:1.3}],
+   [1.6,(g,t)=>{brainIn(g,t,0);at(g,420,470,2.6,()=>{brain(g,P.terraL);brainEyes(g,t,1)},Math.sin(t*30)*.03);at(g,420,880,pop(t,.2),()=>plaque(g,'НЕПРИВЫЧКА',P.terra,56,P.cream))},{zoom:1.3,shake:4}],
+   [1.8,(g,t)=>{bgFill(g,P.sage);rays(g,420,495,'rgba(246,238,221,.3)',t);at(g,420,450,2.4,()=>{brain(g,'#E7B3A0');brainEyes(g,t,0)});at(g,660,240,pop(t,.4),()=>check(g));at(g,420,880,pop(t,.2),()=>plaque(g,'ПРИВЫКАЕТ',P.cream,60))},{zoom:1.25,push:.05}]])}},
+ // 9 — второй поворот + байт
+ {txt:'[chuckling] Ярик теперь пишет пацанам только текстом. [pause] Пацаны думают, что он обиделся. [playful] А ты свой голос на записи выносишь? Пиши в комменты честно.',bg:P.cream,cw:['Ярик','только','Пацаны','что','А','Пиши'],draw(g,t,d){shots(g,t,d,[
+   [1.6,(g,t)=>{bgFill(g,P.cream);yk(g,260,640,.7,'firm',t,{look:.7});at(g,610,470,1,()=>phoneBig(g,t,(g)=>{g.fillStyle='#FBF5EA';g.fillRect(-150,-270,300,540);at(g,40,-120,pop(t,.2)*.7,()=>msg(g,'ок',P.sage,44));at(g,20,0,pop(t,.6)*.7,()=>msg(g,'буду в 8',P.sage,44))}));},{zoom:1.3}],
+   [1.2,(g,t)=>{bgFill(g,P.mustard);rays(g,420,495,'rgba(246,238,221,.3)',t*2);at(g,420,480,1.3,()=>voiceMsg(g,t,0,P.cream));if(t>.15)at(g,420,480,pop(t,.15),()=>cross(g,150,P.terra));at(g,420,860,pop(t,.1),()=>plaque(g,'ТОЛЬКО ТЕКСТОМ',P.cream,56))},{zoom:1.4,shake:3}],
+   [1.4,(g,t)=>{bgFill(g,P.beige);at(g,420,495,1.25,()=>phoneBig(g,t,(g)=>{g.fillStyle='#FBF5EA';g.fillRect(-150,-270,300,540);txt(g,'Пацаны 🔥',0,-220,30,P.choc,800);at(g,0,-110,pop(t,.1)*.62,()=>msg(g,'Ярик, ты чё?',P.cream,44));at(g,0,0,pop(t,.5)*.62,()=>msg(g,'обиделся??',P.cream,44));at(g,0,110,pop(t,.9)*.62,()=>msg(g,'скинь голосовое',P.cream,40))}))},{zoom:1.35,shake:2}],
+   [1.4,(g,t)=>{bgFill(g,P.terraL);friend(g,250,560,.6,'angry',t);friend(g,590,560,.6,'norm',t);at(g,250,170,pop(t,.1),()=>qmark(g,P.choc,110));at(g,590,170,pop(t,.3),()=>qmark(g,P.choc,110));at(g,420,880,pop(t,.2),()=>plaque(g,'ОБИДЕЛСЯ?',P.cream,60))},{zoom:1.3}],
+   [1.6,(g,t)=>{bgFill(g,P.mustard);rays(g,420,495,'rgba(246,238,221,.3)',t*2);yk(g,420,640,1.05,'smile',t,{wink:true});at(g,420,130,pop(t,.1),()=>plaque(g,'А ТЫ?',P.cream,72))},{zoom:1.4,shake:2}],
+   [2.4,(g,t)=>{bgFill(g,P.beige);yk(g,420,690,.75,'laugh',t);at(g,420,160,pop(t,.05),()=>plaque(g,'ПИШИ В КОММЕНТЫ',P.mustard,56));at(g,190,420,pop(t,.4)*.8,()=>chat(g,'выношу'));at(g,640,470,pop(t,.7)*.8,()=>chat(g,'ненавижу 😩'));at(g,420,900,pop(t,1.2),()=>tag(g,'Подробнее в Telegram',P.cream,30))},{zoom:1.3}]])}},
+];
+// cues по словам (cw): номер слова, с которого начинается кадр
+{const cl=s=>s.replace(/\[[a-z -]+\]\s*/g,'').replace(/́/g,'').trim();for(const s of SC){if(!s.cw)continue;const ws=cl(s.txt).split(/\s+/);let k=0;s.cues=s.cw.map((w,j)=>{if(j===0){k=0;return 0}const i=ws.indexOf(w,k+1);k=i<0?k:i;return k})}}
