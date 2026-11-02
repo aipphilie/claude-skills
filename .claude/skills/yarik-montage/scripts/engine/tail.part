@@ -1,0 +1,66 @@
+// ---------- тайминги (без голоса — оценка по длине фразы) ----------
+const clean=s=>s.replace(/\[[a-z -]+\]\s*/g,'').replace(/́/g,'').trim();
+// озвучка читает «Эн-Зэ-Тэ», в субтитрах показываем NZT
+const subShow=w=>w.replace('Эн-Зэ-Тэ-сорок-восемь','NZT-48').replace('Эн-Зэ-Тэ','NZT');
+let T=0;for(const s of SC){s.clean=clean(s.txt);const w=s.clean.split(/\s+/).length;s.d=s.est||(s.silent?2.0:Math.max(2.3,w*0.29+0.45));s.t0=T;T+=s.d}
+let TOTAL=T+0.6;
+// субтитры: куски по 2–4 слова, время пропорционально длине
+for(const s of SC){if(s.silent){s.subs=[];continue}const ws=s.clean.split(/\s+/),ch=[];let cur=[];for(const w of ws){cur.push(w);const len=cur.join(' ').length;if(cur.length>=4||len>=20||/[.,!?:—»]$/.test(w)&&cur.length>=2){ch.push(cur.join(' '));cur=[]}}if(cur.length){if(cur.length===1&&ch.length&&cur[0].length<6)ch[ch.length-1]+=' '+cur[0];else ch.push(cur.join(' '))}
+  const tot=ch.reduce((a,c)=>a+c.length,0);let acc=0;s.subs=ch.map(c=>{const st=acc/tot*s.d;acc+=c.length;const en=acc/tot*s.d,ws=c.split(' '),wt=ws.reduce((a,w)=>a+w.length+1,0);let wa=0;
+    const words=ws.map(w=>{const ws0=st+wa/wt*(en-st);wa+=w.length+1;return {w:subShow(w),st:ws0,en:st+wa/wt*(en-st)}});return {c,st,en,words}})}
+
+if(typeof TIMING!=='undefined'&&TIMING.keep)SC=SC.filter((s,i)=>TIMING.keep.includes(i));
+// Тайминги по реальной озвучке (timing.json из align.py): сцена и каждое слово.
+if(typeof TIMING!=='undefined'){SC.forEach((s,i)=>{const x=TIMING.scenes[i];s.t0=x.t0;s.d=x.d;if(x.speech)s.subEnd=x.speech[1]-x.t0+.35;let k=0;
+  for(const u of s.subs)for(const w of u.words){const tw=x.words[k++];w.st=tw[1]-s.t0;w.en=tw[2]-s.t0}
+  s.subs.forEach((u,j)=>{u.st=j?u.words[0].st:0;u.en=j<s.subs.length-1?s.subs[j+1].words[0].st:s.d;
+    u.words.forEach((w,m)=>{if(m<u.words.length-1)w.en=Math.max(w.en,u.words[m+1].st)})})});
+  TOTAL=TIMING.total}
+// склейки кадров по словам озвучки: cues — номера слов, с которых начинается кадр
+for(const s of SC){const f=s.draw;s.draw=(g,t,d)=>{CUR=s;f(g,t,d)};if(!s.cues)continue;const ws=s.subs.flatMap(u=>u.words);
+  s.cueT=s.cues.map((k,j)=>j===0||!ws[k]?0:Math.max(ws[k].st-.5,(ws[k-1].en+ws[k].st)/2))}
+
+
+// ---------- рамка ----------
+function title(g){
+  txt(g,'Ярик',CX,288,56,P.choc,900);
+  g.font=`900 64px ${F}`;const w=g.measureText('ПЬЯНЫЙ МОЗГ').width+70;rr(g,CX-w/2,334,w,104,30);fs(g,P.mustard,P.choc,6);txt(g,'ПЬЯНЫЙ МОЗГ',CX,390,64,P.choc);}
+// Субтитры: плашка по центру экрана, текущее слово подсвечено горчицей и чуть подпрыгивает.
+const SUB_Y=1490;
+let SUB_STYLE='outline';
+// Стили подсветки текущего слова (все из палитры YARIK.md).
+function subtitle(g,sub,lt){const st=SUB_STYLE;g.font=st==='outline'?`900 50px ${F}`:`800 46px ${F}`;const sp=g.measureText(' ').width+(st==='outline'?22:14),ws=sub.words.map(o=>o.w==='@CAT'?CATW:g.measureText(o.w).width),
+  tw=ws.reduce((a,b)=>a+b,0)+sp*(ws.length-1),w=Math.min(800,tw+76);
+  const light=st==='underline'||st==='sage';
+  if(st!=='outline'){rr(g,540-w/2,SUB_Y-42,w,84,24);fs(g,light?'rgba(246,238,221,.96)':'rgba(74,47,36,.92)',light?P.choc:null,4)}
+  let x=540-tw/2;sub.words.forEach((o,i)=>{const cur=lt>=o.st&&lt<o.en,past=lt>=o.en,k=cur?eo((lt-o.st)/.12):0,cx=x+ws[i]/2,W=ws[i];
+    g.save();g.translate(cx,SUB_Y+2);
+    let col=light?P.choc:P.cream;
+    if(st==='mustard'){g.scale(1+.06*k,1+.06*k);if(cur){rr(g,-W/2-8,-30,W+16,58,12);g.fillStyle='rgba(217,164,65,.28)';g.fill();col=P.mustard}else if(!past)col='rgba(246,238,221,.62)'}
+    if(st==='terra'){if(cur){const e=back(k);g.save();g.scale(e,e);rr(g,-W/2-12,-32,W+24,62,14);fs(g,P.terra,null);g.restore()}}
+    if(st==='outline'){const sc=1+.14*k;g.scale(sc,sc);if(o.w==='@CAT'){cats(g,cur?P.mustard:P.cream);g.restore();x+=W+sp;return}g.font=`900 50px ${F}`;g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';g.lineWidth=12;g.strokeStyle=P.choc;g.strokeText(o.w,0,0);
+      g.fillStyle=cur?P.mustard:P.cream;g.fillText(o.w,0,0);g.restore();x+=W+sp;return}
+    if(st==='underline'){if(cur){col=P.terra;g.fillStyle=P.mustard;rr(g,-W/2,22,W*eo((lt-o.st)/Math.max(.15,o.en-o.st)),8,4);g.fill()}}
+    if(st==='sage'){if(cur){rr(g,-W/2-12,-32,W+24,62,14);fs(g,P.sage,P.choc,3)}}
+    if(st==='reveal'){const a=past?1:cur?eo((lt-o.st)/.15):0;g.globalAlpha=a;if(cur){g.scale(1+.08*(1-k),1+.08*(1-k));col=P.terraL}}
+    txt(g,o.w,0,0,46,col,800);g.restore();x+=W+sp})}
+
+function render(g,t){
+  g.fillStyle=P.beige;g.fillRect(0,0,W,H);
+  // лёгкая текстура фона
+  g.fillStyle='rgba(255,255,255,.18)';for(let i=0;i<9;i++){g.beginPath();g.arc((i*271)%W,(i*613)%H,140,0,7);g.fill()}
+  title(g);
+  let i=SC.findIndex(s=>t>=s.t0&&t<s.t0+s.d);if(i<0)i=SC.length-1;const s=SC[i],lt=t-s.t0;
+  const k=s.nopop?1:eo(lt/.18),sc=.94+.06*k;
+  g.save();g.translate(CX,CARD.y+CARD.h*CARD.k/2);g.scale(sc*CARD.k,sc*CARD.k);g.translate(-CARD.w/2,-CARD.h/2);
+  g.fillStyle='rgba(74,47,36,.18)';rr(g,8,14,CARD.w,CARD.h,CARD.r);g.fill();
+  rr(g,0,0,CARD.w,CARD.h,CARD.r);g.save();g.clip();g.fillStyle=s.bg;g.fillRect(0,0,CARD.w,CARD.h);
+  if(s.bg===P.dark||s.bg===P.darker){const gr=g.createRadialGradient(420,495,100,420,495,700);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,.35)');g.fillStyle=gr;g.fillRect(0,0,CARD.w,CARD.h)}
+  if(s.lux===1)rays(g,420,520,'rgba(246,238,221,.18)',t);
+  if(s.lux===2)rays(g,260,500,'rgba(217,164,65,.22)',t);
+  s.draw(g,lt,s.d);g.restore();
+  rr(g,0,0,CARD.w,CARD.h,CARD.r);fs(g,null,P.choc,7);g.restore();
+  if(s.subs.length&&lt<(s.subEnd??1e9)){const sub=s.subs.find(u=>lt>=u.st&&lt<u.en)||s.subs[s.subs.length-1];subtitle(g,sub,lt)}
+  g.globalAlpha=1;
+}
+if(typeof module!=='undefined')module.exports={SC,TOTAL};
