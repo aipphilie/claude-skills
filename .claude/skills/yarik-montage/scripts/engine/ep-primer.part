@@ -1,0 +1,190 @@
+
+// ---------- серия 15: Пьяный мозг Ярика (сценарий Ярослава, кадр каждые 1–2 сек) ----------
+const CONE='#E8743B',CONED='#B9552A',FLOORW='#C9A27E',FLOORD='#B08865',NIGHTS='#2E2A3E',SEA='#5F8AA0',SEAD='#46697C',SHRIMP='#F09A86',BEERC='#E9B44C';
+// дорожный конус
+function cone(g){g.beginPath();g.moveTo(-26,-150);g.lineTo(26,-150);g.lineTo(80,90);g.lineTo(-80,90);g.closePath();fs(g,CONE,P.choc,6);
+  g.save();g.clip();g.fillStyle='#FBF5EA';for(const y of [-80,10]){g.beginPath();g.moveTo(-120,y);g.lineTo(120,y);g.lineTo(120,y+36);g.lineTo(-120,y+36);g.closePath();g.fill()}g.restore();
+  g.beginPath();g.moveTo(-26,-150);g.lineTo(26,-150);g.lineTo(80,90);g.lineTo(-80,90);g.closePath();fs(g,null,P.choc,6);rr(g,-110,86,220,30,8);fs(g,CONED,P.choc,6)}
+// нога в носке / босая
+function foot(g,sock){rr(g,-40,-200,80,200,30);fs(g,sock?P.terra:'#E3AB89',P.choc,6);g.beginPath();g.ellipse(30,0,80,40,0,0,7);fs(g,sock?P.terra:'#E3AB89',P.choc,6);
+  if(sock){g.fillStyle='rgba(246,238,221,.7)';for(const y of [-170,-140])g.fillRect(-36,y,72,12)}else for(let i=0;i<5;i++){g.beginPath();g.arc(84+i*-12,-22+i*3,9,0,7);fs(g,'#E3AB89',P.choc,3)}}
+function floorBg(g){bgFill(g,FLOORW);g.strokeStyle=FLOORD;g.lineWidth=5;for(let y=-40;y<1000;y+=110){g.beginPath();g.moveTo(-200,y);g.lineTo(1040,y);g.stroke();for(let x=((y/110)%2)*150;x<900;x+=300){g.beginPath();g.moveTo(x,y);g.lineTo(x,y+110);g.stroke()}}}
+// Ярик лежит на полу: голова слева, конус в руке
+function yarikFloor(g,t,emo='bad'){floorBg(g);g.save();g.translate(0,Math.sin(t*2)*3);
+  rr(g,300,470,520,190,80);fs(g,YC.shirt,P.choc,7);at(g,700,640,.9,()=>foot(g,1),-1.4);at(g,770,520,.9,()=>foot(g,0),-1.7);
+  at(g,560,440,1.05,()=>cone(g),.5);rr(g,470,420,120,60,28);fs(g,YC.skin,P.choc,6);g.restore();
+  yk(g,250,560,.62,emo,t,{rot:-1.45,look:.3})}
+// пивная кружка; lvl 0..1
+function mugBeer(g,lvl=1,t=0,red=0){const H=200;g.save();rr(g,-70,-100,140,H,18);g.clip();g.fillStyle='rgba(246,238,221,.55)';g.fillRect(-70,-100,140,H);
+  const y=100-H*clamp(lvl);g.fillStyle=red?(Math.sin(t*14)>0?'#D9503F':BEERC):BEERC;g.fillRect(-70,y,140,H);
+  if(lvl>.02){g.fillStyle='#FBF5EA';for(let i=-2;i<=2;i++){g.beginPath();g.arc(i*30,y,22,0,7);g.fill()}}
+  g.fillStyle='rgba(255,255,255,.45)';for(let i=0;i<5;i++){const p=(t*.8+i*.23)%1;g.beginPath();g.arc(-40+i*20,100-p*(100-y),5,0,7);g.fill()}g.restore();
+  rr(g,-70,-100,140,H,18);fs(g,null,P.choc,7);g.strokeStyle=P.choc;g.lineWidth=7;g.beginPath();g.moveTo(70,-50);g.quadraticCurveTo(130,-50,130,0);g.quadraticCurveTo(130,50,70,50);g.stroke()}
+// индикатор фазы в углу кадра
+function meter(g,n,t,red=0){const lvl=n/3;at(g,742,128,.62,()=>{if(red&&Math.sin(t*14)>0){g.save();g.globalCompositeOperation='lighter';glow(g,0,0,200,'217,80,63',.6);g.restore()}
+  rr(g,-110,-150,250,330,34);fs(g,'rgba(42,30,24,.72)',P.cream,5);at(g,-10,-10,1,()=>mugBeer(g,lvl,t,red));txt(g,'ФАЗА '+n,10,138,42,red?'#F07A63':P.cream)})}
+// пузырьки алкоголя: весёлые
+function abub(g,r,t,i=0){g.beginPath();g.arc(0,0,r,0,7);fs(g,'rgba(233,180,76,.85)',P.choc,4);g.beginPath();g.ellipse(-r*.35,-r*.4,r*.25,r*.14,-.6,0,7);g.fillStyle='rgba(255,255,255,.6)';g.fill();
+  if(r>22){for(const s of [-1,1]){g.beginPath();g.arc(s*r*.28,-r*.05,r*.09,0,7);g.fillStyle=P.choc;g.fill()}g.strokeStyle=P.choc;g.lineWidth=3;g.beginPath();g.arc(0,r*.12,r*.3,.2,Math.PI-.2);g.stroke()}}
+function bubFlow(g,t,n=14,x0=0,y0=990,x1=420,y1=300,spd=.8){for(let i=0;i<n;i++){const p=(t*spd+i/n)%1,x=x0+(x1-x0)*p+Math.sin(p*9+i)*60,y=y0+(y1-y0)*p;at(g,x,y,1,()=>abub(g,18+(i%4)*10,t,i))}}
+// стол с монитором
+function oDesk(g,x,y,w=300,scr=P.sage){rr(g,x-w/2,y,w,40,10);fs(g,'#B07A5E',P.choc,6);rr(g,x-w/2+20,y+40,24,120,6);fs(g,'#8A5A44',P.choc,5);rr(g,x+w/2-44,y+40,24,120,6);fs(g,'#8A5A44',P.choc,5);
+  rr(g,x+w/2-150,y-110,130,90,10);fs(g,P.dark,P.choc,5);rr(g,x+w/2-140,y-100,110,70,6);fs(g,scr,null);rr(g,x+w/2-95,y-20,20,20,4);fs(g,P.dark,P.choc,4)}
+// закрытые глаза поверх person (спит)
+function eyesShut(g,x,y,s,tilt=0){at(g,x,y,s,()=>{g.rotate(tilt);for(const s2 of [-1,1]){g.beginPath();g.ellipse(s2*28,0,17,18,0,0,7);g.fillStyle=P.peach;g.fill();g.strokeStyle=P.choc;g.lineWidth=5;g.beginPath();g.arc(s2*28,-2,12,.25,Math.PI-.25);g.stroke()}})}
+function zzz(g,t,x,y){for(let i=0;i<3;i++){const p=(t*.8+i/3)%1;g.globalAlpha=1-p;at(g,x+p*70,y-p*150,.7+p*.8,()=>zz(g,1,P.cream));g.globalAlpha=1}}
+// Кора-начальник: очки, галстук. st: 0 — работает, 1 — галстук ослаблен, дремлет, 2 — спит лицом в клавиатуре
+function kora(g,x,y,s,t,st=0){if(st===2){at(g,x,y,s,()=>{rr(g,-170,150,340,40,10);fs(g,'#B07A5E',P.choc,6);rr(g,-120,110,240,40,8);fs(g,'#E3DACB',P.choc,5);for(let i=0;i<6;i++){rr(g,-108+i*38,118,30,22,4);fs(g,'#FBF5EA',P.choc,2)}});
+    person(g,x,y+60*s+Math.sin(t*2)*3*s,s,{shirt:'#B9C9CF',hair:P.choc,glasses:1,tilt:.5});eyesShut(g,x,y+60*s+Math.sin(t*2)*3*s,s,.5);zzz(g,t,x+70*s,y-40*s);return}
+  person(g,x,y,s,{shirt:'#B9C9CF',hair:P.choc,glasses:1,tie:st===0,tilt:st?Math.sin(t*1.5)*.08+.12:0,look:st?0:Math.sin(t*2)});
+  if(st){at(g,x,y,s,()=>{g.save();g.translate(26,120);g.rotate(.5);g.beginPath();g.moveTo(-12,0);g.lineTo(12,0);g.lineTo(18,90);g.lineTo(0,112);g.lineTo(-18,90);g.closePath();fs(g,P.terra,P.choc,4);g.restore()});eyesShut(g,x,y,s,Math.sin(t*1.5)*.08+.12);zzz(g,t,x+60*s,y-80*s)}}
+// Мозжечок-спортсмен: повязка на лбу
+function cereb(g,x,y,s,t,o={}){person(g,x,y,s,Object.assign({shirt:P.terra,hair:P.choc,look:0},o));at(g,x,y,s,()=>{g.rotate(o.tilt||0);rr(g,-78,-46,156,22,8);fs(g,P.mustard,P.choc,4);txt(g,'',0,0,10)})}
+// Гиппокамп: с камерой
+function camera(g,on,t){rr(g,-80,-50,160,100,16);fs(g,'#5B5450',P.choc,6);rr(g,-40,-78,60,30,8);fs(g,'#5B5450',P.choc,5);g.beginPath();g.arc(-6,0,36,0,7);fs(g,on?'#2E3A44':'#77706B',P.choc,6);
+  g.beginPath();g.arc(-6,0,18,0,7);fs(g,on?'#6E8FA3':'#8E8782',P.choc,4);if(on&&(t*2)%1<.6){g.beginPath();g.arc(56,-30,10,0,7);g.fillStyle='#E0523F';g.fill()}}
+function hippo(g,x,y,s,t,on=1,o={}){person(g,x,y,s,Object.assign({shirt:P.mustard,hair:P.terra,look:.5},o));at(g,x+70*s,y+150*s,s*.9,()=>camera(g,on,t))}
+// офис мозга: все отделы на местах
+function brainOffice(g,t,o={}){brainIn(g,t,0);g.fillStyle='rgba(42,30,24,.25)';g.fillRect(-200,470,1240,30);
+  const ks=o.kora??0;kora(g,215,250,.78,t,ks);if(ks<2)oDesk(g,215,420,300,'#B9C9CF');
+  cereb(g,625,250,.78,t,{look:-.5});oDesk(g,625,420,300,P.terraL);
+  hippo(g,215,660,.78,t,o.cam??1);oDesk(g,215,830,300,P.mustard);
+  at(g,625,700,1.35,()=>guard(g,t));oDesk(g,625,830,300,'#5B6E7A');
+  if(o.labels!==0){at(g,215,505,.8,()=>tag(g,'КОРА',P.cream,30));at(g,625,505,.8,()=>tag(g,'МОЗЖЕЧОК',P.cream,30));at(g,215,915,.8,()=>tag(g,'ГИППОКАМП',P.cream,30));at(g,625,915,.8,()=>tag(g,'СТВОЛ',P.cream,30))}}
+// мозг сбоку с отделами; hi: 'front'|'cereb'|'hippo'|'stem'
+function brainMap(g,t,hi){const pul=.5+.5*Math.sin(t*9);
+  // ствол и мозжечок
+  rr(g,20,40,46,120,18);fs(g,hi==='stem'?'#F07A63':'#D9A08E',P.choc,6);
+  g.beginPath();g.ellipse(80,58,52,34,0,0,7);fs(g,hi==='cereb'?P.mustard:'#D9A08E',P.choc,6);g.strokeStyle='rgba(74,47,36,.5)';g.lineWidth=3;for(const y of [46,58,70]){g.beginPath();g.moveTo(40,y);g.lineTo(122,y);g.stroke()}
+  brain(g,'#E7B3A0');
+  if(hi==='front'){g.save();g.beginPath();g.moveTo(-110,20);g.bezierCurveTo(-130,-40,-90,-100,-20,-105);g.lineTo(-30,40);g.closePath();g.clip();g.globalAlpha=.55+.3*pul;g.fillStyle=P.mustard;g.fillRect(-140,-120,120,200);g.restore()}
+  if(hi==='hippo'){g.globalAlpha=.7+.3*pul;g.strokeStyle=P.mustard;g.lineWidth=16;g.lineCap='round';g.beginPath();g.moveTo(-10,20);g.quadraticCurveTo(30,50,50,10);g.stroke();g.globalAlpha=1}
+  if(hi){const [x,y]={front:[-75,-40],cereb:[80,58],hippo:[20,25],stem:[43,110]}[hi];g.save();g.globalCompositeOperation='lighter';glow(g,x,y,90,'217,164,65',.35+.25*pul);g.restore()}}
+// натянутый канат
+function rope(g,t){g.strokeStyle=P.choc;g.lineWidth=8;g.beginPath();g.moveTo(-40,700);g.quadraticCurveTo(420,730+Math.sin(t*6)*10,880,700);g.stroke();for(const x of [60,780]){rr(g,x-14,700,28,300,6);fs(g,'#8A5A44',P.choc,5)}}
+// море в шторм
+function storm(g,t){bgFill(g,'#4B5563');for(let k=0;k<3;k++){g.beginPath();g.moveTo(-200,1200);for(let x=-200;x<=1040;x+=20)g.lineTo(x,640+k*120+Math.sin(x/90+t*4+k)*40);g.lineTo(1040,1200);g.closePath();fs(g,k%2?SEA:SEAD,P.choc,5)}}
+function boat(g){g.beginPath();g.moveTo(-200,0);g.lineTo(200,0);g.lineTo(150,80);g.lineTo(-150,80);g.closePath();fs(g,P.terra,P.choc,7)}
+// улитка (медленная реакция)
+function snail(g,t){g.beginPath();g.moveTo(-160,60);g.quadraticCurveTo(-170,0,-110,10);g.lineTo(150,30);g.quadraticCurveTo(180,60,150,70);g.closePath();fs(g,'#C9B79A',P.choc,6);
+  g.beginPath();g.arc(30,-30,90,0,7);fs(g,P.terraL,P.choc,7);at(g,30,-30,1.6,()=>swirl(g,P.choc));for(const s of [0,1]){g.strokeStyle=P.choc;g.lineWidth=6;g.beginPath();g.moveTo(-140,20);g.lineTo(-160-s*30,-60);g.stroke();g.beginPath();g.arc(-160-s*30,-66,10,0,7);fs(g,P.cream,P.choc,4)}}
+// плывущий текст
+function wavyTxt(g,s,x,y,size,t,col=P.cream){g.font=`900 ${size}px ${F}`;let w=g.measureText(s).width,cx=x-w/2;for(const ch of s){const cw=g.measureText(ch).width;g.save();g.translate(cx+cw/2,y+Math.sin(t*5+cx/40)*18);g.rotate(Math.sin(t*4+cx/60)*.18);
+  g.lineWidth=12;g.strokeStyle=P.choc;g.lineJoin='round';g.textAlign='center';g.textBaseline='middle';g.strokeText(ch,0,0);g.fillStyle=col;g.fillText(ch,0,0);g.restore();cx+=cw}}
+// громкость: растущие столбики
+function volume(g,t){for(let i=0;i<7;i++){const h=40+i*38*(.7+.3*Math.abs(Math.sin(t*9+i)));rr(g,-210+i*62,120-h,44,h,8);fs(g,i>4?RED:i>2?P.mustard:P.sage,P.choc,4)}}
+// телефон крупно с сообщением
+function phoneBig(g,t,fn){rr(g,-170,-300,340,600,46);fs(g,P.choc,P.choc,6);rr(g,-150,-270,300,540,28);fs(g,'#FBF5EA',null);g.save();rr(g,-150,-270,300,540,28);g.clip();fn&&fn(g,t);g.restore()}
+// плёнка памяти; empty — пустые чёрные кадры
+function film(g,t,empty=0,spd=120){const off=(t*spd)%220;g.fillStyle='#2A1E18';g.fillRect(-200,-150,1240,300);
+  for(let i=-2;i<7;i++){const x=i*220-off;g.fillStyle='#F6EEDD';for(let k=0;k<6;k++){rr(g,x+12+k*34,-136,20,18,4);g.fill();rr(g,x+12+k*34,118,20,18,4);g.fill()}
+    rr(g,x+10,-100,196,200,10);const e=empty===1||(empty>0&&((i%3)+3)%3<empty*3);if(e){g.fillStyle='#120C0A';g.fill()}else{fs(g,['#E9D8BF','#9DB38F','#D9A441','#D98D72'][((i%4)+4)%4],null);at(g,x+108,10,.28,()=>drawYarik(g,{emo:i%2?'laugh':'norm',cap:true}))}}}
+// креветка
+function shrimp(g,t){g.strokeStyle=P.choc;g.lineWidth=74;g.lineCap='round';g.beginPath();g.arc(0,0,110,-.6,Math.PI*1.25);g.stroke();g.strokeStyle=SHRIMP;g.lineWidth=60;g.stroke();
+  g.strokeStyle='rgba(74,47,36,.45)';g.lineWidth=5;for(let a=-.3;a<3.8;a+=.5){g.beginPath();g.moveTo(Math.cos(a)*80,Math.sin(a)*80);g.lineTo(Math.cos(a)*140,Math.sin(a)*140);g.stroke()}
+  at(g,Math.cos(-.6)*110,Math.sin(-.6)*110,1,()=>{g.beginPath();g.arc(0,0,40,0,7);fs(g,SHRIMP,P.choc,6);g.beginPath();g.arc(8,-6,8,0,7);g.fillStyle=P.choc;g.fill();g.strokeStyle=P.choc;g.lineWidth=4;g.beginPath();g.moveTo(20,-30);g.quadraticCurveTo(70,-90,110,-60);g.stroke()});
+  at(g,Math.cos(Math.PI*1.25)*110,Math.sin(Math.PI*1.25)*110,1,()=>{g.beginPath();g.moveTo(0,0);g.lineTo(-60,-30);g.lineTo(-50,30);g.closePath();fs(g,SHRIMP,P.choc,5)})}
+// Ярик лежит на боку, калачиком (креветка): одеяло на полу
+function yarikSide(g,t,o={}){floorBg(g);if(o.dark){g.fillStyle='rgba(30,22,40,.55)';g.fillRect(-200,-200,1240,1390)}
+  g.beginPath();g.ellipse(520,640,300,130,0,0,7);fs(g,'#8FA8B8',P.choc,7);
+  g.save();g.translate(520,600);g.beginPath();g.moveTo(-180,-60);g.quadraticCurveTo(80,-170,220,-20);g.quadraticCurveTo(160,80,-40,70);g.quadraticCurveTo(-160,60,-180,-60);g.closePath();fs(g,YC.shirt,P.choc,7);g.restore();
+  if(o.blue)g.filter='hue-rotate(185deg) saturate(1.5)';yk(g,300,520,.55,o.emo||'norm',t,{rot:-1.25,blink:o.blink??1,look:0});g.filter='none';if(o.z!==0)zzz(g,t,240,330)}
+// телефон с 112
+function call112(g,t){const on=Math.sin(t*10)>0;if(on){g.save();g.globalCompositeOperation='lighter';glow(g,0,0,320,'217,80,63',.5);g.restore()}
+  phoneBig(g,t,(g)=>{g.fillStyle='#FBF5EA';g.fillRect(-150,-270,300,540);txt(g,'112',0,-80,120,RED);rr(g,-80,80,160,110,50);fs(g,P.sageD,P.choc,5);at(g,0,135,.9,()=>{g.strokeStyle=P.cream;g.lineWidth=12;g.lineCap='round';g.beginPath();g.arc(0,0,30,Math.PI*.8,Math.PI*1.9);g.stroke()})})}
+// сосед-дорожник: оранжевый жилет, каска
+function neighbor(g,x,y,s,t){person(g,x,y,s,{shirt:CONE,hair:P.choc,look:-.6});at(g,x,y,s,()=>{g.fillStyle='#FBF5EA';g.fillRect(-110,170,220,16);g.fillRect(-114,210,228,16);at(g,0,-12,.42,()=>helmet(g))})}
+// дверь квартиры со стуком
+function doorK(g,t,knock){rr(g,-170,-330,340,660,14);fs(g,'#9A6A50',P.choc,7);rr(g,-140,-300,280,260,10);fs(g,null,'#7E553F',5);rr(g,-140,-10,280,310,10);fs(g,null,'#7E553F',5);g.beginPath();g.arc(120,10,16,0,7);fs(g,P.mustard,P.choc,4);
+  if(knock&&(t*3)%1<.45)for(const [x,y] of [[-60,-160],[40,-120]])at(g,x,y,1,()=>bang(g,'ТУК',P.cream))}
+// лампа под потолком, мигает
+function flickLamp(g,t,x){const on=Math.sin(t*23)*Math.sin(t*7)>-.2;g.strokeStyle=P.choc;g.lineWidth=5;g.beginPath();g.moveTo(x,-200);g.lineTo(x,80);g.stroke();
+  if(on){g.save();g.globalCompositeOperation='lighter';glow(g,x,140,260,'255,236,180',.45);g.restore()}g.beginPath();g.moveTo(x-60,130);g.lineTo(x+60,130);g.lineTo(x+30,80);g.lineTo(x-30,80);g.closePath();fs(g,'#6B6460',P.choc,5);g.beginPath();g.arc(x,140,18,0,7);fs(g,on?'#FFF3C8':'#7E7468',P.choc,4)}
+// ряд «бокал → выключил отдел»
+function chain(g,t){const it=[['ТОРМОЗА',P.terra],['НОГИ',P.mustard],['ПАМЯТЬ',P.sageD]];it.forEach(([s,c],i)=>{const y=210+i*260,st=.1+i*.4;at(g,190,y,pop(t,st)*.55,()=>mugBeer(g,1,t));at(g,330,y,pop(t,st+.1),()=>arrow(g,90,P.cream));at(g,590,y,pop(t,st+.2),()=>plaque(g,s,c,50,P.cream));if(t>st+.35)at(g,590,y,pop(t,st+.35),()=>cross(g,60,P.choc))})}
+
+let SC=[
+ // 0 — хук: проснулся на полу с конусом
+ {txt:'[gasping] Ярик проснулся с дорожным конусом в руке. [pause] [scoffing] И не помнит вообще ни-че-го. Давай разберёмся, что вчера творилось у него в башке.',bg:FLOORW,est:9,cues:[0,3,7,11,12,17],draw(g,t,d){shots(g,t,d,[
+   [1.4,(g,t)=>{yarikFloor(g,t,'shock');stamp(g,'ЧТО ВЧЕРА БЫЛО?',420,150,P.terra,t,.05,-.06,58)},{zoom:1.7,shake:6,speed:1}],
+   [1.2,(g,t)=>{floorBg(g);rays(g,420,495,'rgba(246,238,221,.25)',t*2);at(g,420,540,2.2,()=>cone(g),Math.sin(t*12)*.04);at(g,640,180,pop(t,.15),()=>qmark(g,P.choc,150))},{zoom:1.5,shake:4}],
+   [1.3,(g,t)=>{bgFill(g,P.dark);yk(g,420,560,1.5,'shock',t,{look:Math.sin(t*6)});at(g,170,200,pop(t,.1),()=>qmark(g,P.mustard,120));at(g,680,240,pop(t,.25),()=>qmark(g,P.mustard,90))},{zoom:1.6,shake:5}],
+   [1.2,(g,t)=>{bgFill(g,P.terra);['НИ','ЧЕ','ГО'].forEach((s,i)=>stamp(g,s,200+i*220,495,P.choc,t,.05+i*.18,(i-1)*.12,110))},{zoom:1.3,shake:6}],
+   [1.4,(g,t)=>{bgFill(g,P.beige);yk(g,420,560,1.1,'bad',t,{look:0});at(g,420,300,1,()=>{g.save();g.globalCompositeOperation='lighter';glow(g,0,0,200,'217,164,65',.6);g.restore()})},{zoom:1.25,push:.1}],
+   [1.6,(g,t,sd)=>{brainIn(g,t,1);const z=.8+eo(t/sd)*1.2;at(g,420,500,1.8*z,()=>brainMap(g,t,null));at(g,420,860,pop(t,.2),()=>plaque(g,'В БАШКЕ',P.mustard,60))},{zoom:1.2,speed:1}]])}},
+ // 1 — вечер, первый бокал, зум через зрачок в мозг
+ {txt:'[whispering] Вечер. Первый бокал. [echoing] Залетаем в мозг. [playful] Пока тут офис мечты: все работают, начальник на месте.',bg:BAR,est:8,cues:[0,1,3,6,12],draw(g,t,d){shots(g,t,d,[
+   [1.0,(g,t)=>{bgFill(g,NIGHTS);stars(g,t);at(g,640,220,1,()=>moon(g,70));at(g,420,620,pop(t,.05),()=>plaque(g,'ВЕЧЕР',P.mustard,84))},{zoom:1.3,rot:-.05}],
+   [1.6,(g,t)=>{barBack(g,t);friend(g,690,600,.5,'norm',t);yk(g,350,560,.68,'smile',t,{look:.3});at(g,560,420-eo(t/.5)*80,.9,()=>beer(g),.15);barFront(g);at(g,420,140,pop(t,.2),()=>plaque(g,'БОКАЛ №1',P.cream,56))},{zoom:1.3}],
+   [1.6,(g,t,sd)=>{bgFill(g,P.cream);const z=1+Math.pow(t/sd,2)*7;at(g,420,495,1.6*z,()=>eye(g,1));if(t>sd-.3){g.fillStyle=`rgba(42,30,24,${clamp((t-sd+.3)/.3)})`;g.fillRect(-200,-200,1240,1390)}},{zoom:1.05,flash:0}],
+   [1.8,(g,t)=>{brainOffice(g,t);at(g,420,70,pop(t,.15),()=>plaque(g,'ОФИС МЕЧТЫ',P.mustard,52))},{zoom:1.35,speed:1}],
+   [1.4,(g,t)=>{brainIn(g,t,0);kora(g,420,380,1.5,t,0);oDesk(g,420,700,560,'#B9C9CF');at(g,640,150,pop(t,.2),()=>check(g));at(g,420,880,pop(t,.15),()=>plaque(g,'НАЧАЛЬНИК НА МЕСТЕ',P.cream,44))},{zoom:1.3}]])}},
+ // 2 — фаза 1
+ {txt:'[excited] Фаза один! Алкоголь за минуты долетает до мозга по крови. [chuckling] Первым делом он бьёт по лобной доле. Это начальник, который отвечает за контроль и «а может, не надо». [playful] Начальник расслабился. Тормоза ослабли. [laughing] И Ярик внезапно стал самым смешным человеком в баре. По его мнению.',bg:P.mustard,est:17,cues:[0,2,5,10,17,23,28,30,32,36,41],draw(g,t,d){shots(g,t,d,[
+   [1.0,(g,t)=>{bgFill(g,P.mustard);rays(g,420,495,'rgba(246,238,221,.3)',t*3);stamp(g,'ФАЗА 1',420,495,P.choc,t,.02,-.08,130)},{zoom:1.5,shake:6}],
+   [1.6,(g,t)=>{bgFill(g,'#5A3A32');vessel(g,t);bubFlow(g,t,10,420,1000,420,300,1.1);at(g,420,140,pop(t,.15),()=>plaque(g,'ПО КРОВИ',P.terra,56,P.cream))},{zoom:1.25,speed:1}],
+   [1.6,(g,t)=>{brainOffice(g,t,{labels:0});bubFlow(g,t,12,-60,500,900,480,.9);at(g,420,70,pop(t,.1),()=>plaque(g,'ЗА МИНУТЫ',P.mustard,52))},{zoom:1.3}],
+   [1.8,(g,t)=>{brainIn(g,t,1);at(g,440,500,2.6,()=>brainMap(g,t,'front'));flyIn(g,t,.1,-100,300,170,380,1,()=>abub(g,46,t));if(t>.4)at(g,170,380,pop(t,.4),()=>bang(g,'БАЦ!'));at(g,420,860,pop(t,.3),()=>plaque(g,'ЛОБНАЯ ДОЛЯ',P.mustard,56))},{zoom:1.3,shake:3}],
+   [1.8,(g,t)=>{brainIn(g,t,0);kora(g,420,360,1.6,t,0);oDesk(g,420,690,560,'#B9C9CF');at(g,420,880,pop(t,.15),()=>plaque(g,'КОНТРОЛЬ',P.cream,60))},{zoom:1.3}],
+   [1.6,(g,t)=>{brainIn(g,t,0);kora(g,420,520,1.3,t,0);at(g,400,210,pop(t,.1),()=>bubbleTxt(g,'А МОЖЕТ, НЕ НАДО?',40))},{zoom:1.35}],
+   [1.4,(g,t)=>{brainIn(g,t,0);kora(g,420,380,1.5,t,1);oDesk(g,420,700,560,'#B9C9CF');bubFlow(g,t,6,0,900,840,100,.5);at(g,420,880,pop(t,.15),()=>plaque(g,'РАССЛАБИЛСЯ',P.mustard,56))},{zoom:1.3,rot:.05}],
+   [1.2,(g,t)=>{bgFill(g,P.dark);at(g,420,470,1.9,()=>pedal(g,1,'',P.terra),Math.sin(t*3)*.05-.2+eo(t/.6)*.4);at(g,420,860,pop(t,.1),()=>plaque(g,'ТОРМОЗА ОСЛАБЛИ',P.terra,48,P.cream))},{zoom:1.4,shake:3}],
+   [1.4,(g,t)=>{barBack(g,t);friend(g,150,620,.5,'norm',t);friend(g,700,620,.5,'norm',t);yk(g,420,560,.72,'laugh',t,{shake:3,flush:.6});at(g,610,300,pop(t,.1),()=>haBubble(g,'ХА-ХА'));barFront(g)},{zoom:1.35,shake:3}],
+   [1.6,(g,t)=>{bgFill(g,P.terra);rays(g,420,495,'rgba(246,238,221,.25)',t*3);yk(g,420,450,.85,'laugh',t,{flush:.6,shake:2});at(g,420,860,pop(t,.15),()=>plaque(g,'САМЫЙ СМЕШНОЙ',P.mustard,54))},{zoom:1.3,speed:1}],
+   [1.6,(g,t)=>{barBack(g,t);friend(g,250,600,.62,'norm',t);friend(g,610,600,.62,'bad',t);barFront(g);at(g,420,160,pop(t,.2),()=>plaque(g,'ПО ЕГО МНЕНИЮ',P.cream,52))},{zoom:1.25}]]);meter(g,1,t)}},
+ // 3 — фаза 2
+ {txt:'[playful] Фаза два. Начальник уже спит лицом в клавиатуре. [panting] Алкоголь добрался до мозжечка, это наш отдел равновесия. Отсюда походка, как у моряка в шторм. [chuckling] Реакция замедлилась, речь поплыла, громкость наоборот выросла. [scoffing] И вот Ярик уже в час ночи пишет бывшей: «ты не спишь?»',bg:P.terra,est:17,cues:[0,2,8,12,16,20,23,25,27,30,37],draw(g,t,d){shots(g,t,d,[
+   [1.0,(g,t)=>{bgFill(g,P.terra);rays(g,420,495,'rgba(246,238,221,.25)',t*3);stamp(g,'ФАЗА 2',420,495,P.choc,t,.02,.08,130)},{zoom:1.5,shake:6}],
+   [1.8,(g,t)=>{brainIn(g,t,0);kora(g,420,330,1.5,t,2);at(g,420,860,pop(t,.2),()=>plaque(g,'ЛИЦОМ В КЛАВИАТУРУ',P.cream,42))},{zoom:1.3,push:.05}],
+   [1.6,(g,t)=>{brainIn(g,t,1);at(g,400,480,2.6,()=>brainMap(g,t,'cereb'));flyIn(g,t,.1,900,900,610,640,1,()=>abub(g,46,t));at(g,420,860,pop(t,.3),()=>plaque(g,'МОЗЖЕЧОК',P.mustard,60))},{zoom:1.3,shake:3}],
+   [1.8,(g,t)=>{brainIn(g,t,0);rope(g,t);const a=Math.sin(t*5)*.35+(t>1.2?(t-1.2)*3:0);g.save();g.translate(420,700);g.rotate(a);g.translate(-420,-700);
+     g.strokeStyle=P.choc;g.lineWidth=10;g.beginPath();g.moveTo(140,560);g.lineTo(700,560);g.stroke();cereb(g,420,430,1,t,{tilt:0});g.restore();at(g,420,140,pop(t,.1),()=>plaque(g,'РАВНОВЕСИЕ',P.cream,56))},{zoom:1.3,shake:2}],
+   [1.6,(g,t)=>{autumnStreet(g,t,{speed:120,sky:'#3B3550'});yk(g,420+Math.sin(t*3)*90,560,.72,'smile',t,{rot:Math.sin(t*3)*.3,flush:.8,blink:.55});at(g,420,140,pop(t,.1),()=>plaque(g,'ПОХОДКА',P.mustard,56))},{zoom:1.3}],
+   [1.4,(g,t)=>{storm(g,t);g.save();g.translate(420,640);g.rotate(Math.sin(t*4)*.25);at(g,0,0,1,()=>boat(g));yk(g,0,-170,.5,'shock',t,{flush:.8});g.restore();at(g,420,140,pop(t,.1),()=>plaque(g,'КАК МОРЯК В ШТОРМ',P.cream,46))},{zoom:1.35,shake:4}],
+   [1.4,(g,t)=>{bgFill(g,P.sage);at(g,420+t*20,560,1.6,()=>snail(g,t));at(g,420,170,pop(t,.1),()=>plaque(g,'РЕАКЦИЯ',P.cream,60))},{zoom:1.25}],
+   [1.2,(g,t)=>{bgFill(g,P.dark);yk(g,300,560,.7,'smile',t,{flush:.8,blink:.5,rot:Math.sin(t*2)*.1});wavyTxt(g,'РЕЧЬ ПОПЛЫЛА',420,200,72,t,P.mustard)},{zoom:1.3}],
+   [1.6,(g,t)=>{barBack(g,t);yk(g,420,520,.8,'laugh',t,{shake:5,flush:.8});notes(g,t,420,300,5,P.cream,500);at(g,420,860,1,()=>volume(g,t));at(g,420,130,pop(t,.1),()=>plaque(g,'ГРОМКОСТЬ ↑',P.terra,52,P.cream))},{zoom:1.35,shake:4}],
+   [1.2,(g,t)=>{bgFill(g,NIGHTS);stars(g,t);at(g,420,480,1.6,()=>digital(g,'01:00',P.mustard,120))},{zoom:1.4,shake:2}],
+   [2.0,(g,t)=>{bgFill(g,NIGHTS);yk(g,250,600,.62,'smile',t,{flush:.9,blink:.5,look:.6});at(g,560,520,1,()=>phoneBig(g,t,(g)=>{g.fillStyle='#FBF5EA';g.fillRect(-150,-270,300,540);txt(g,'Бывшая',0,-220,32,P.choc,800);at(g,10,40,pop(t,.4)*.85,()=>msg(g,'ты не спишь?',P.mustard,40))}));at(g,420,120,pop(t,.2),()=>plaque(g,'ПИШЕТ БЫВШЕЙ',P.terra,50,P.cream))},{zoom:1.3,push:.06}]]);meter(g,2,t)}},
+ // 4 — фаза 3: гиппокамп выключает запись
+ {txt:'[menacing] Фаза три. Вот тут начинается самое интересное. [whispering] В мозге есть гиппокамп, он записывает всё, что с тобой происходит, в память. [pause] А когда алкоголя много, он просто… выключает запись. [echoing] [sighing] Ярик в это время живёт, ходит, общается… но плёнка пустая. [scoffing] Поэтому утром он не помнит, откуда конус. Не забыл. Мозг это вообще не записал.',bg:P.darker,est:21,cues:[0,2,7,11,20,24,28,32,35,38,43,45,47],draw(g,t,d){shots(g,t,d,[
+   [1.0,(g,t)=>{bgFill(g,P.darker);glow(g,420,495,420,'217,80,63',.4+.2*Math.sin(t*14));stamp(g,'ФАЗА 3',420,495,RED,t,.02,-.08,130)},{zoom:1.6,shake:8}],
+   [1.6,(g,t,sd)=>{brainIn(g,t,1);at(g,420,500,2.2+t/sd*.6,()=>brainMap(g,t,null));g.fillStyle='rgba(20,12,10,.35)';g.fillRect(-200,-200,1240,1390);at(g,420,860,pop(t,.3),()=>plaque(g,'САМОЕ ИНТЕРЕСНОЕ',P.mustard,48))},{zoom:1.2,push:.08}],
+   [1.6,(g,t)=>{brainIn(g,t,0);hippo(g,360,360,1.5,t,1);at(g,420,880,pop(t,.2),()=>plaque(g,'ГИППОКАМП',P.mustard,60))},{zoom:1.3}],
+   [2.2,(g,t)=>{brainIn(g,t,0);at(g,420,500,1,()=>film(g,t,0,160));at(g,640,190,1,()=>camera(g,1,t));at(g,420,860,pop(t,.2),()=>plaque(g,'ЗАПИСЬ В ПАМЯТЬ',P.cream,48))},{zoom:1.25}],
+   [1.4,(g,t)=>{brainIn(g,t,1);bubFlow(g,t,30,-100,500,940,500,1.4);bubFlow(g,t,20,420,1100,420,-100,1.2);at(g,420,170,pop(t,.1),()=>plaque(g,'АЛКОГОЛЯ МНОГО',P.terra,52,P.cream))},{zoom:1.35,shake:4}],
+   [1.8,(g,t)=>{brainIn(g,t,1);at(g,420,440,2.3,()=>camera(g,t<.5,t));if(t>.5){g.fillStyle='rgba(20,12,10,.5)';g.fillRect(-200,-200,1240,1390);stamp(g,'ЗАПИСЬ ОСТАНОВЛЕНА',420,790,RED,t,.55,-.06,46)}},{zoom:1.4,shake:3}],
+   [1.4,(g,t)=>{bgFill(g,BAR);rays(g,420,300,'rgba(217,164,65,.15)',t*3);friend(g,170,620,.5,'laugh',t);yk(g,420,560+Math.abs(Math.sin(t*8))*-30,.7,'laugh',t,{flush:.9,rot:Math.sin(t*6)*.15});friend(g,680,620,.5,'laugh',t);notes(g,t,420,260,4)},{zoom:1.3,shake:3}],
+   [1.4,(g,t)=>{autumnStreet(g,t,{speed:160,sky:'#3B3550'});yk(g,340,560,.66,'smile',t,{flush:.9,blink:.5,rot:Math.sin(t*3)*.15});at(g,600,640,1.15,()=>cone(g),eo(t/.8)*-.4);if(t>.3)at(g,620,320,pop(t,.3),()=>bang(g,'МОЁ!'))},{zoom:1.3}],
+   [1.8,(g,t)=>{bgFill(g,P.darker);at(g,420,480,1,()=>film(g,t,1,160));at(g,420,860,pop(t,.2),()=>plaque(g,'ПЛЁНКА ПУСТАЯ',P.cream,54))},{zoom:1.25,push:.05}],
+   [1.6,(g,t)=>{yarikFloor(g,t,'bad');at(g,420,140,pop(t,.1),()=>plaque(g,'УТРО',P.mustard,60))},{zoom:1.3}],
+   [1.2,(g,t)=>{bgFill(g,P.beige);at(g,420,520,2,()=>cone(g));at(g,420,160,pop(t,.1),()=>plaque(g,'ОТКУДА?',P.terra,64,P.cream))},{zoom:1.45,shake:3}],
+   [1.2,(g,t)=>{bgFill(g,P.cream);at(g,420,495,pop(t,.02),()=>plaque(g,'НЕ ЗАБЫЛ',P.mustard,80));if(t>.25)at(g,420,495,pop(t,.25),()=>cross(g,140,P.terra))},{zoom:1.35}],
+   [1.8,(g,t)=>{brainIn(g,t,1);at(g,420,430,1,()=>film(g,t,1,40));at(g,640,700,1.4,()=>camera(g,0,t));at(g,380,860,pop(t,.2),()=>plaque(g,'НЕ ЗАПИСАЛ',P.terra,56,P.cream))},{zoom:1.25,push:.06}]]);meter(g,3,t,1)}},
+ // 5 — ствол мозга и кенты
+ {txt:'[menacing] Если перебрать совсем, алкоголь доходит до ствола мозга. А это, на секундочку, дыхание и сердце. [pause] [chuckling] Ярику повезло: у него нормальные кенты. Положили на бок, чтобы не захлебнулся. Не бросили одного. Сидели и следили, дышит ли эта креветка. [playful] А если бы он не просыпался, дышал редко или стал синий, как смурфик, они бы сразу набрали 112. [scoffing] Без «да пусть проспится». [slowly] Поэтому Ярик вообще дожил до этого видоса.',bg:P.darker,est:27,cues:[0,8,15,21,27,30,37,46,50,55,59],draw(g,t,d){shots(g,t,d,[
+   [2.2,(g,t)=>{brainIn(g,t,1);flickLamp(g,t,420);at(g,420,600,2.6,()=>guard(g,t,Math.abs(Math.sin(t*3))));for(let i=0;i<3;i++){const q=(t*1.2+i/3)%1;g.globalAlpha=1-q;at(g,300+i*120,420+q*120,1.6,()=>sweat(g));g.globalAlpha=1}
+     bubFlow(g,t,10,-60,900,900,880,.8);at(g,420,880,pop(t,.2),()=>plaque(g,'СТВОЛ МОЗГА',P.terra,56,P.cream))},{zoom:1.3,shake:2}],
+   [1.8,(g,t)=>{bgFill(g,P.dark);at(g,270,470,1.15,()=>lungs(g,.5+.5*Math.sin(t*3)));at(g,600,480,1.3,()=>heart(g,t,1.4));at(g,420,860,pop(t,.2),()=>plaque(g,'ДЫХАНИЕ И СЕРДЦЕ',P.mustard,46))},{zoom:1.3}],
+   [1.8,(g,t)=>{bgFill(g,P.sage);rays(g,420,495,'rgba(246,238,221,.2)',t);friend(g,230,560,.6,'norm',t);friend(g,610,560,.6,'smile',t);at(g,420,860,pop(t,.2),()=>plaque(g,'НОРМАЛЬНЫЕ КЕНТЫ',P.cream,48))},{zoom:1.25}],
+   [2.0,(g,t)=>{yarikSide(g,t,{dark:1});friend(g,690,330,.42,'norm',t);at(g,640,720,pop(t,.2),()=>plaque(g,'НА БОК',P.mustard,56))},{zoom:1.25,push:.05}],
+   [1.4,(g,t)=>{yarikSide(g,t,{dark:1,z:0});friend(g,640,300,.5,'norm',t);at(g,420,140,pop(t,.1),()=>plaque(g,'НЕ БРОСИЛИ',P.cream,56))},{zoom:1.3}],
+   [2.0,(g,t)=>{bgFill(g,P.terraL);rays(g,420,495,'rgba(246,238,221,.25)',t*2);at(g,420,480,1.7,()=>shrimp(g,t),Math.sin(t*2)*.05);at(g,420,860,pop(t,.2),()=>plaque(g,'ДЫШИТ?',P.cream,60))},{zoom:1.3}],
+   [2.4,(g,t)=>{bgFill(g,P.dark);['НЕ ПРОСЫПАЕТСЯ','ДЫШИТ РЕДКО'].forEach((s,i)=>at(g,420,250+i*200,pop(t,.1+i*.45),()=>plaque(g,s,P.terra,46,P.cream)));at(g,420,800,pop(t,1),()=>{g.beginPath();g.moveTo(0,-90);g.lineTo(100,80);g.lineTo(-100,80);g.closePath();fs(g,P.mustard,P.choc,7);txt(g,'!',0,20,90,P.choc)})},{zoom:1.25}],
+   [1.6,(g,t)=>{yarikSide(g,t,{blue:1,emo:'bad',z:0});at(g,420,140,pop(t,.15),()=>plaque(g,'СИНИЙ, КАК СМУРФИК',P.cream,44))},{zoom:1.35,shake:2}],
+   [1.8,(g,t)=>{bgFill(g,P.darker);at(g,420,480,1.25,()=>call112(g,t));at(g,420,890,pop(t,.2),()=>plaque(g,'СРАЗУ 112',P.terra,56,P.cream))},{zoom:1.35,shake:3}],
+   [1.6,(g,t)=>{bgFill(g,P.beige);at(g,420,480,pop(t,.05),()=>bubbleTxt(g,'ДА ПУСТЬ ПРОСПИТСЯ',40));if(t>.4)at(g,420,470,pop(t,.4),()=>cross(g,170,P.terra))},{zoom:1.3}],
+   [2.2,(g,t)=>{bgFill(g,P.mustard);rays(g,420,495,'rgba(246,238,221,.3)',t);at(g,170,160,.9,()=>sun(g,t));yk(g,420,540,1,'norm',t,{look:0,blink:.3});at(g,420,880,pop(t,.3),()=>plaque(g,'ДОЖИЛ ДО ВИДОСА',P.cream,48))},{zoom:1.2,push:.05}]])}},
+ // 6 — панч: сосед-дорожник, вывод
+ {txt:'[knocking on door] [chuckling] А конус, кстати, оказался соседский. [playful] Вывод простой: каждый бокал по очереди выключает отделы мозга. Сначала тормоза, потом ноги, потом память. [slowly] Так что знай свою фазу. [sighing] Ярик свою вчера проспал.',bg:P.beige,lux:2,est:14,cues:[0,3,5,7,14,20,25],draw(g,t,d){shots(g,t,d,[
+   [1.6,(g,t)=>{bgFill(g,HALLY);at(g,420,560,1.3,()=>doorK(g,t,1),Math.sin(t*40)*.006)},{zoom:1.3,shake:3}],
+   [2.0,(g,t)=>{bgFill(g,HALLY);neighbor(g,620,380,1.3,t);yk(g,240,600,.6,'bad',t,{look:1});at(g,420-eo(t/1.4)*20,700-eo(t/1.4)*60,.9,()=>cone(g),.2);at(g,420,140,pop(t,.3),()=>plaque(g,'СОСЕДСКИЙ',CONE,58,P.cream))},{zoom:1.3}],
+   [1.0,(g,t)=>{bgFill(g,P.terra);rays(g,420,495,'rgba(246,238,221,.2)',t*3);stamp(g,'ВЫВОД',420,495,P.choc,t,.02,-.06,120)},{zoom:1.5,shake:5}],
+   [1.8,(g,t)=>{brainOffice(g,t,{labels:0,kora:t>.4?2:0,cam:t<1.0});if(t>.7){g.fillStyle='rgba(20,12,10,.4)';g.fillRect(-200,470,620,40)}bubFlow(g,t,10,-60,500,900,480,.9);at(g,420,70,pop(t,.1),()=>plaque(g,'ОТДЕЛ ЗА ОТДЕЛОМ',P.mustard,46))},{zoom:1.3}],
+   [2.2,(g,t)=>{bgFill(g,P.dark);chain(g,t)},{zoom:1.15}],
+   [1.6,(g,t)=>{bgFill(g,P.mustard);rays(g,420,495,'rgba(246,238,221,.3)',t);at(g,420,430,1.6,()=>mugBeer(g,.33,t));at(g,420,840,pop(t,.2),()=>plaque(g,'ЗНАЙ СВОЮ ФАЗУ',P.cream,56))},{zoom:1.3,push:.05}],
+   [2.0,(g,t)=>{bgFill(g,P.beige);at(g,420,760,1,()=>sofa(g));yk(g,420,560,.7,'norm',t,{rot:-.5,blink:1});zzz(g,t,560,330);at(g,700,760,.8,()=>cone(g),.3);at(g,420,130,pop(t,.2),()=>plaque(g,'ПРОСПАЛ',P.terra,60,P.cream))},{zoom:1.25,push:.05}]])}},
+];
+const HALLY='#E3D3B8';
+function bubbleTxt(g,s,size=48,col=P.cream){g.font=`900 ${size}px ${F}`;const w=g.measureText(s).width+60;rr(g,-w/2,-size,w,size*2,size*.6);fs(g,col,P.choc,6);
+  g.beginPath();g.moveTo(-20,size-2);g.lineTo(-44,size+40);g.lineTo(14,size-2);g.closePath();fs(g,col,null);g.strokeStyle=P.choc;g.lineWidth=6;g.beginPath();g.moveTo(-20,size);g.lineTo(-44,size+40);g.lineTo(14,size);g.stroke();txt(g,s,0,3,size,P.choc)}
