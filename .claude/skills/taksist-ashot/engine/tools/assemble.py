@@ -1,10 +1,11 @@
 # python3 tools/assemble.py tools/lines.json public/voice src/timeline.json public/voice.wav
 # Раскладывает реплики подряд с паузой GAP, пишет общий голос, тайминги слов (ASR) и амплитуду по кадрам для липсинка.
-import json, sys, re, subprocess, numpy as np
+import json, os, sys, re, subprocess, numpy as np
 from scipy.io import wavfile
 from scipy.signal import resample_poly
-FPS, SR, GAP, LEAD, TAIL = 30, 48000, 0.12, 0.35, 0.9
-GAPS = {"p2": 0.18, "a2": 0.45}       # доп. пауза перед репликой (шок держим чуть дольше)
+FPS, SR, GAP, LEAD = 30, 48000, 0.12, 0.35
+TAIL = float(os.environ.get("TAIL", "0.9"))  # хвост после последней реплики (под шпаргалку в полной серии ~3.5)
+GAPS = {"p2": 0.18, "a2": 0.45}       # доп. пауза перед репликой (шок держим чуть дольше); в lines.json можно задать "gap"
 lines = json.load(open(sys.argv[1])); vdir = sys.argv[2]
 try:
     from faster_whisper import WhisperModel
@@ -13,10 +14,11 @@ except Exception as e:
     print("no ASR, слова по длине", e); asr = None
 t = LEAD; clips = []; out_lines = []
 for L in lines:
-    t += GAPS.get(L["id"], 0)
+    t += L.get("gap", GAPS.get(L["id"], 0))
     sr, x = wavfile.read(f"{vdir}/{L['id']}.wav"); x = x.astype(np.float32) / 32768
     dur = len(x) / SR
-    words = [w for w in re.sub(r"\[[a-z -]+\]", "", L["text"]).replace("́", "").split()]
+    # слова для субтитров: "sub" (нормальная орфография), иначе text без тегов
+    words = [w for w in re.sub(r"\[[a-z ,-]+\]", "", L.get("sub", L["text"])).replace("́", "").replace("…", "").split() if w not in ("—", "-")]
     timing = None
     if asr:
         segs, _ = asr.transcribe(resample_poly(x, 1, 3).astype(np.float32), language="ru", word_timestamps=True, vad_filter=False)

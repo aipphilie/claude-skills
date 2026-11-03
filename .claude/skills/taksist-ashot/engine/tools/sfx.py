@@ -11,7 +11,7 @@ def cue(name):
     c = story['cues'][name] if isinstance(name, str) else name
     if isinstance(c, (int, float)): return c
     i, w, off = c; l = L[i]
-    return (l['end'] if w == 'end' else l['words'][w]['s']) + (off or 0)
+    return (l['end'] if w == 'end' else l['start'] if w == 'start' else l['words'][w]['s']) + (off or 0)
 def bp(x, lo, hi): b, a = butter(2, [lo / (SR / 2), hi / (SR / 2)], 'band'); return lfilter(b, a, x)
 def lp(x, hi): b, a = butter(2, hi / (SR / 2), 'low'); return lfilter(b, a, x)
 def env(n, a=.005, r=.1): t = np.arange(n) / SR; return np.minimum(1, t / a) * np.exp(-t / r)

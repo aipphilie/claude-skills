@@ -132,7 +132,7 @@ const SideCabin: React.FC<{t?: number}> = ({t = 0}) => (
   </g>
 );
 const fmt = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: number}> = ({mode, value}) => {
+export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: number; label?: string}> = ({mode, value, label}) => {
   const val = value !== undefined ? fmt(value) : mode === 'crazy' ? '12 000 000' : mode === 'rewind' ? '− − − − −' : '400';
   return (
     <svg viewBox="0 0 1080 1920">
@@ -143,8 +143,8 @@ export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: num
         <text x={-400} y={-200} fontFamily={F} fontWeight={800} fontSize={46} fill="#8A7A70">ТАКСОМЕТР</text>
         <circle cx={380} cy={-214} r={22} fill={mode === 'crazy' ? '#E0523E' : P.sage} />
         <rect x={-420} y={-140} width={840} height={300} rx={30} fill="#3A1F14" />
-        <text x={0} y={70} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={mode === 'fare' ? 220 : 140} fill={mode === 'rewind' ? '#9FD18A' : '#FF9A4A'}>{val} ₽</text>
-        <text x={0} y={240} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={44} fill={P.cream}>{mode === 'fare' ? 'ПОЕЗДКА' : mode === 'crazy' ? 'ПЕРЕПЛАТА БАНКУ' : 'ПЕРЕПЛАТА ↓'}</text>
+        <text x={0} y={70} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={mode === 'fare' ? 220 : val.length > 9 ? 112 : 140} fill={mode === 'rewind' ? '#9FD18A' : '#FF9A4A'}>{val} ₽</text>
+        <text x={0} y={240} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={44} fill={P.cream}>{label || (mode === 'fare' ? 'ПОЕЗДКА' : mode === 'crazy' ? 'ПЕРЕПЛАТА БАНКУ' : 'ПЕРЕПЛАТА ↓')}</text>
       </g>
       {mode === 'crazy' && <>
         {[[-300, -380], [120, -420], [380, -360]].map(([x, y], i) => <circle key={i} cx={540 + x} cy={880 + y} r={70 + i * 20} fill="#8C8079" opacity={0.6} />)}

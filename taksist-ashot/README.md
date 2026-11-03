@@ -8,12 +8,13 @@
 
 | Папка / файл | Что там |
 |---|---|
-| `serii/01-ipoteka/scenariy-2min.md` | **Сценарий серии «Ипотека»** (v2, ~1:35): реплики для озвучки, кадры, расчёты, закреп |
+| `serii/01-ipoteka/scenariy-2min.md` | **Сценарий серии «Ипотека»** (v2, ~2:08 в озвучке): реплики для озвучки, кадры, расчёты, закреп |
 | `serii/01-ipoteka/sud-2min.md` | Суд присяжных над полной серией и что исправлено |
 | `serii/01-ipoteka/scenariy-17sek.md`, `sud-17sek.md` | Короткая версия и её суд |
 | `serii/01-ipoteka/tz-pilot.md` | Исходное ТЗ пилота |
 | `serii/01-ipoteka/raskadrovka.png` | Раскадровка на 15 ракурсов |
-| `serii/01-ipoteka/chernovik-v2.mp4` | Черновое видео (временный голос) |
+| `serii/01-ipoteka/chernovik-v3-polnaya.mp4` | Черновой монтаж полной серии (~2:08) с голосами ElevenLabs |
+| `serii/01-ipoteka/chernovik-v2.mp4` | Старое черновое видео короткой версии (временный голос) |
 | `personazhi/` | Ашот (вариант Д, эмоции), отклонённые варианты, пассажиры |
 | `../.claude/skills/taksist-ashot/` | Скилл: правила сериала, реализм, голоса (`GOLOSA.md`), движок на Remotion |
 
