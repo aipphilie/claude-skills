@@ -20,6 +20,7 @@ export type AshotState = {
   look: [number, number]; // направление зрачков -1..1
   arm: {from: ArmPose; to: ArmPose; k: number};
   poke?: number;     // 0..1 тычок пальцем вперёд
+  noRightArm?: boolean; // правую руку рисует сцена сама (например, тянется в камеру)
 };
 
 const ARM: Record<ArmPose, {e: [number, number]; h: [number, number]; hand: 'fist' | 'finger' | 'palm'}> = {
@@ -205,10 +206,12 @@ export const Ashot: React.FC<{s: AshotState}> = ({s}) => {
       </g>
 
       {/* правая рука */}
+      {!s.noRightArm && <>
       {limb([[215, 70], eR], 92, P.shirt)}
       <ellipse cx={eR[0]} cy={eR[1]} rx={54} ry={34} fill={P.shirtShade} stroke={P.ink} strokeWidth={O} />
       {limb([eR, hR], 62, P.skin)}
       <Hand x={hR[0]} y={hR[1]} kind={handKind} rot={handKind === 'finger' ? 8 - poke * 30 : handKind === 'palm' ? -8 : 0} />
+      </>}
     </g>
   );
 };

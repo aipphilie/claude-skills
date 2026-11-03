@@ -2,7 +2,7 @@ import React from 'react';
 import {P} from '../palette';
 import {Ashot, AshotEyes, AshotState} from '../characters/Ashot';
 import {RiderFigure, Rider, Emotion, EMO, RIDERS} from '../characters/Rider';
-import {City, Buildings, CabinBack} from '../scene/Cabin';
+import {City, Buildings, CabinBack, CabinFront, DriverSeat} from '../scene/Cabin';
 
 // Сцены-ракурсы сериала. Каждая рисует кадр 1080×1920 и принимает t (сек от начала плана).
 // Используются и в раскадровке (Storyboard.tsx), и в ролике.
@@ -48,8 +48,7 @@ export const TaxiSide: React.FC<{t?: number}> = ({t = 0}) => (
     {/* шашечки */}
     {Array.from({length: 14}, (_, i) => <rect key={i} x={-330 + i * 46} y={-132 + (i % 2) * 20} width={23} height={20} fill={P.ink} />)}
     <path d="M-392,-90 L402,-90" stroke={TAXI_D} strokeWidth={6} />
-    <rect x={-10} y={-336} width={130} height={42} rx={10} fill={P.cream} stroke={P.ink} strokeWidth={7} />
-    <text x={55} y={-305} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={30} fill={P.ink}>ТАКСИ</text>
+    <g transform="translate(55,-296)"><Checker w={150} h={46} /></g>
     <rect x={378} y={-150} width={28} height={32} rx={8} fill="#FFF1C8" stroke={P.ink} strokeWidth={6} />
     <rect x={-398} y={-150} width={20} height={30} rx={6} fill="#E0523E" stroke={P.ink} strokeWidth={6} />
     {[-250, 255].map((x) => (
@@ -84,38 +83,11 @@ export const ShotExterior: React.FC<{t?: number}> = ({t = 0}) => (
   </svg>
 );
 
-// 2. Хук: телефон «ипотека одобрена»
-export const ShotPhone: React.FC<{rider?: Rider}> = ({rider = RIDERS[0]}) => (
-  <svg viewBox="0 0 1080 1920">
-    <g transform="translate(-260,-420) scale(1.5)"><CabinBack t={0} /></g>
-    <g transform="translate(540,1300) scale(1.9)"><RiderFigure r={rider} e={{...EMO.talk, smile: 0.8, look: [0, 0.4]}} /></g>
-    <g transform="translate(560,860) rotate(-8)">
-      <rect x={-210} y={-380} width={420} height={760} rx={56} fill="#1D1A1F" stroke={P.ink} strokeWidth={12} />
-      <rect x={-184} y={-344} width={368} height={688} rx={38} fill={P.cream} />
-      <circle cx={0} cy={-150} r={86} fill={P.sage} stroke={P.ink} strokeWidth={8} />
-      <path d="M-40,-150 L-8,-116 L46,-186" fill="none" stroke={P.cream} strokeWidth={20} strokeLinecap="round" strokeLinejoin="round" />
-      <text y={-10} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.ink}>ИПОТЕКА</text>
-      <text y={50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.sageDark}>ОДОБРЕНА</text>
-      <rect x={-150} y={100} width={300} height={90} rx={20} fill={P.beige} stroke={P.ink} strokeWidth={5} />
-      <text y={160} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={P.ink}>5 000 000 ₽</text>
-      <rect x={-150} y={230} width={300} height={70} rx={35} fill={P.mustard} stroke={P.ink} strokeWidth={5} />
-      <text y={276} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={32} fill={P.ink}>ПОДПИСАТЬ</text>
-      {/* пальцы пассажира */}
-      {[0, 1, 2].map((i) => <rect key={i} x={196} y={-60 + i * 70} width={70} height={52} rx={26} fill={rider.skin} stroke={P.ink} strokeWidth={7} />)}
-      <rect x={-262} y={40} width={80} height={56} rx={28} fill={rider.skin} stroke={P.ink} strokeWidth={7} />
-    </g>
-    {Array.from({length: 22}, (_, i) => {
-      const x = (i * 137) % 1000 + 40, y = 300 + ((i * 251) % 900);
-      return <rect key={i} x={x} y={y} width={22} height={12} rx={3} fill={[P.mustard, P.terracotta, P.sage, P.cream][i % 4]} transform={`rotate(${i * 37} ${x} ${y})`} />;
-    })}
-    <Sub text="Брат, ипотеку взял" />
-  </svg>
-);
-
-// затылок Ашота (вид сзади)
 const AshotBack: React.FC = () => (
   <g>
     <path d="M-170,140 Q-200,0 -120,-30 L120,-30 Q200,0 170,140 L240,700 L-240,700Z" fill={P.shirt} stroke={P.ink} strokeWidth={10} />
+    <path d="M-170,140 Q-200,0 -120,-30 L120,-30 Q200,0 170,140" fill="none" stroke="#6A7890" strokeWidth={8} opacity={0.8} />
+    <path d="M-150,60 L150,640" stroke="#6B6560" strokeWidth={46} />
     <rect x={-80} y={-90} width={160} height={90} fill={P.skinShade} stroke={P.ink} strokeWidth={9} />
     <ellipse cx={0} cy={-200} rx={150} ry={150} fill={P.hairGray} stroke={P.ink} strokeWidth={10} />
     <path d="M-120,-140 q40,30 0,60 M110,-140 q-40,30 0,60" fill="none" stroke={P.hairDark} strokeWidth={5} />
@@ -136,33 +108,6 @@ const RoadAhead: React.FC<{t?: number}> = ({t = 0}) => (
   </g>
 );
 
-// 3 / 13. Зеркало глазами пассажира: в нём глаза Ашота
-export const ShotMirror: React.FC<{wink?: number; brow?: number}> = ({wink = 0, brow = 0.9}) => (
-  <svg viewBox="0 0 1080 1920">
-    <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
-    <RoadAhead />
-    <rect y={1100} width={1080} height={820} fill={P.cabin} />
-    <path d="M0,0 L1080,0 L1080,240 Q540,190 0,240Z" fill={P.cabinMid} />
-    <rect x={526} y={160} width={28} height={380} fill="#2A2220" stroke={P.ink} strokeWidth={6} />
-    <g transform="translate(540,720)">
-      <rect x={-420} y={-180} width={840} height={360} rx={110} fill="#241C1A" stroke={P.ink} strokeWidth={14} />
-      <clipPath id="mclip"><rect x={-394} y={-154} width={788} height={308} rx={90} /></clipPath>
-      <g clipPath="url(#mclip)">
-        <rect x={-400} y={-160} width={800} height={320} fill={P.skin} />
-        <path d="M-400,-160 L400,-160 L400,-110 Q0,-80 -400,-110Z" fill={P.capDark} />
-        <g transform="translate(0,600) scale(2.4)">
-          <AshotEyes s={{...A0, browL: brow, browR: 0.2 + wink * 0.3, wink, look: [0.2, 0.5]}} dx={0} />
-        </g>
-        <path d="M-30,60 Q-40,130 -60,160 L60,160 Q40,130 30,60Z" fill={P.skinShade} stroke={P.ink} strokeWidth={8} />
-        <path d="M-380,-150 L-260,-150 L-380,150Z" fill="#fff" opacity={0.15} />
-      </g>
-    </g>
-    <g transform="translate(290,1560) scale(1.1)"><AshotBack /></g>
-    <Sub text={wink ? 'Запомнил?' : 'пять лямов. Норм же?'} keys={['пять', 'лямов.']} />
-  </svg>
-);
-
-// салон сбоку: камера на переднем пассажирском сиденье, Ашот лицом к дороге (вправо)
 const SideCabin: React.FC<{t?: number}> = ({t = 0}) => (
   <g>
     <rect width={1080} height={1920} fill={P.cabin} />
@@ -177,29 +122,6 @@ const SideCabin: React.FC<{t?: number}> = ({t = 0}) => (
     <rect x={70} y={600} width={200} height={190} rx={60} fill={P.seatDark} stroke={P.ink} strokeWidth={10} />
   </g>
 );
-const SideWheel = () => (
-  <g transform="translate(860,1380)">
-    <ellipse rx={70} ry={250} fill="none" stroke={P.ink} strokeWidth={54} />
-    <ellipse rx={70} ry={250} fill="none" stroke="#3E3532" strokeWidth={36} />
-    <path d="M60,0 L240,80" stroke={P.ink} strokeWidth={50} />
-  </g>
-);
-
-// 4 / 7. Ашот за рулём, вид с пассажирского сиденья
-export const ShotSide: React.FC<{turn?: number; arm?: 'rest' | 'up'; mouth?: number; text: string; keys?: string[]; whoosh?: boolean}> = ({turn = 0.3, arm = 'rest', mouth = 2, text, keys, whoosh}) => (
-  <svg viewBox="0 0 1080 1920">
-    <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
-    <SideCabin />
-    <g transform="translate(470,1180) scale(-1.15,1.15)">
-      <Ashot s={{...A0, turn, mouth, smirk: 1, look: turn > 0.5 ? [0.7, 0] : [-0.8, -0.2], arm: {from: arm, to: arm, k: 1}}} />
-    </g>
-    <SideWheel />
-    {whoosh && <g opacity={0.8}>{[0, 1, 2].map((i) => <path key={i} d={`M${200 + i * 30},${520 + i * 60} q-120,80 -60,200`} fill="none" stroke={P.cream} strokeWidth={12} strokeLinecap="round" />)}</g>}
-    <Sub text={text} keys={keys} />
-  </svg>
-);
-
-// 5 / 12. Таксометр крупно
 export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'}> = ({mode}) => {
   const val = mode === 'crazy' ? '12 000 000' : mode === 'rewind' ? '− − − − −' : '400';
   return (
@@ -235,39 +157,6 @@ export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'}> = ({mode})
   );
 };
 
-// 6 / 15. Через лобовое стекло снаружи
-export const ShotWindshield: React.FC<{shock?: number; freeze?: boolean; text: string; keys?: string[]}> = ({shock = 1, freeze, text, keys}) => (
-  <svg viewBox="0 0 1080 1920">
-    <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
-    <rect width={1080} height={1920} fill={P.sky1} />
-    <g filter="url(#blur8)">{Array.from({length: 10}, (_, i) => <circle key={i} cx={(i * 211) % 1080} cy={200 + (i * 97) % 400} r={30} fill={[P.lamp, '#FFD9A0', '#E0523E'][i % 3]} opacity={0.6} />)}</g>
-    <path d="M60,500 Q540,400 1020,500 L1080,1500 L0,1500Z" fill={TAXI} stroke={P.ink} strokeWidth={12} />
-    <rect x={460} y={400} width={160} height={54} rx={12} fill={P.cream} stroke={P.ink} strokeWidth={8} />
-    <text x={540} y={442} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={36} fill={P.ink}>ТАКСИ</text>
-    <clipPath id="wsh"><path d="M140,560 Q540,490 940,560 L1010,1440 L70,1440Z" /></clipPath>
-    <g clipPath="url(#wsh)">
-      <rect width={1080} height={1920} fill={P.cabin} />
-      <clipPath id="rw"><path d="M240,640 L840,640 L860,900 L220,900Z" /></clipPath>
-      <g clipPath="url(#rw)"><g transform="translate(-40,180) scale(1.1,0.75)"><City t={0} /></g></g>
-      <path d="M150,860 L930,860 L960,1500 L120,1500Z" fill={P.seat} stroke={P.ink} strokeWidth={10} />
-      <g transform="translate(400,1150) scale(1.35)"><RiderFigure r={RIDERS[0]} e={{...EMO.shock, shock, mouth: freeze ? 0 : 3}} /></g>
-      <g transform="translate(790,1380) scale(1.05)"><Ashot s={{...A0, turn: 0.75, smirk: 1, look: [-0.5, 0], arm: {from: freeze ? 'palm' : 'rest', to: freeze ? 'palm' : 'rest', k: 1}}} /></g>
-      <g transform="translate(790,1500) rotate(4)">
-        <ellipse rx={200} ry={70} fill="none" stroke={P.ink} strokeWidth={46} />
-        <ellipse rx={200} ry={70} fill="none" stroke="#3E3532" strokeWidth={30} />
-      </g>
-      <path d="M200,560 L340,560 L160,1440 L60,1440Z" fill="#fff" opacity={0.1} />
-      <path d="M760,540 L820,540 L700,1440 L660,1440Z" fill="#fff" opacity={0.08} />
-    </g>
-    <path d="M140,560 Q540,490 940,560 L1010,1440 L70,1440Z" fill="none" stroke={P.ink} strokeWidth={16} />
-    <path d="M-20,1440 L1100,1440 L1100,1920 L-20,1920Z" fill={TAXI} stroke={P.ink} strokeWidth={12} />
-    <path d="M140,1440 Q330,1460 520,1430 M560,1430 Q750,1460 940,1440" stroke={P.ink} strokeWidth={14} fill="none" strokeLinecap="round" />
-    {freeze && <rect x={18} y={18} width={1044} height={1884} fill="none" stroke={P.cream} strokeWidth={24} />}
-    <Sub text={text} keys={keys} />
-  </svg>
-);
-
-// 8. Пассажир стареет на заднем сиденье
 const AGES: Rider[] = [
   RIDERS[0],
   {...RIDERS[0], name: '35', hair: 'sidepart', hairColor: '#6A5446', clothes: 'shirtTie', c1: '#C9C2B4', c2: '#6B5A4A', glasses: true, wrinkles: true, bodyScale: 1.12},
@@ -341,82 +230,358 @@ const PokeHand: React.FC<{x: number; y: number; rot?: number; s?: number}> = ({x
   </g>
 );
 
-// 9. Торпеда: рука Ашота тянется к навигатору
+// ---------- шашки на крыше (начало координат — низ по центру)
+export const Checker: React.FC<{w: number; h: number}> = ({w, h}) => {
+  const n = 7, cw = w / n, ch = h / 2;
+  return (
+    <g>
+      <ellipse cx={0} cy={-h / 2} rx={w * 0.75} ry={h * 1.1} fill="#FFE7A8" opacity={0.18} />
+      <rect x={-w / 2} y={-h} width={w} height={h} rx={8} fill={P.mustard} />
+      {Array.from({length: n * 2}, (_, i) => { const c = i % n, r = Math.floor(i / n); return (c + r) % 2 === 0 ? <rect key={i} x={-w / 2 + c * cw} y={-h + r * ch} width={cw} height={ch} fill={P.ink} /> : null; })}
+      <rect x={-w / 2} y={-h} width={w} height={h} rx={8} fill="none" stroke={P.ink} strokeWidth={6} />
+      <rect x={-w / 2 + 10} y={-4} width={w - 20} height={10} rx={4} fill="#2A2422" />
+    </g>
+  );
+};
+
+// ---------- торпеда «как у классики» (вид с заднего сиденья, водитель слева)
+const Dash2107: React.FC<{fare?: string; wheel?: boolean}> = ({fare = '312', wheel = true}) => (
+  <g>
+    <path d="M-50,1000 Q540,950 1130,1000 L1130,1920 L-50,1920Z" fill="#1F1B1A" stroke={P.ink} strokeWidth={10} />
+    <path d="M-50,1000 Q540,950 1130,1000 L1130,1030 Q540,980 -50,1030Z" fill="#2E2826" />
+    {/* щиток приборов под козырьком */}
+    <path d="M200,1010 Q390,950 590,1010 L580,1080 L210,1080Z" fill="#141110" stroke={P.ink} strokeWidth={8} />
+    {[320, 470].map((x, i) => (
+      <g key={x} transform={`translate(${x},1060)`}>
+        <circle r={56} fill="#0E0C0B" stroke="#6E6660" strokeWidth={6} />
+        {Array.from({length: 9}, (_, k) => { const a = Math.PI * (0.8 + k * 0.175); return <path key={k} d={`M${Math.cos(a) * 40},${Math.sin(a) * 40} L${Math.cos(a) * 50},${Math.sin(a) * 50}`} stroke="#E9E1D2" strokeWidth={4} />; })}
+        <path d={`M0,0 L${Math.cos(Math.PI * (1.2 + i * 0.5)) * 42},${Math.sin(Math.PI * (1.2 + i * 0.5)) * 42}`} stroke="#FF9A4A" strokeWidth={6} strokeLinecap="round" />
+      </g>
+    ))}
+    {/* центральная консоль: часы, решётки, магнитола */}
+    <rect x={660} y={1040} width={260} height={300} rx={14} fill="#191514" stroke={P.ink} strokeWidth={8} />
+    {[0, 1, 2, 3].map((i) => <rect key={i} x={680 + i * 60} y={1060} width={44} height={60} rx={6} fill="#0E0C0B" />)}
+    <rect x={690} y={1150} width={200} height={70} rx={8} fill="#0E0C0B" stroke="#6E6660" strokeWidth={4} />
+    <text x={790} y={1198} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={36} fill="#9FD18A">FM 101.7</text>
+    <circle cx={790} cy={1280} r={36} fill="#0E0C0B" stroke="#6E6660" strokeWidth={5} />
+    <path d="M790,1280 l0,-24 M790,1280 l16,8" stroke="#E9E1D2" strokeWidth={4} strokeLinecap="round" />
+    {/* таксометр на торпеде */}
+    <g transform="translate(960,990)">
+      <rect x={-100} y={-50} width={200} height={84} rx={14} fill="#1E1816" stroke={P.ink} strokeWidth={7} />
+      <text y={14} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill="#FF9A4A">{fare} ₽</text>
+    </g>
+    {/* тонкий двухспицевый руль */}
+    {wheel && <g transform="translate(395,1110)">
+      <ellipse rx={270} ry={200} fill="none" stroke={P.ink} strokeWidth={30} />
+      <ellipse rx={270} ry={200} fill="none" stroke="#2A2422" strokeWidth={18} />
+      <path d="M-60,30 L-250,90 M60,30 L250,90" stroke={P.ink} strokeWidth={34} strokeLinecap="round" />
+      <path d="M-60,30 L-250,90 M60,30 L250,90" stroke="#2A2422" strokeWidth={22} strokeLinecap="round" />
+      <ellipse cx={0} cy={30} rx={80} ry={56} fill="#2A2422" stroke={P.ink} strokeWidth={8} />
+      <circle cx={0} cy={30} r={20} fill="#B9A58C" stroke={P.ink} strokeWidth={5} />
+    </g>}
+  </g>
+);
+
+// 2. Хук: телефон «ипотека одобрена» — кисть с пятью пальцами
+export const ShotPhone: React.FC<{rider?: Rider}> = ({rider = RIDERS[0]}) => (
+  <svg viewBox="0 0 1080 1920">
+    <g transform="translate(-260,-420) scale(1.5)"><CabinBack t={0} /></g>
+    <g transform="translate(540,1300) scale(1.9)"><RiderFigure r={rider} e={{...EMO.talk, smile: 0.8, look: [0, 0.4]}} /></g>
+    <g transform="translate(560,860) rotate(-8)">
+      {/* ладонь за телефоном */}
+      <path d="M-150,300 Q-170,420 -40,470 Q120,480 190,380 L200,250 L-140,250Z" fill={rider.skin} stroke={P.ink} strokeWidth={8} />
+      <rect x={-210} y={-380} width={420} height={760} rx={56} fill="#1D1A1F" stroke={P.ink} strokeWidth={12} />
+      <rect x={-184} y={-344} width={368} height={688} rx={38} fill={P.cream} />
+      <circle cx={0} cy={-150} r={86} fill={P.sage} stroke={P.ink} strokeWidth={8} />
+      <path d="M-40,-150 L-8,-116 L46,-186" fill="none" stroke={P.cream} strokeWidth={20} strokeLinecap="round" strokeLinejoin="round" />
+      <text y={-10} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.ink}>ИПОТЕКА</text>
+      <text y={50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.sageDark}>ОДОБРЕНА</text>
+      <rect x={-150} y={100} width={300} height={90} rx={20} fill={P.beige} stroke={P.ink} strokeWidth={5} />
+      <text y={160} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={P.ink}>5 000 000 ₽</text>
+      <rect x={-150} y={230} width={300} height={70} rx={35} fill={P.mustard} stroke={P.ink} strokeWidth={5} />
+      <text y={276} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={32} fill={P.ink}>ПОДПИСАТЬ</text>
+      {/* четыре пальца обхватывают правый край */}
+      {[0, 1, 2, 3].map((i) => <rect key={i} x={180} y={-30 + i * 66} width={66 - i * 4} height={56} rx={28} fill={rider.skin} stroke={P.ink} strokeWidth={7} />)}
+      {/* большой палец спереди слева */}
+      <path d="M-226,200 Q-250,120 -200,90 Q-160,80 -150,130 L-150,240Z" fill={rider.skin} stroke={P.ink} strokeWidth={7} />
+    </g>
+    {Array.from({length: 22}, (_, i) => {
+      const x = (i * 137) % 1000 + 40, y = 300 + ((i * 251) % 900);
+      return <rect key={i} x={x} y={y} width={22} height={12} rx={3} fill={[P.mustard, P.terracotta, P.sage, P.cream][i % 4]} transform={`rotate(${i * 37} ${x} ${y})`} />;
+    })}
+    <Sub text="Брат, ипотеку взял" />
+  </svg>
+);
+
+// 3 / 13. С заднего сиденья: голова Ашота наполовину перекрывает зеркало, во второй половине — его глаза
+export const ShotMirror: React.FC<{wink?: number; brow?: number}> = ({wink = 0, brow = 0.9}) => (
+  <svg viewBox="0 0 1080 1920">
+    <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
+    <RoadAhead />
+    <path d="M0,0 L1080,0 L1080,200 Q540,160 0,200Z" fill={P.cabinMid} />
+    <path d="M0,180 L90,180 L40,1000 L0,1000Z M1080,180 L990,180 L1040,1000 L1080,1000Z" fill={P.cabinLight} stroke={P.ink} strokeWidth={8} />
+    <Dash2107 />
+    {/* зеркало */}
+    <rect x={608} y={150} width={24} height={150} fill="#2A2220" stroke={P.ink} strokeWidth={6} />
+    <g transform="translate(620,420)">
+      <rect x={-330} y={-125} width={660} height={250} rx={40} fill="#1E1A19" stroke={P.ink} strokeWidth={12} />
+      <clipPath id="mclip2"><rect x={-310} y={-105} width={620} height={210} rx={28} /></clipPath>
+      <g clipPath="url(#mclip2)">
+        <rect x={-320} y={-110} width={640} height={220} fill="#4A3B36" />
+        <g transform="translate(110,0)">
+          <rect x={-200} y={-110} width={400} height={220} fill={P.skin} />
+          <path d="M-200,-110 L200,-110 L200,-80 Q0,-60 -200,-80Z" fill={P.capDark} />
+          <g transform="translate(0,436) scale(2)"><AshotEyes s={{...A0, browL: brow, browR: 0.2 + wink * 0.3, wink, look: [0.25, 0.4]}} dx={0} /></g>
+          <path d="M-24,70 Q-34,100 -40,110 L40,110 Q34,100 24,70Z" fill={P.skinShade} stroke={P.ink} strokeWidth={7} />
+          {[-1, 1].map((sd) => <path key={sd} d={`M${sd * 200},-110 Q${sd * 170},0 ${sd * 200},110`} fill={P.hairGray} stroke={P.ink} strokeWidth={6} />)}
+        </g>
+        <path d="M-300,-100 L-220,-100 L-300,100Z" fill="#fff" opacity={0.12} />
+      </g>
+    </g>
+    {/* руки на руле по бокам */}
+    {[[120, 1100, -20], [560, 1100, 20]].map(([x, y, r], i) => (
+      <g key={i} transform={`translate(${x},${y}) rotate(${r})`}>
+        <rect x={-40} y={-34} width={80} height={68} rx={30} fill={P.skin} stroke={P.ink} strokeWidth={8} />
+      </g>
+    ))}
+    <g transform="translate(340,730) scale(0.9)"><AshotBack /></g>
+    <Sub text={wink ? 'Запомнил?' : 'пять лямов. Норм же?'} keys={['пять', 'лямов.']} />
+  </svg>
+);
+
+// 4 / 7. Сбоку с переднего пассажирского: руль в перспективе, рука на ободе, приборка
+export const ShotSide: React.FC<{turn?: number; arm?: 'rest' | 'up'; mouth?: number; text: string; keys?: string[]; whoosh?: boolean}> = ({turn = 0.3, arm = 'rest', mouth = 2, text, keys, whoosh}) => (
+  <svg viewBox="0 0 1080 1920">
+    <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
+    <SideCabin />
+    {/* торпеда справа */}
+    <path d="M690,1080 L1100,1000 L1100,1920 L760,1920Z" fill="#1F1B1A" stroke={P.ink} strokeWidth={10} />
+    <path d="M700,1080 Q760,1020 860,1030 L880,1100 L720,1130Z" fill="#141110" stroke={P.ink} strokeWidth={8} />
+    <ellipse cx={800} cy={1090} rx={36} ry={30} fill="#0E0C0B" stroke="#6E6660" strokeWidth={5} />
+    <g transform="translate(450,1150) scale(-1.15,1.15)">
+      <Ashot s={{...A0, turn, mouth, smirk: 1, look: turn > 0.5 ? [0.7, 0] : [-0.8, -0.2], arm: {from: arm, to: arm, k: 1}}} />
+    </g>
+    {/* рулевая колонка и руль — перед Ашотом */}
+    <path d="M840,1450 L1100,1560" stroke={P.ink} strokeWidth={70} />
+    <path d="M840,1450 L1100,1560" stroke="#2A2422" strokeWidth={54} />
+    <g transform="translate(820,1420) rotate(-6)">
+      <ellipse rx={95} ry={250} fill="none" stroke={P.ink} strokeWidth={34} />
+      <ellipse rx={95} ry={250} fill="none" stroke="#5C504A" strokeWidth={20} />
+      <path d="M-70,-200 Q-96,0 -70,200" fill="none" stroke="#8A7C72" strokeWidth={6} strokeLinecap="round" />
+      <path d="M20,30 L-70,180 M20,30 L-74,-150" stroke={P.ink} strokeWidth={26} strokeLinecap="round" />
+      <path d="M20,30 L-70,180 M20,30 L-74,-150" stroke="#5C504A" strokeWidth={14} strokeLinecap="round" />
+      <ellipse cx={20} cy={30} rx={34} ry={64} fill="#5C504A" stroke={P.ink} strokeWidth={7} />
+    </g>
+    {/* кулак на ободе */}
+    <g transform="translate(728,1470) rotate(-10)">
+      <rect x={-46} y={-40} width={92} height={80} rx={34} fill={P.skin} stroke={P.ink} strokeWidth={9} />
+      <path d="M-40,-6 Q-10,6 30,-8" fill="none" stroke={P.skinShade} strokeWidth={5} />
+    </g>
+    {whoosh && <g opacity={0.8}>{[0, 1, 2].map((i) => <path key={i} d={`M${200 + i * 30},${520 + i * 60} q-120,80 -60,200`} fill="none" stroke={P.cream} strokeWidth={12} strokeLinecap="round" />)}</g>}
+    <Sub text={text} keys={keys} />
+  </svg>
+);
+
+// 6. Машина спереди: фары, решётка, капот, шашки
+export const ShotCarFront: React.FC<{text: string; keys?: string[]}> = ({text, keys}) => (
+  <svg viewBox="0 0 1080 1920">
+    <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
+    <rect width={1080} height={1920} fill={P.sky1} />
+    <g filter="url(#blur8)">{Array.from({length: 10}, (_, i) => <circle key={i} cx={(i * 211) % 1080} cy={150 + (i * 97) % 300} r={30} fill={[P.lamp, '#FFD9A0', '#E0523E'][i % 3]} opacity={0.6} />)}</g>
+    <rect y={1780} width={1080} height={140} fill="#2A2430" />
+    {/* кузов */}
+    <path d="M150,530 Q540,480 930,530 L1000,1170 L1050,1200 L1050,1800 L30,1800 L30,1200 L80,1170Z" fill={TAXI} stroke={P.ink} strokeWidth={12} strokeLinejoin="round" />
+    <g transform="translate(540,505)"><Checker w={240} h={66} /></g>
+    {/* салон через лобовое */}
+    <clipPath id="wsh2"><path d="M195,560 Q540,520 885,560 L950,1150 L130,1150Z" /></clipPath>
+    <g clipPath="url(#wsh2)">
+      <rect width={1080} height={1920} fill={P.cabin} />
+      <clipPath id="rw2"><path d="M300,650 L780,650 L800,860 L280,860Z" /></clipPath>
+      <g clipPath="url(#rw2)"><g transform="translate(40,200) scale(0.95,0.7)"><City t={0} /></g></g>
+      <path d="M200,840 L880,840 L900,1300 L180,1300Z" fill={P.seat} stroke={P.ink} strokeWidth={10} />
+      <g transform="translate(400,1040) scale(1.1)"><RiderFigure r={RIDERS[0]} e={{...EMO.shock, mouth: 3}} /></g>
+      <g transform="translate(760,1120) scale(0.92)"><Ashot s={{...A0, turn: 0.75, smirk: 1, look: [-0.5, 0]}} /></g>
+      <path d="M560,1150 Q560,1080 760,1070 Q960,1080 960,1150" fill="none" stroke={P.ink} strokeWidth={30} />
+      <path d="M60,1140 L1020,1100 L1020,1160 L60,1160Z" fill="#1F1B1A" />
+      <path d="M250,560 L360,560 L210,1150 L140,1150Z" fill="#fff" opacity={0.1} />
+      <path d="M760,550 L810,550 L700,1150 L670,1150Z" fill="#fff" opacity={0.08} />
+    </g>
+    <path d="M195,560 Q540,520 885,560 L950,1150 L130,1150Z" fill="none" stroke={P.ink} strokeWidth={14} />
+    {/* дворники */}
+    <path d="M200,1150 L520,1100 M560,1150 L880,1100" stroke={P.ink} strokeWidth={14} strokeLinecap="round" />
+    {/* капот с рёбрами */}
+    <path d="M60,1190 L1020,1190 L1050,1560 L30,1560Z" fill={TAXI} stroke={P.ink} strokeWidth={10} />
+    <path d="M400,1195 L340,1555 M680,1195 L740,1555" stroke={TAXI_D} strokeWidth={8} />
+    {/* решётка и прямоугольные фары */}
+    <rect x={30} y={1560} width={1020} height={150} fill="#2A2422" stroke={P.ink} strokeWidth={10} />
+    {[0, 1, 2, 3].map((i) => <path key={i} d={`M330,${1590 + i * 30} L750,${1590 + i * 30}`} stroke="#B9B2A8" strokeWidth={10} />)}
+    {[[60, 300], [780, 1020]].map(([a, b], i) => (
+      <g key={i}>
+        <rect x={a} y={1575} width={b - a} height={120} rx={14} fill="#FFF3CF" stroke={P.ink} strokeWidth={8} />
+        <circle cx={(a + b) / 2 + (i ? 40 : -40)} cy={1635} r={42} fill="#FFFBEB" stroke={P.ink} strokeWidth={5} />
+        <rect x={(a + b) / 2 + (i ? -110 : 30)} y={1600} width={80} height={70} rx={8} fill="#FFE7A8" stroke={P.ink} strokeWidth={4} />
+      </g>
+    ))}
+    <path d="M300,1640 L60,1500 L60,1780Z M780,1640 L1020,1500 L1020,1780Z" fill="#FFE7A8" opacity={0.0} />
+    {/* бампер и номер */}
+    <rect x={10} y={1715} width={1060} height={60} rx={28} fill="#B9B2A8" stroke={P.ink} strokeWidth={9} />
+    <rect x={400} y={1690} width={280} height={74} rx={8} fill="#F5F2EA" stroke={P.ink} strokeWidth={7} />
+    <text x={540} y={1745} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={48} fill={P.ink}>А 400 ВА</text>
+    <Sub text={text} keys={keys} />
+  </svg>
+);
+
+// ---------- телефон-навигатор в держателе (интерфейс «как у навигатора», без логотипов)
+export const NavPhone: React.FC<{pick?: boolean}> = ({pick = true}) => (
+  <g>
+    <rect x={-270} y={-520} width={540} height={1040} rx={60} fill="#111014" stroke={P.ink} strokeWidth={12} />
+    <clipPath id="navp"><rect x={-246} y={-494} width={492} height={988} rx={44} /></clipPath>
+    <g clipPath="url(#navp)">
+      <rect x={-250} y={-500} width={500} height={1000} fill="#2F333B" />
+      {Array.from({length: 8}, (_, i) => <path key={i} d={`M-260,${-480 + i * 120} L260,${-440 + i * 120}`} stroke="#444A55" strokeWidth={22} />)}
+      {Array.from({length: 6}, (_, i) => <path key={'v' + i} d={`M${-230 + i * 100},-500 L${-200 + i * 100},520`} stroke="#444A55" strokeWidth={22} />)}
+      <path d="M-260,120 Q-60,60 260,160" stroke="#3E5A74" strokeWidth={50} fill="none" />
+      {/* длинный маршрут с пробками */}
+      <path d="M0,250 L-180,240 L-190,-60 L-140,-200 L0,-260" fill="none" stroke={pick ? '#5A5F68' : '#E0523E'} strokeWidth={22} strokeLinecap="round" strokeLinejoin="round" />
+      {!pick && <path d="M-185,100 L-190,-60" stroke="#F2B84B" strokeWidth={22} strokeLinecap="round" />}
+      {/* короткий маршрут */}
+      <path d="M0,250 L20,0 L0,-260" fill="none" stroke={pick ? '#6FCF5A' : '#7FAF6B'} strokeWidth={pick ? 30 : 20} strokeLinecap="round" strokeLinejoin="round" />
+      <g transform="translate(0,-290)"><circle r={22} fill="#fff" stroke={P.ink} strokeWidth={6} /><circle r={9} fill="#E0523E" /></g>
+      <path d="M0,230 L-26,290 L0,276 L26,290Z" fill="#fff" stroke={P.ink} strokeWidth={5} />
+      {/* плашка манёвра сверху */}
+      <rect x={-226} y={-474} width={452} height={130} rx={24} fill="#1C1E23" />
+      <path d="M-180,-380 L-180,-430 L-150,-430 M-162,-446 L-146,-430 L-162,-414" fill="none" stroke="#fff" strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" />
+      <text x={-110} y={-396} fontFamily={F} fontWeight={900} fontSize={58} fill="#fff">300 м</text>
+      {/* нижняя карточка: выбор маршрута */}
+      <rect x={-250} y={150} width={500} height={360} rx={36} fill="#F6F3EC" />
+      <rect x={-40} y={166} width={80} height={10} rx={5} fill="#C9C2B4" />
+      {[['УМЕНЬШИТЬ ПЛАТЁЖ', '20 лет', 'пробки', !pick], ['УМЕНЬШИТЬ СРОК', 'быстрее', 'свободно', pick]].map(([a, b, c, on], i) => (
+        <g key={i} transform={`translate(${i ? 118 : -118},280)`}>
+          <rect x={-108} y={-80} width={216} height={160} rx={22} fill={on ? '#FFF4C2' : '#fff'} stroke={on ? '#F2C230' : '#DDD6C8'} strokeWidth={6} />
+          <text y={-46} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={22} fill={P.ink}>{(a as string).split(' ')[0]}</text>
+          <text y={-20} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={22} fill={P.ink}>{(a as string).split(' ')[1]}</text>
+          <text y={26} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill={i ? P.sageDark : '#C8553D'}>{b as string}</text>
+          <text y={62} textAnchor="middle" fontFamily={F} fontWeight={600} fontSize={22} fill="#7A7268">{c as string}</text>
+        </g>
+      ))}
+      <rect x={-226} y={390} width={452} height={90} rx={24} fill="#F2C230" />
+      <text y={450} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.ink}>Поехали</text>
+    </g>
+  </g>
+);
+
+// 9. Торпеда: телефон в держателе, рука Ашота тянется
 export const ShotDash: React.FC = () => (
   <svg viewBox="0 0 1080 1920">
     <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
     <RoadAhead />
-    <path d="M-50,1000 Q540,880 1130,1000 L1130,1920 L-50,1920Z" fill="#2E2420" stroke={P.ink} strokeWidth={12} />
-    <g transform="translate(-60,1350) rotate(-10)">
-      <ellipse rx={240} ry={110} fill="none" stroke={P.ink} strokeWidth={60} />
-      <ellipse rx={240} ry={110} fill="none" stroke="#3E3532" strokeWidth={40} />
+    <path d="M-50,1000 Q540,920 1130,1000 L1130,1920 L-50,1920Z" fill="#1F1B1A" stroke={P.ink} strokeWidth={12} />
+    <g transform="translate(-60,1450) rotate(-10)">
+      <ellipse rx={260} ry={150} fill="none" stroke={P.ink} strokeWidth={34} />
+      <ellipse rx={260} ry={150} fill="none" stroke="#2A2422" strokeWidth={20} />
     </g>
-    <g transform="translate(560,1060)">
-      <rect x={-300} y={-210} width={600} height={420} rx={40} fill="#1D1A1F" stroke={P.ink} strokeWidth={12} />
-      <clipPath id="navs"><rect x={-270} y={-180} width={540} height={360} rx={24} /></clipPath>
-      <g clipPath="url(#navs)"><g transform="scale(0.55) rotate(-90)"><NavMap /></g></g>
-      <rect x={-30} y={210} width={60} height={110} fill="#1D1A1F" stroke={P.ink} strokeWidth={8} />
-    </g>
-    <PokeHand x={620} y={1120} rot={-20} s={1.1} />
+    {/* держатель */}
+    <path d="M540,1300 L540,1420 M480,1440 L600,1440" stroke="#2A2422" strokeWidth={30} strokeLinecap="round" />
+    <g transform="translate(560,900) scale(0.78)"><NavPhone pick={false} /></g>
+    <PokeHand x={650} y={1150} rot={-24} s={1.05} />
     <Sub text="Гаси досрочно" keys={['досрочно']} />
   </svg>
 );
 
-// 10. Экран навигатора: два маршрута
+// 10. Экран навигатора крупно: тык в «срок»
 export const ShotNav: React.FC<{pick?: boolean}> = ({pick = true}) => (
   <svg viewBox="0 0 1080 1920">
     <rect width={1080} height={1920} fill="#1D1A1F" />
-    <g transform="translate(540,880)">
-      <clipPath id="navb"><rect x={-480} y={-560} width={960} height={1120} rx={40} /></clipPath>
-      <g clipPath="url(#navb)"><NavMap pick={pick} big /></g>
-      <rect x={-480} y={-560} width={960} height={1120} rx={40} fill="none" stroke={P.ink} strokeWidth={14} />
-    </g>
-    <PokeHand x={680} y={990} rot={-25} />
+    <g transform="translate(540,720) scale(1.38)"><NavPhone pick={pick} /></g>
+    <g transform="translate(700,1110)"><circle r={60} fill="#fff" opacity={0.25} /><circle r={36} fill="#fff" opacity={0.35} /></g>
+    <PokeHand x={720} y={1150} rot={-18} s={1.0} />
     <Sub text="уменьшай срок, а не платёж" keys={['срок,']} />
   </svg>
 );
 
-// 11. Сверху: такси сворачивает на короткую дорогу
-export const ShotTopDown: React.FC = () => (
-  <svg viewBox="0 0 1080 1920">
-    <rect width={1080} height={1920} fill="#3A3346" />
-    {Array.from({length: 30}, (_, i) => <rect key={i} x={(i % 5) * 230 - 40} y={Math.floor(i / 5) * 330 - 60} width={170} height={250} rx={20} fill="#4A4258" />)}
-    {Array.from({length: 30}, (_, i) => <rect key={'w' + i} x={(i % 5) * 230 + 10} y={Math.floor(i / 5) * 330 - 20} width={30} height={30} rx={6} fill={P.win} opacity={0.5} />)}
-    <path d="M540,1950 L540,1250 C540,1100 120,1100 120,800 C120,450 520,600 470,300 L470,-40" fill="none" stroke="#5E566A" strokeWidth={150} />
-    <path d="M540,1250 C700,1100 760,700 470,300" fill="none" stroke="#5E566A" strokeWidth={150} />
-    <path d="M540,1950 L540,1250 C540,1100 120,1100 120,800 C120,450 520,600 470,300" fill="none" stroke={P.terracotta} strokeWidth={14} strokeDasharray="40 30" opacity={0.8} />
-    <path d="M540,1250 C700,1100 760,700 470,300" fill="none" stroke={P.sage} strokeWidth={18} strokeDasharray="40 24" />
-    {[[140, 900], [160, 760], [230, 1080], [300, 600]].map(([x, y], i) => <rect key={i} x={x - 30} y={y - 50} width={60} height={100} rx={14} fill="#E0523E" stroke={P.ink} strokeWidth={6} />)}
-    <g transform="translate(640,1120) rotate(35)">
-      <rect x={-45} y={-80} width={90} height={160} rx={22} fill={TAXI} stroke={P.ink} strokeWidth={8} />
-      <rect x={-34} y={-50} width={68} height={40} rx={8} fill="#2C2840" />
-      <rect x={-24} y={0} width={48} height={22} rx={5} fill={P.cream} stroke={P.ink} strokeWidth={4} />
-      <path d="M-30,-82 L-60,-200 L60,-200 L30,-82Z" fill="#FFE7A8" opacity={0.35} />
-    </g>
-    <Lines x={560} y={1300} n={3} len={160} dir={-1} />
-    <g transform="translate(250,470)"><rect x={-170} y={-46} width={340} height={92} rx={46} fill={P.terracotta} stroke={P.ink} strokeWidth={7} /><text y={16} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill={P.cream}>ПРОБКА 20 ЛЕТ</text></g>
-    <g transform="translate(790,700)"><rect x={-150} y={-46} width={300} height={92} rx={46} fill={P.sage} stroke={P.ink} strokeWidth={7} /><text y={16} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill={P.cream}>КОРОЧЕ</text></g>
-    <Sub text="Так переплатишь меньше" keys={['меньше']} />
-  </svg>
+// машинка сверху
+const CarTop: React.FC<{x: number; y: number; r: number; c: string; brake?: boolean; taxi?: boolean}> = ({x, y, r, c, brake, taxi}) => (
+  <g transform={`translate(${x},${y}) rotate(${r})`}>
+    <rect x={-30} y={-52} width={60} height={104} rx={16} fill={c} stroke={P.ink} strokeWidth={6} />
+    <rect x={-22} y={-30} width={44} height={24} rx={6} fill="#2C2840" />
+    <rect x={-22} y={22} width={44} height={16} rx={5} fill="#2C2840" />
+    {taxi && <rect x={-16} y={-4} width={32} height={16} rx={3} fill={P.mustard} stroke={P.ink} strokeWidth={3} />}
+    {brake && <><rect x={-26} y={46} width={14} height={8} rx={3} fill="#FF4A3A" /><rect x={12} y={46} width={14} height={8} rx={3} fill="#FF4A3A" /></>}
+  </g>
 );
 
-// 14. Глазами пассажира: Ашот тянет руку за деньгами
+// 11. Сверху: развилка, слева пробка в полосах, такси идёт по короткой
+export const ShotTopDown: React.FC = () => {
+  const W = 170;
+  const road = (d: string) => <><path d={d} fill="none" stroke="#5E566A" strokeWidth={W} strokeLinejoin="round" /><path d={d} fill="none" stroke={P.cream} strokeWidth={6} strokeDasharray="34 30" opacity={0.7} strokeLinejoin="round" /></>;
+  const cols = ['#C8553D', '#8FA57E', '#B9C6CF', '#E9E2D6', '#6B5A4A', '#B5677A'];
+  const cars: [number, number, number][] = [];
+  // нижняя горизонталь y=1250 (едут влево), две полосы
+  for (let x = 470; x > 200; x -= 120) { cars.push([x, 1250 - 40, -90]); cars.push([x - 50, 1250 + 40, -90]); }
+  // вертикаль x=150 (едут вверх)
+  for (let y = 1130; y > 520; y -= 125) { cars.push([150 - 40, y, 0]); cars.push([150 + 40, y - 55, 0]); }
+  // верхняя горизонталь y=420 (едут вправо)
+  for (let x = 250; x < 470; x += 120) { cars.push([x, 420 - 40, 90]); }
+  return (
+    <svg viewBox="0 0 1080 1920">
+      <rect width={1080} height={1920} fill="#3A3346" />
+      {Array.from({length: 30}, (_, i) => <rect key={i} x={(i % 5) * 230 - 40} y={Math.floor(i / 5) * 330 - 60} width={170} height={250} rx={20} fill="#4A4258" />)}
+      {road('M540,1960 L540,240')}
+      {road('M540,1250 L150,1250 L150,420 L540,420')}
+      {cars.map(([x, y, r], i) => <CarTop key={i} x={x} y={y} r={r} c={cols[i % cols.length]} brake />)}
+      <path d="M580,1180 L580,330" stroke={P.sage} strokeWidth={16} strokeDasharray="40 24" />
+      <g transform="translate(540,240)"><path d="M-60,30 L0,-30 L60,30Z" fill={P.terracotta} stroke={P.ink} strokeWidth={6} /><rect x={-44} y={30} width={88} height={60} fill={P.cream} stroke={P.ink} strokeWidth={6} /></g>
+      <CarTop x={580} y={1130} r={0} c={TAXI} taxi />
+      <Lines x={580} y={1220} n={3} len={120} dir={0} />
+      {[0, 1, 2].map((i) => <path key={i} d={`M${555 + i * 25},1200 l0,${90 + i * 20}`} stroke={P.cream} strokeWidth={8} strokeLinecap="round" opacity={0.6} />)}
+      <g transform="translate(300,1110)"><rect x={-180} y={-44} width={360} height={88} rx={44} fill={P.terracotta} stroke={P.ink} strokeWidth={7} /><text y={15} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={38} fill={P.cream}>ПЛАТЁЖ · 20 ЛЕТ</text></g>
+      <g transform="translate(820,700)"><rect x={-150} y={-44} width={300} height={88} rx={44} fill={P.sage} stroke={P.ink} strokeWidth={7} /><text y={15} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={38} fill={P.cream}>СРОК · КОРОЧЕ</text></g>
+      <Sub text="Так переплатишь меньше" keys={['меньше']} />
+    </svg>
+  );
+};
+
+// 14. Глазами пассажира: Ашот повернулся, тянет ОДНУ правую руку ладонью в камеру
 export const ShotPOV: React.FC = () => (
   <svg viewBox="0 0 1080 1920">
     <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
     <RoadAhead />
-    <path d="M-50,1050 Q540,980 1130,1050 L1130,1920 L-50,1920Z" fill="#2E2420" />
-    <g transform="translate(830,1110)">
-      <rect x={-120} y={-50} width={240} height={100} rx={16} fill="#1E1816" stroke={P.ink} strokeWidth={7} />
-      <text y={22} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={60} fill="#FF9A4A">400 ₽</text>
-    </g>
-    <rect x={560} y={1000} width={500} height={920} rx={60} fill={P.seat} stroke={P.ink} strokeWidth={10} />
-    <g transform="translate(360,1330) scale(1.05)"><Ashot s={{...A0, turn: 1, mouth: 2, smirk: 1, look: [0.3, 0.1], arm: {from: 'palm', to: 'palm', k: 1}}} /></g>
-    {/* ладонь крупно на камеру */}
-    <g transform="translate(720,1220) scale(1.9) rotate(-12)">
+    <path d="M0,0 L1080,0 L1080,200 Q540,160 0,200Z" fill={P.cabinMid} />
+    <Dash2107 fare="400" />
+    <g transform="translate(340,1330) scale(1.05)"><Ashot s={{...A0, turn: 1, mouth: 2, smirk: 1, look: [0.3, 0.1], noRightArm: true}} /></g>
+    {/* рука от плеча к камере, с ракурсом: чем ближе, тем толще */}
+    <path d="M560,1380 L640,1300 L700,1215" fill="none" stroke={P.ink} strokeWidth={128} strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M560,1380 L640,1300" fill="none" stroke={P.shirt} strokeWidth={110} strokeLinecap="round" />
+    <ellipse cx={640} cy={1300} rx={66} ry={46} fill={P.shirtShade} stroke={P.ink} strokeWidth={8} transform="rotate(-40 640 1300)" />
+    <path d="M640,1300 L700,1215" fill="none" stroke={P.skin} strokeWidth={100} strokeLinecap="round" />
+    <g transform="translate(740,1150) scale(2.3) rotate(-14)">
       <path d="M-58,-6 Q-60,34 -10,40 Q48,42 62,6 L70,-14 Q74,-26 62,-26 L50,-12 Q30,-30 -10,-28 Q-50,-26 -58,-6Z" fill={P.skin} stroke={P.ink} strokeWidth={5} />
       {[-34, -12, 10, 32].map((fx, i) => <path key={i} d={`M${fx},-24 q-4,-26 8,-28 q12,2 8,28`} fill={P.skin} stroke={P.ink} strokeWidth={5} />)}
+      <path d="M-30,10 Q0,22 34,8" fill="none" stroke={P.skinShade} strokeWidth={3} />
     </g>
     <Sub text="С тебя четыреста рублей" keys={['четыреста', 'рублей']} />
   </svg>
 );
+
+// 15. Стоп-кадр изнутри салона: Ашот с протянутой рукой, пассажир в шоке
+export const ShotFreeze: React.FC = () => {
+  const s = {...A0, turn: 1, mouth: 0, smirk: 1, look: [0.6, -0.1] as [number, number], arm: {from: 'palm' as const, to: 'palm' as const, k: 1}};
+  return (
+    <svg viewBox="0 0 1080 1920">
+      <g transform="translate(540,960) scale(1.12) translate(-560,-1010)">
+        <CabinBack t={0} />
+        <g transform="translate(720,1000)"><RiderFigure r={RIDERS[0]} e={EMO.shock} /></g>
+        <DriverSeat />
+        <g transform="translate(330,1090) rotate(2)"><Ashot s={s} /></g>
+        <CabinFront t={0} ashot={s} mirrorOn={0} fare={400} shake={0} />
+      </g>
+      <rect width={1080} height={1920} fill="#FFF6E6" opacity={0.15} />
+      <rect x={18} y={18} width={1044} height={1884} fill="none" stroke={P.cream} strokeWidth={24} />
+      <g transform="translate(489,470) rotate(-7)">
+        <rect x={-230} y={-85} width={460} height={170} rx={28} fill={P.cream} stroke={P.terracotta} strokeWidth={12} />
+        <text y={44} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={124} fill={P.terracotta}>400 ₽</text>
+      </g>
+      <Sub text="четыреста рублей" keys={['четыреста', 'рублей']} />
+    </svg>
+  );
+};
