@@ -9,6 +9,7 @@ import {Stamp400} from './overlays/Graphics';
 import {Cards, Score, ShotCheat} from './overlays/Episode';
 import {Subtitles} from './overlays/Subtitles';
 import * as SH from './boards/Shots';
+import * as W from './boards/World';
 
 // врезки-ракурсы поверх салона (story.json → inserts)
 const inserts = (story.inserts || []).map((x: any) => ({...x, a: cue(x.from), b: cue(x.to)}));
@@ -16,6 +17,23 @@ const renderInsert = (x: any, t: number, lt: number, dur: number) => {
   const k = clamp(lt / dur);
   switch (x.shot) {
     case 'exterior': return <SH.ShotExterior t={t} />;
+    case 'brake': return <SH.ShotBrake lt={lt} tb={x.tb ?? 0.3} ts={x.ts ?? 0.9} />;
+    case 'jolt': return <SH.ShotJolt lt={lt} />;
+    // сцены вне такси (boards/World.tsx)
+    case 'bankStamp': return <W.SceneBankStamp lt={lt} dur={dur} />;
+    case 'newBuilding': return <W.SceneNewBuilding lt={lt} dur={dur} split={x.splitAt !== undefined ? clamp((cue(x.splitAt) - x.a) / dur) : 0.5} />;
+    case 'bankRent': return <W.SceneBankRent lt={lt} dur={dur} />;
+    case 'hundred': return <W.SceneHundred lt={lt} dur={dur} />;
+    case 'pizza': return <W.ScenePizza lt={lt} dur={dur} />;
+    case 'stacks': return <W.SceneStacks lt={lt} dur={dur} />;
+    case 'jam': return <W.SceneJam lt={lt} dur={dur} />;
+    case 'toll': return <W.SceneToll lt={lt} dur={dur} />;
+    case 'piggy': return <W.ScenePiggy lt={lt} dur={dur} />;
+    case 'bars': return <W.SceneBars lt={lt} dur={dur} />;
+    case 'calendar': return <W.SceneCalendar lt={lt} dur={dur} />;
+    case 'rate': return <W.SceneRate lt={lt} dur={dur} />;
+    case 'freedom': return <W.SceneFreedom lt={lt} dur={dur} />;
+    case 'mirror': return <SH.ShotMirror brow={0.9} wink={0} />;
     case 'phone': return <SH.ShotPhone />;
     case 'meterCrazy': { const [a, b] = x.value || [287, 12000000]; return <SH.ShotMeter mode="crazy" value={lerp(a, b, easeInOut(clamp(lt / Math.max(0.3, dur - 0.35))))} label={x.label} />; }
     case 'meterRewind': { const [a, b] = x.value || [12000000, 9000000]; return <SH.ShotMeter mode="rewind" value={lerp(a, b, easeOut(k))} label={x.label} />; }
@@ -137,7 +155,7 @@ export const Video: React.FC<{sub?: string}> = ({sub}) => {
       )}
       <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{position: 'absolute'}}>
         {!(ins && ins.shot === 'cheat') && <Cards t={t} />}
-        <Score t={t} />
+        {!ins && <Score t={t} />}
       </svg>
       {!(ins && ins.shot === 'cheat') && <Subtitles t={t} style={sub} />}
       <AbsoluteFill style={{background: '#FFF6E6', opacity: fl * 0.35 + freezeFlash * 0.8}} />

@@ -53,15 +53,34 @@ def scratch():  # «чего?!» — стоп-скретч
     n = int(.25 * SR); t = np.arange(n) / SR; f = 900 * np.exp(-t * 9) + 150
     return bp(np.sign(np.sin(2 * np.pi * np.cumsum(f) / SR)) + noise(.25) * .3, 200, 4000) * env(n, .002, .08) * .4
 
-# поворотник на старте
-for i in range(4): put(sfx, 0.05 + i * 0.42, tick(i % 2 == 0), .55)
+def squeal(s):  # визг тормозов: два «поющих» тона с дрожью + шорох резины
+    n = int(s * SR); t = np.arange(n) / SR; wob = 1 + .015 * np.sin(2 * np.pi * 23 * t)
+    x = sum(np.sin(2 * np.pi * np.cumsum(f * wob * (1 - .08 * t / s)) / SR) * g for f, g in ((2350, 1), (3420, .5), (4700, .25)))
+    x += bp(noise(s), 1500, 7000) * .6
+    return x * np.minimum(1, t / .04) * np.minimum(1, (s - t) / .08)
+intro = story.get('intro')
+if intro == 'brake':  # хук: визг тормозов, удар, рывок, телефон
+    tb, ts = intro_t = (cue('brakeAt'), cue('stopAt'))
+    put(sfx, 0.0, bp(noise(tb), 60, 400) * .8, .25)           # гул мотора на ходу
+    put(sfx, tb, squeal(ts - tb + .05), .38)
+    put(sfx, ts, thump(), .7); put(sfx, ts + .02, bp(noise(.15), 300, 3000) * env(int(.15 * SR), .002, .04), .4)
+    put(sfx, cue('joltIn') + .05, whoosh(.3), .32)
+    put(sfx, cue('phoneLand'), click(), .7); put(sfx, cue('phoneLand') + .07, click(), .4)
+else:
+    # поворотник на старте
+    for i in range(4): put(sfx, 0.05 + i * 0.42, tick(i % 2 == 0), .55)
 # вжух на зумах/перебивках
 for s in story['shots'][1:]:
     if s.get('whoosh') or s.get('move', 0) >= 6:
         put(sfx, cue(s['at']) - .12, whoosh(), .30 if s.get('whoosh') else .17)
 # вжух на каждую врезку-ракурс
 for x in story.get('inserts', []):
-    if x['from'] != 0: put(sfx, cue(x['from']) - .1, whoosh(.26), .28)
+    if x['from'] != 0 and x['shot'] not in ('brake', 'jolt'): put(sfx, cue(x['from']) - .1, whoosh(.26), .28)
+# звуки сцен вне такси: inserts[].sfx = [[сдвиг от начала, 'thump'|'kaching'|'pop'|'click'|'whoosh'], …]
+SND = {'thump': (thump, .5), 'kaching': (kaching, .35), 'pop': (pop, .25), 'click': (click, .35), 'whoosh': (lambda: whoosh(.4), .25)}
+for x in story.get('inserts', []):
+    for off, name in x.get('sfx', []):
+        f, g = SND[name]; put(sfx, cue(x['from']) + off, f(), g)
 put(sfx, cue('n5'), pop(), .25)
 put(sfx, cue('cross'), bp(noise(.18), 1500, 6000) * env(int(.18 * SR), .01, .06), .22)
 put(sfx, cue('n12'), kaching(), .42)

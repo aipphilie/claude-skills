@@ -3,7 +3,8 @@
 import json, os, sys, re, subprocess, numpy as np
 from scipy.io import wavfile
 from scipy.signal import resample_poly
-FPS, SR, GAP, LEAD = 30, 48000, 0.12, 0.35
+FPS, SR, GAP = 30, 48000, 0.12
+LEAD = float(os.environ.get("LEAD", "0.35"))  # пауза до первой реплики (под хук без слов, в «Ипотеке» 1.9)
 TAIL = float(os.environ.get("TAIL", "0.9"))  # хвост после последней реплики (под шпаргалку в полной серии ~3.5)
 GAPS = {"p2": 0.18, "a2": 0.45}       # доп. пауза перед репликой (шок держим чуть дольше); в lines.json можно задать "gap"
 lines = json.load(open(sys.argv[1])); vdir = sys.argv[2]
