@@ -8,7 +8,7 @@ const rnd = (seed: number) => () => { seed = (seed * 16807) % 2147483647; return
 const REAR = 'M200,480 Q210,455 260,452 L930,452 Q975,455 985,480 L1010,850 L180,850Z';
 const SIDE = 'M1040,420 L1080,420 L1080,980 L1050,980Z';
 
-const Buildings: React.FC<{t: number; speed: number; seed: number; color: string; base: number; hMin: number; hMax: number; winOp: number}> = ({t, speed, seed, color, base, hMin, hMax, winOp}) => {
+export const Buildings: React.FC<{t: number; speed: number; seed: number; color: string; base: number; hMin: number; hMax: number; winOp: number}> = ({t, speed, seed, color, base, hMin, hMax, winOp}) => {
   const W = 1400;
   const blds = useMemo(() => {
     const r = rnd(seed); const out: {x: number; w: number; h: number; wins: [number, number][]}[] = [];
@@ -39,7 +39,7 @@ const Buildings: React.FC<{t: number; speed: number; seed: number; color: string
   );
 };
 
-const City: React.FC<{t: number}> = ({t}) => {
+export const City: React.FC<{t: number}> = ({t}) => {
   const lamps = Array.from({length: 9}, (_, i) => i);
   const lampOff = (t * 420) % 1400;
   return (
@@ -136,17 +136,10 @@ export const CabinFront: React.FC<{t: number; ashot: AshotState; mirrorOn: numbe
           <path d="M0,90 l-34,52 h20 l-26,40 h28 l-20,34 h64 l-20,-34 h28 l-26,-40 h20Z" fill={P.terracotta} stroke={P.ink} strokeWidth={5} strokeLinejoin="round" />
         </g>
         <rect x={-180} y={-70} width={360} height={130} rx={44} fill="#241C1A" stroke={P.ink} strokeWidth={10} />
-        <clipPath id="mirror"><rect x={-164} y={-56} width={328} height={102} rx={34} /></clipPath>
-        <g clipPath="url(#mirror)">
-          <rect x={-170} y={-60} width={340} height={110} fill="#8C7A72" />
-          <rect x={-170} y={-60} width={340} height={110} fill="#B9A59A" opacity={0.5} />
-          {/* в зеркале — глаза Ашота (отражение), исчезают после поворота */}
-          <g opacity={mirrorOn} transform="translate(0,252) scale(0.95)">
-            <rect x={-150} y={-320} width={300} height={140} fill={P.skin} />
-            <AshotEyes s={{...ashot, look: [-0.2, -0.5]}} dx={0} />
-          </g>
-          <path d="M-150,-60 L-90,-60 L-150,50Z" fill="#fff" opacity={0.18} />
-        </g>
+        {/* зеркало повёрнуто к водителю: нам видна пластиковая спинка */}
+        <rect x={-164} y={-56} width={328} height={102} rx={34} fill="#3A302C" />
+        <path d="M-140,-40 Q0,-56 140,-40" fill="none" stroke="#5A4C46" strokeWidth={8} strokeLinecap="round" />
+        <circle cx={0} cy={-6} r={14} fill="#2A2220" stroke={P.ink} strokeWidth={4} />
       </g>
     </g>
   );
