@@ -71,7 +71,7 @@ const camera = (t: number) => {
   return {x, y, z, sh, i};
 };
 
-export const Video: React.FC = () => {
+export const Video: React.FC<{sub?: string}> = ({sub}) => {
   const frame = useCurrentFrame();
   const real = frame / FPS;
   const tf = freezeT();
@@ -139,7 +139,7 @@ export const Video: React.FC = () => {
         {!(ins && ins.shot === 'cheat') && <Cards t={t} />}
         <Score t={t} />
       </svg>
-      {!(ins && ins.shot === 'cheat') && <Subtitles t={t} />}
+      {!(ins && ins.shot === 'cheat') && <Subtitles t={t} style={sub} />}
       <AbsoluteFill style={{background: '#FFF6E6', opacity: fl * 0.35 + freezeFlash * 0.8}} />
       {real >= tf && <AbsoluteFill style={{boxShadow: `inset 0 0 0 ${18 * (1 - freezeFlash * 0.5)}px ${P.cream}`}} />}
       <Audio src={staticFile('mix.wav')} />
