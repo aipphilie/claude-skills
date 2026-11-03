@@ -13,6 +13,7 @@
 - `.claude/skills/ig-*` — 13 скиллов для Instagram из [Jakeschincariol/instagram-agent-skill](https://github.com/Jakeschincariol/instagram-agent-skill) (MIT): `/ig-reel` (хуки, сценарий, раскадровка по времени), `/ig-caption`, `/ig-human` и др. Шаблон голоса — `.claude/skills/ig-reel/voice-template.md`, заполненный кладите в `~/.claude/instagram/voice.md`
 - `zip/instagram/` — те же 13 скиллов Instagram в zip, по одному на скилл, для загрузки в claude.ai (Настройки → скиллы)
 - `.claude/skills/higgsfield-*` — скиллы Higgsfield (генерация картинок и видео)
+- `.mcp.json` — MCP-сервер [codebase-memory-mcp](https://github.com/DeusData/codebase-memory-mcp) 0.12.1 (граф кода: поиск функций, связей, архитектуры). Включается сам в каждой сессии, при старте индексирует репо в фоне, а к каждому сообщению хук добавляет напоминание пользоваться его инструментами
 - `.claude/settings.json` — плагин Remotion (подтягивается из маркетплейса remotion-dev/claude-code-plugin) и автоустановка программы Higgsfield при старте сессии
 
 ## Higgsfield в новой сессии
