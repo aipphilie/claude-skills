@@ -7,6 +7,24 @@ import {RiderFigure, RIDERS, Emotion} from './characters/Rider';
 import {CabinBack, CabinFront, DriverSeat} from './scene/Cabin';
 import {Buttons, HouseRibbon, MoneyCard, Stamp400} from './overlays/Graphics';
 import {Subtitles} from './overlays/Subtitles';
+import * as SH from './boards/Shots';
+
+// врезки-ракурсы поверх салона (story.json → inserts)
+const inserts = (story.inserts || []).map((x: any) => ({...x, a: cue(x.from), b: cue(x.to)}));
+const renderInsert = (name: string, t: number, lt: number, dur: number) => {
+  const k = clamp(lt / dur);
+  switch (name) {
+    case 'exterior': return <SH.ShotExterior t={t} />;
+    case 'phone': return <SH.ShotPhone />;
+    case 'meterCrazy': { const kk = easeInOut(clamp((t - cue('cross')) / (cue('n12') - cue('cross')))); return <SH.ShotMeter mode="crazy" value={lerp(287, 12000000, kk)} />; }
+    case 'meterRewind': return <SH.ShotMeter mode="rewind" value={lerp(12000000, 9000000, easeOut(k))} />;
+    case 'meterFare': return <SH.ShotMeter mode="fare" value={400} />;
+    case 'aging': { const st = Math.min(2, Math.floor(k * 3)); return <SH.ShotAging stage={st} year={Math.round(lerp(2026, 2046, easeOut(k)))} />; }
+    case 'nav': return <SH.ShotNav pick={t >= cue('poke')} hand={easeOut(clamp((t - cue('navIn')) / (cue('poke') - cue('navIn'))))} />;
+    case 'topdown': return <SH.ShotTopDown k={easeInOut(k)} />;
+  }
+  return null;
+};
 
 // шрифт
 const fontHandle = typeof window !== 'undefined' ? delayRender('fonts') : 0;
@@ -61,7 +79,9 @@ export const Video: React.FC = () => {
     look: t < cue('turn') ? [0.4, 0] : [-0.7, 0.1], sweat: easeOut(after(t, cue('years'), 0.4)) * (t < cue('pay') ? 1 : 0),
   };
   const fare = t < cue('n400') ? 287 + t * 4 : 400;
-  const fl = Math.max(...shots.filter((s: any) => s.whoosh).map((s: any) => 1 - clamp(Math.abs(t - s.t) * 8)), 0);
+  const fl = Math.max(...shots.filter((s: any) => s.whoosh).map((s: any) => 1 - clamp(Math.abs(t - s.t) * 8)), ...inserts.map((x: any) => 1 - clamp(Math.abs(t - x.a) * 10)), 0);
+  const ins = inserts.find((x: any) => t >= x.a && t < x.b);
+  const insShake = ins && ins.shot === 'meterCrazy' && t > cue('n12') ? 14 * Math.exp(-(t - cue('n12')) * 5) : 0;
   const freezeFlash = real >= tf ? 1 - clamp((real - tf) * 3) : 0;
 
   return (
@@ -82,11 +102,18 @@ export const Video: React.FC = () => {
           </radialGradient>
         </defs>
         <rect width={1080} height={1920} fill="url(#vig)" />
-        <MoneyCard t={t} />
-        <HouseRibbon t={t} />
-        <Buttons t={t} />
         <Stamp400 t={t} />
       </svg>
+      {ins && (
+        <AbsoluteFill style={{background: '#1D1A1F', overflow: 'hidden'}}>
+          <div style={{position: 'absolute', inset: 0, transform: `translate(${noise(t, 1) * insShake}px,${noise(t + 5, 1.2) * insShake}px) scale(${1.02 + 0.06 * clamp((t - ins.a) / (ins.b - ins.a))})`}}>
+            <SH.SubCtx.Provider value={false}>
+              <style>{'.ins > svg{width:1080px;height:1920px;display:block}'}</style>
+              <div className="ins">{renderInsert(ins.shot, t, t - ins.a, ins.b - ins.a)}</div>
+            </SH.SubCtx.Provider>
+          </div>
+        </AbsoluteFill>
+      )}
       <Subtitles t={t} />
       <AbsoluteFill style={{background: '#FFF6E6', opacity: fl * 0.35 + freezeFlash * 0.8}} />
       {real >= tf && <AbsoluteFill style={{boxShadow: `inset 0 0 0 ${18 * (1 - freezeFlash * 0.5)}px ${P.cream}`}} />}

@@ -90,6 +90,36 @@
    "a4",
    "end",
    0.15
+  ],
+  "extEnd": [
+   "p1",
+   1,
+   0.15
+  ],
+  "phoneEnd": [
+   "p1",
+   3,
+   0.05
+  ],
+  "agingIn": [
+   "a2",
+   5,
+   0.0
+  ],
+  "navIn": [
+   "a3",
+   3,
+   -0.1
+  ],
+  "topOut": [
+   "a3",
+   10,
+   -0.1
+  ],
+  "fareOut": [
+   "a4",
+   4,
+   0.12
   ]
  },
  "shots": [
@@ -226,5 +256,48 @@
   "четыреста",
   "рублей",
   "досрочно"
- ]
+ ],
+ "inserts": [
+  {
+   "from": 0,
+   "to": "extEnd",
+   "shot": "exterior"
+  },
+  {
+   "from": "extEnd",
+   "to": "phoneEnd",
+   "shot": "phone"
+  },
+  {
+   "from": "cross",
+   "to": "shock",
+   "shot": "meterCrazy"
+  },
+  {
+   "from": "agingIn",
+   "to": "buttons",
+   "shot": "aging"
+  },
+  {
+   "from": "navIn",
+   "to": "less",
+   "shot": "nav"
+  },
+  {
+   "from": "less",
+   "to": "topOut",
+   "shot": "topdown"
+  },
+  {
+   "from": "topOut",
+   "to": "remember",
+   "shot": "meterRewind"
+  },
+  {
+   "from": "n400",
+   "to": "fareOut",
+   "shot": "meterFare"
+  }
+ ],
+ "_doc_inserts": "inserts: врезки-ракурсы поверх салона (компоненты из boards/Shots.tsx), from/to — имена cue или секунды"
 }

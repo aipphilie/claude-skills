@@ -59,6 +59,9 @@ for i in range(4): put(sfx, 0.05 + i * 0.42, tick(i % 2 == 0), .55)
 for s in story['shots'][1:]:
     if s.get('whoosh') or s.get('move', 0) >= 6:
         put(sfx, cue(s['at']) - .12, whoosh(), .30 if s.get('whoosh') else .17)
+# вжух на каждую врезку-ракурс
+for x in story.get('inserts', []):
+    if x['from'] != 0: put(sfx, cue(x['from']) - .1, whoosh(.26), .28)
 put(sfx, cue('n5'), pop(), .25)
 put(sfx, cue('cross'), bp(noise(.18), 1500, 6000) * env(int(.18 * SR), .01, .06), .22)
 put(sfx, cue('n12'), kaching(), .42)

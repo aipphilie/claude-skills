@@ -11,7 +11,9 @@ const F = 'Rubik';
 export const A0: AshotState = {t: 0, turn: 1, browL: 0, browR: 0.15, blink: 0, wink: 0, mouth: 0, smirk: 1, look: [0.55, -0.1], arm: {from: 'rest', to: 'rest', k: 1}};
 const TAXI = '#E9B23F', TAXI_D = '#C48F27';
 
+export const SubCtx = React.createContext(true); // в ролике субтитры рисует общий слой, во врезках их выключаем
 export const Sub: React.FC<{text: string; keys?: string[]}> = ({text, keys = []}) => {
+  if (!React.useContext(SubCtx)) return null;
   const lines: string[][] = [[]];
   for (const w of text.split(' ')) {
     const cur = lines[lines.length - 1];
@@ -129,8 +131,9 @@ const SideCabin: React.FC<{t?: number}> = ({t = 0}) => (
     <rect x={70} y={600} width={200} height={190} rx={60} fill={P.seatDark} stroke={P.ink} strokeWidth={10} />
   </g>
 );
-export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'}> = ({mode}) => {
-  const val = mode === 'crazy' ? '12 000 000' : mode === 'rewind' ? '− − − − −' : '400';
+const fmt = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: number}> = ({mode, value}) => {
+  const val = value !== undefined ? fmt(value) : mode === 'crazy' ? '12 000 000' : mode === 'rewind' ? '− − − − −' : '400';
   return (
     <svg viewBox="0 0 1080 1920">
       <rect width={1080} height={1920} fill="#231B18" />
@@ -150,7 +153,7 @@ export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'}> = ({mode})
       </>}
       {mode === 'rewind' && <>
         {Array.from({length: 6}, (_, i) => (
-          <g key={i} transform={`translate(${200 + i * 140},${1230 - (i % 3) * 60})`}>
+          <g key={i} transform={`translate(${200 + i * 140},${1420 - (i % 3) * 50})`}>
             <circle r={40} fill={P.gold} stroke={P.ink} strokeWidth={6} />
             <text y={14} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={40} fill={P.goldDark}>₽</text>
             <path d="M0,60 l0,90" stroke={P.cream} strokeWidth={8} strokeLinecap="round" opacity={0.6} />
@@ -169,17 +172,17 @@ const AGES: Rider[] = [
   {...RIDERS[0], name: '35', hair: 'sidepart', hairColor: '#6A5446', clothes: 'shirtTie', c1: '#C9C2B4', c2: '#6B5A4A', glasses: true, wrinkles: true, bodyScale: 1.12},
   {...RIDERS[4], name: '60'},
 ];
-export const ShotAging: React.FC = () => (
+export const ShotAging: React.FC<{stage?: number; year?: number}> = ({stage = 2, year = 2046}) => (
   <svg viewBox="0 0 1080 1920">
     <g transform="translate(-200,-300) scale(1.4)"><CabinBack t={0} /></g>
     {/* снег за окном — прошли годы */}
     {Array.from({length: 40}, (_, i) => <circle key={i} cx={(i * 173) % 1080} cy={360 + (i * 89) % 560} r={6 + (i % 3) * 3} fill="#fff" opacity={0.8} />)}
-    <g transform="translate(540,1270) scale(1.8)"><RiderFigure r={AGES[2]} e={EMO.worry} /></g>
+    <g transform="translate(540,1270) scale(1.8)"><RiderFigure r={AGES[stage]} e={EMO.worry} /></g>
     <g transform="translate(540,330)">
       <rect x={-170} y={-110} width={340} height={210} rx={20} fill={P.cream} stroke={P.ink} strokeWidth={9} />
       <rect x={-170} y={-110} width={340} height={60} rx={20} fill={P.terracotta} stroke={P.ink} strokeWidth={9} />
       {[-110, -40, 40, 110].map((x) => <rect key={x} x={x - 8} y={-130} width={16} height={46} rx={8} fill={P.ink} />)}
-      <text y={70} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={110} fill={P.ink}>2046</text>
+      <text y={70} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={110} fill={P.ink}>{year}</text>
       <path d="M-150,40 Q-40,-80 150,-30" fill="none" stroke={P.cream} strokeWidth={6} opacity={0.6} />
     </g>
     {/* полоска: 3 склейки */}
@@ -496,12 +499,12 @@ export const ShotDash: React.FC = () => (
 );
 
 // 10. Экран навигатора крупно: тык в «срок»
-export const ShotNav: React.FC<{pick?: boolean}> = ({pick = true}) => (
+export const ShotNav: React.FC<{pick?: boolean; hand?: number}> = ({pick = true, hand = 1}) => (
   <svg viewBox="0 0 1080 1920">
     <rect width={1080} height={1920} fill="#1D1A1F" />
     <g transform="translate(540,800) scale(1.12)"><NavPhone pick={pick} /></g>
     <g transform="translate(700,1180)"><circle r={60} fill="#fff" opacity={0.25} /><circle r={36} fill="#fff" opacity={0.35} /></g>
-    <PokeHand x={712} y={1278} rot={-14} s={0.9} />
+    <PokeHand x={712 + (1 - hand) * 300} y={1278 + (1 - hand) * 700} rot={-14} s={0.9} />
     <Sub text="уменьшай срок, а не платёж" keys={['срок,']} />
   </svg>
 );
@@ -518,7 +521,7 @@ const CarTop: React.FC<{x: number; y: number; r: number; c: string; brake?: bool
 );
 
 // 11. Сверху: развилка, слева пробка в полосах, такси идёт по короткой
-export const ShotTopDown: React.FC = () => {
+export const ShotTopDown: React.FC<{k?: number}> = ({k = 0}) => {
   const W = 170;
   const road = (d: string) => <><path d={d} fill="none" stroke="#5E566A" strokeWidth={W} strokeLinejoin="round" /><path d={d} fill="none" stroke={P.cream} strokeWidth={6} strokeDasharray="34 30" opacity={0.7} strokeLinejoin="round" /></>;
   const cols = ['#C8553D', '#8FA57E', '#B9C6CF', '#E9E2D6', '#6B5A4A', '#B5677A'];
@@ -538,7 +541,7 @@ export const ShotTopDown: React.FC = () => {
       {cars.map(([x, y, r], i) => <CarTop key={i} x={x} y={y} r={r} c={cols[i % cols.length]} brake />)}
       <path d="M580,1180 L580,330" stroke={P.sage} strokeWidth={16} strokeDasharray="40 24" />
       <g transform="translate(540,240)"><path d="M-60,30 L0,-30 L60,30Z" fill={P.terracotta} stroke={P.ink} strokeWidth={6} /><rect x={-44} y={30} width={88} height={60} fill={P.cream} stroke={P.ink} strokeWidth={6} /></g>
-      <CarTop x={580} y={1130} r={0} c={TAXI} taxi />
+      <CarTop x={580} y={1130 - k * 600} r={0} c={TAXI} taxi />
       <Lines x={580} y={1220} n={3} len={120} dir={0} />
       {[0, 1, 2].map((i) => <path key={i} d={`M${555 + i * 25},1200 l0,${90 + i * 20}`} stroke={P.cream} strokeWidth={8} strokeLinecap="round" opacity={0.6} />)}
       <g transform="translate(300,1110)"><rect x={-180} y={-44} width={360} height={88} rx={44} fill={P.terracotta} stroke={P.ink} strokeWidth={7} /><text y={15} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={38} fill={P.cream}>ПЛАТЁЖ · 20 ЛЕТ</text></g>

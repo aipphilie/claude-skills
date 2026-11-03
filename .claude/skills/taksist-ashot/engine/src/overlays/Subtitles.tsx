@@ -29,7 +29,7 @@ export const Subtitles: React.FC<{t: number}> = ({t}) => {
   const k = pop(after(t, c.s - 0.03, 0.22));
   return (
     <div style={{position: 'absolute', left: 140, right: 140, top: 1330, height: 260, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-      <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0 24px', maxWidth: 800, transform: `scale(${0.85 + 0.15 * k})`}}>
+      <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0 30px', maxWidth: 800, transform: `scale(${0.85 + 0.15 * k})`}}>
         {c.words.map((w, i) => {
           const active = t >= w.s - 0.02 && t < (c.words[i + 1]?.s ?? w.e + 0.4);
           const key = KEYS.includes(norm(w.w));
