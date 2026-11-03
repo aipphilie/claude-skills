@@ -83,17 +83,24 @@ export const ShotExterior: React.FC<{t?: number}> = ({t = 0}) => (
   </svg>
 );
 
+// Ашот с заднего сиденья: видно спинку водительского кресла, плечи по бокам от неё, шею и затылок.
+// Ремня НЕ видно — он спереди, на груди.
 const AshotBack: React.FC = () => (
   <g>
-    <path d="M-170,140 Q-200,0 -120,-30 L120,-30 Q200,0 170,140 L240,700 L-240,700Z" fill={P.shirt} stroke={P.ink} strokeWidth={10} />
-    <path d="M-170,140 Q-200,0 -120,-30 L120,-30 Q200,0 170,140" fill="none" stroke="#6A7890" strokeWidth={8} opacity={0.8} />
-    <path d="M-150,60 L150,640" stroke="#6B6560" strokeWidth={46} />
-    <rect x={-80} y={-90} width={160} height={90} fill={P.skinShade} stroke={P.ink} strokeWidth={9} />
+    <path d="M-250,120 Q-250,20 -120,0 L120,0 Q250,20 250,120 L250,400 L-250,400Z" fill={P.shirt} stroke={P.ink} strokeWidth={10} />
+    <path d="M-250,120 Q-250,20 -120,0 M120,0 Q250,20 250,120" fill="none" stroke="#6A7890" strokeWidth={8} opacity={0.8} />
+    <rect x={-80} y={-90} width={160} height={110} fill={P.skinShade} stroke={P.ink} strokeWidth={9} />
+    <path d="M-50,-20 q50,14 100,0" fill="none" stroke="#9C6B4C" strokeWidth={5} />
     <ellipse cx={0} cy={-200} rx={150} ry={150} fill={P.hairGray} stroke={P.ink} strokeWidth={10} />
     <path d="M-120,-140 q40,30 0,60 M110,-140 q-40,30 0,60" fill="none" stroke={P.hairDark} strokeWidth={5} />
     {[-1, 1].map((s) => <ellipse key={s} cx={s * 150} cy={-200} rx={28} ry={42} fill={P.skin} stroke={P.ink} strokeWidth={9} />)}
     <path d="M-176,-230 Q-190,-380 0,-392 Q190,-380 176,-230 Q100,-210 0,-212 Q-100,-210 -176,-230Z" fill={P.cap} stroke={P.ink} strokeWidth={10} />
     {[-100, -40, 30, 90].map((x) => <path key={x} d={`M${x},-216 Q${x * 0.5},-320 0,-384`} fill="none" stroke={P.capDark} strokeWidth={6} />)}
+    {/* спинка водительского кресла закрывает спину */}
+    <path d="M-200,70 Q-205,20 -150,16 L150,16 Q205,20 200,70 L225,1400 L-225,1400Z" fill={P.seatDark} stroke={P.ink} strokeWidth={10} strokeLinejoin="round" />
+    {[-120, -40, 40, 120].map((x) => <path key={x} d={`M${x},60 L${x * 1.08},1380`} stroke="#3A2820" strokeWidth={8} />)}
+    <path d="M-200,300 L205,300" stroke="#3A2820" strokeWidth={8} />
+    <rect x={150} y={420} width={50} height={80} rx={10} fill="#2A1E19" stroke={P.ink} strokeWidth={6} />
   </g>
 );
 
@@ -549,6 +556,9 @@ export const ShotPOV: React.FC = () => (
     <path d="M0,0 L1080,0 L1080,200 Q540,160 0,200Z" fill={P.cabinMid} />
     <Dash2107 fare="400" />
     <g transform="translate(340,1330) scale(1.05)"><Ashot s={{...A0, turn: 1, mouth: 2, smirk: 1, look: [0.3, 0.1], noRightArm: true}} /></g>
+    {/* спинка его кресла между ним и камерой */}
+    <path d="M90,1500 Q90,1440 160,1436 L560,1436 Q630,1440 630,1500 L650,1920 L70,1920Z" fill={P.seatDark} stroke={P.ink} strokeWidth={10} />
+    {[200, 300, 400, 500].map((x) => <path key={x} d={`M${x},1480 L${x},1900`} stroke="#3A2820" strokeWidth={8} />)}
     {/* рука от плеча к камере, с ракурсом: чем ближе, тем толще */}
     <path d="M560,1380 L640,1300 L700,1215" fill="none" stroke={P.ink} strokeWidth={128} strokeLinecap="round" strokeLinejoin="round" />
     <path d="M560,1380 L640,1300" fill="none" stroke={P.shirt} strokeWidth={110} strokeLinecap="round" />
