@@ -15,14 +15,14 @@ export const Sub: React.FC<{text: string; keys?: string[]}> = ({text, keys = []}
   const lines: string[][] = [[]];
   for (const w of text.split(' ')) {
     const cur = lines[lines.length - 1];
-    if (cur.length && (cur.join(' ') + ' ' + w).length > 15) lines.push([w]); else cur.push(w);
+    if (cur.length && (cur.join(' ') + ' ' + w).length > 22) lines.push([w]); else cur.push(w);
   }
   return (
     <g>
       {lines.map((ws, j) => (
-        <text key={j} x={540} y={1440 + j * 100 - (lines.length - 1) * 50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84}>
+        <text key={j} x={540} y={1440 + j * 62 - (lines.length - 1) * 31} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50}>
           {ws.map((w, i) => (
-            <tspan key={i} dx={i ? 24 : 0} fill={keys.includes(w) ? P.mustard : P.cream} stroke={P.ink} strokeWidth={16} paintOrder="stroke" strokeLinejoin="round">{w.toUpperCase()}</tspan>
+            <tspan key={i} dx={i ? 14 : 0} fill={keys.includes(w) ? P.mustard : P.cream} stroke={P.ink} strokeWidth={10} paintOrder="stroke" strokeLinejoin="round">{w.toUpperCase()}</tspan>
           ))}
         </text>
       ))}
@@ -458,9 +458,9 @@ export const NavPhone: React.FC<{pick?: boolean}> = ({pick = true}) => (
       {[['УМЕНЬШИТЬ ПЛАТЁЖ', '20 лет', 'пробки', !pick], ['УМЕНЬШИТЬ СРОК', 'быстрее', 'свободно', pick]].map(([a, b, c, on], i) => (
         <g key={i} transform={`translate(${i ? 118 : -118},280)`}>
           <rect x={-108} y={-80} width={216} height={160} rx={22} fill={on ? '#FFF4C2' : '#fff'} stroke={on ? '#F2C230' : '#DDD6C8'} strokeWidth={6} />
-          <text y={-46} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={22} fill={P.ink}>{(a as string).split(' ')[0]}</text>
-          <text y={-20} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={22} fill={P.ink}>{(a as string).split(' ')[1]}</text>
-          <text y={26} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill={i ? P.sageDark : '#C8553D'}>{b as string}</text>
+          <text y={-46} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={20} fill={P.ink}>{(a as string).split(' ')[0]}</text>
+          <text y={-20} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={20} fill={P.ink}>{(a as string).split(' ')[1]}</text>
+          <text y={26} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={34} fill={i ? P.sageDark : '#C8553D'}>{b as string}</text>
           <text y={62} textAnchor="middle" fontFamily={F} fontWeight={600} fontSize={22} fill="#7A7268">{c as string}</text>
         </g>
       ))}
@@ -492,9 +492,9 @@ export const ShotDash: React.FC = () => (
 export const ShotNav: React.FC<{pick?: boolean}> = ({pick = true}) => (
   <svg viewBox="0 0 1080 1920">
     <rect width={1080} height={1920} fill="#1D1A1F" />
-    <g transform="translate(540,720) scale(1.38)"><NavPhone pick={pick} /></g>
-    <g transform="translate(700,1110)"><circle r={60} fill="#fff" opacity={0.25} /><circle r={36} fill="#fff" opacity={0.35} /></g>
-    <PokeHand x={720} y={1150} rot={-18} s={1.0} />
+    <g transform="translate(540,800) scale(1.12)"><NavPhone pick={pick} /></g>
+    <g transform="translate(700,1180)"><circle r={60} fill="#fff" opacity={0.25} /><circle r={36} fill="#fff" opacity={0.35} /></g>
+    <PokeHand x={712} y={1278} rot={-14} s={0.9} />
     <Sub text="уменьшай срок, а не платёж" keys={['срок,']} />
   </svg>
 );

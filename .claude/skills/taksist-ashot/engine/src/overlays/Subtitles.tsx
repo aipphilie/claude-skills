@@ -29,17 +29,17 @@ export const Subtitles: React.FC<{t: number}> = ({t}) => {
   const k = pop(after(t, c.s - 0.03, 0.22));
   return (
     <div style={{position: 'absolute', left: 140, right: 140, top: 1330, height: 260, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-      <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0 46px', maxWidth: 800, transform: `scale(${0.85 + 0.15 * k})`}}>
+      <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0 24px', maxWidth: 800, transform: `scale(${0.85 + 0.15 * k})`}}>
         {c.words.map((w, i) => {
           const active = t >= w.s - 0.02 && t < (c.words[i + 1]?.s ?? w.e + 0.4);
           const key = KEYS.includes(norm(w.w));
           return (
             <span key={i} style={{
-              fontFamily: 'Rubik', fontWeight: 900, fontSize: 92, lineHeight: 1.12, textTransform: 'uppercase',
+              fontFamily: 'Rubik', fontWeight: 900, fontSize: 55, lineHeight: 1.12, textTransform: 'uppercase',
               color: key ? P.mustard : c.who === 'passenger' ? '#FFFFFF' : P.cream,
-              WebkitTextStroke: `13px ${P.ink}`, paintOrder: 'stroke fill',
+              WebkitTextStroke: `8px ${P.ink}`, paintOrder: 'stroke fill',
               transform: `scale(${active ? 1.1 : 1}) translateY(${active ? -4 : 0}px)`, display: 'inline-block',
-              textShadow: `0 8px 0 ${P.ink}`,
+              textShadow: `0 5px 0 ${P.ink}`,
             }}>{w.w.replace(/[,.]$/, '')}</span>
           );
         })}
