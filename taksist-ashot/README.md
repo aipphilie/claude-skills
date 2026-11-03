@@ -13,7 +13,7 @@
 | `serii/01-ipoteka/scenariy-17sek.md`, `sud-17sek.md` | Короткая версия и её суд |
 | `serii/01-ipoteka/tz-pilot.md` | Исходное ТЗ пилота |
 | `serii/01-ipoteka/raskadrovka.png` | Раскадровка на 15 ракурсов |
-| `serii/01-ipoteka/chernovik-v3-polnaya.mp4` | Черновой монтаж полной серии (~2:08) с голосами ElevenLabs |
+| (файлы проекта) `taksist-ashot-ipoteka-v3.mp4` | Готовая серия v3 (2:10): хук с тормозами, сцены вне такси, субтитры-караоке. В репозиторий не кладём (66 МБ), рендерится движком |
 | `serii/01-ipoteka/chernovik-v2.mp4` | Старое черновое видео короткой версии (временный голос) |
 | `personazhi/` | Ашот (вариант Д, эмоции), отклонённые варианты, пассажиры |
 | `../.claude/skills/taksist-ashot/` | Скилл: правила сериала, реализм, голоса (`GOLOSA.md`), движок на Remotion |
