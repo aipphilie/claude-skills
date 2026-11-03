@@ -9,6 +9,7 @@
 - `.claude/skills/petlya-vovlechennosti` — петля вовлечённости: прокачивает сценарий рилса по 6 шагам (шок, интрига, пружина, катарсис с поворотом, перенос симпатии, условный рефлекс), ставит оценки и выдаёт исправленный сценарий. Zip для claude.ai — `zip/yarik/petlya-vovlechennosti.zip`
 - `taksist-ashot/` — папка проекта «Таксист Ашот»: сценарии серий, суды, раскадровки, персонажи, черновые видео
 - `.claude/skills/taksist-ashot` — сериал Reels «Таксист Ашот»: персонажи кодом (Ашот + конструктор пассажиров), салон, инфографика, субтитры, озвучка, звук, рендер на Remotion. правила, голоса, движок
+- `.claude/skills/ushi` — уши для Claude: **Openverse** (где взять звук, CC0), **Real SFX** ([opus-sound-layer](https://github.com/Bodila51/opus-sound-layer), MIT — библиотека живых записей, микс, QA), **PANNs** (нейросеть слушает ролик и говорит, что и где звучит). Подключён к скиллам Ашота, Ярика и мистических сериалов. В новой сессии: «поставь уши» → `bash .claude/skills/ushi/scripts/setup.sh`
 - `.claude/skills/ig-*` — 13 скиллов для Instagram из [Jakeschincariol/instagram-agent-skill](https://github.com/Jakeschincariol/instagram-agent-skill) (MIT): `/ig-reel` (хуки, сценарий, раскадровка по времени), `/ig-caption`, `/ig-human` и др. Шаблон голоса — `.claude/skills/ig-reel/voice-template.md`, заполненный кладите в `~/.claude/instagram/voice.md`
 - `zip/instagram/` — те же 13 скиллов Instagram в zip, по одному на скилл, для загрузки в claude.ai (Настройки → скиллы)
 - `.claude/skills/higgsfield-*` — скиллы Higgsfield (генерация картинок и видео)
