@@ -422,7 +422,7 @@ export const SceneRate: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
   return (
     <svg viewBox="0 0 1080 1920">
       <rect width={1080} height={1920} fill="#1F2A2A" />
-      <g transform="translate(540,840)">
+      <g transform="translate(540,780)">
         <circle r={360} fill="#2E3E3C" stroke={P.ink} strokeWidth={12} />
         {Array.from({length: 24}, (_, i) => <path key={i} d={`M${Math.cos(i / 24 * Math.PI * 2) * 320},${Math.sin(i / 24 * Math.PI * 2) * 320} L${Math.cos(i / 24 * Math.PI * 2) * 350},${Math.sin(i / 24 * Math.PI * 2) * 350}`} stroke={P.cream} strokeWidth={8} />)}
         <g transform={`rotate(${lerp(40, -40, a)})`}><path d="M-16,0 L0,-300 L16,0Z" fill={P.terracotta} stroke={P.ink} strokeWidth={5} /></g>
@@ -430,7 +430,7 @@ export const SceneRate: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
         <text y={50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={150} fill={a > 0.5 ? '#9FD18A' : '#FF9A4A'}>{val.toFixed(1).replace('.0', '').replace('.', ',')}%</text>
       </g>
       <text x={540} y={380} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.cream}>СТАВКА — ЭТО ВСЁ</text>
-      {a > 0.9 && <g transform={`translate(540,1300) scale(${pop(after(lt, 1.0, 0.45))}) rotate(-4)`}><rect x={-300} y={-70} width={600} height={140} rx={70} fill={P.sage} stroke={P.ink} strokeWidth={8} /><text y={30} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84} fill={P.cream}>−806 000 ₽</text></g>}
+      {a > 0.9 && <g transform={`translate(540,1215) scale(${pop(after(lt, 1.0, 0.45))}) rotate(-4)`}><rect x={-300} y={-70} width={600} height={140} rx={70} fill={P.sage} stroke={P.ink} strokeWidth={8} /><text y={30} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84} fill={P.cream}>−806 000 ₽</text></g>}
     </svg>
   );
 };

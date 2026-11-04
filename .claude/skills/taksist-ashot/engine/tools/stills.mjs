@@ -10,6 +10,6 @@ const comp = await selectComposition({serveUrl, id: 'Ashot', browserExecutable: 
 const list = secs ? secs.split(',').map(Number) : Array.from({length: 12}, (_, i) => (i + 0.5) * comp.durationInFrames / 30 / 12);
 for (const s of list) {
   const f = Math.min(comp.durationInFrames - 1, Math.round(s * 30));
-  await renderStill({serveUrl, composition: comp, frame: f, output: path.resolve(`${out}/t${s.toFixed(2)}.png`), inputProps, scale: Number(scale), browserExecutable: chrome, chromiumOptions: {gl: 'swangle'}});
+  await renderStill({serveUrl, composition: comp, frame: f, output: path.resolve(`${out}/t${s.toFixed(2)}.png`), inputProps, scale: Number(scale), browserExecutable: chrome, chromiumOptions: {gl: process.env.GL || 'swiftshader'}});
   console.log('ok', s);
 }
