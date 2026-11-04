@@ -6,9 +6,9 @@ export const story = STORY as any;
 type Line = {id: string; who: string; start: number; end: number; words: {w: string; s: number; e: number}[]};
 export const lines: Line[] = timeline.lines;
 export const lineById = (id: string) => lines.find((l) => l.id === id)!;
-export const cue = (name: string | number): number => {
+export const cue = (name: string | number | any[]): number => {
   if (typeof name === 'number') return name;
-  const c = story.cues[name];
+  const c = Array.isArray(name) ? name : story.cues[name];
   if (c === undefined) throw new Error('no cue ' + name);
   if (typeof c === 'number') return c;
   const [id, w, off] = c; const L = lineById(id);

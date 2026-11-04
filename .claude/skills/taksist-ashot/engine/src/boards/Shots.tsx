@@ -132,7 +132,7 @@ const SideCabin: React.FC<{t?: number}> = ({t = 0}) => (
   </g>
 );
 const fmt = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: number}> = ({mode, value}) => {
+export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: number; label?: string}> = ({mode, value, label}) => {
   const val = value !== undefined ? fmt(value) : mode === 'crazy' ? '12 000 000' : mode === 'rewind' ? '− − − − −' : '400';
   return (
     <svg viewBox="0 0 1080 1920">
@@ -143,8 +143,8 @@ export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: num
         <text x={-400} y={-200} fontFamily={F} fontWeight={800} fontSize={46} fill="#8A7A70">ТАКСОМЕТР</text>
         <circle cx={380} cy={-214} r={22} fill={mode === 'crazy' ? '#E0523E' : P.sage} />
         <rect x={-420} y={-140} width={840} height={300} rx={30} fill="#3A1F14" />
-        <text x={0} y={70} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={mode === 'fare' ? 220 : 140} fill={mode === 'rewind' ? '#9FD18A' : '#FF9A4A'}>{val} ₽</text>
-        <text x={0} y={240} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={44} fill={P.cream}>{mode === 'fare' ? 'ПОЕЗДКА' : mode === 'crazy' ? 'ПЕРЕПЛАТА БАНКУ' : 'ПЕРЕПЛАТА ↓'}</text>
+        <text x={0} y={70} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={mode === 'fare' ? 220 : val.length > 9 ? 112 : 140} fill={mode === 'rewind' ? '#9FD18A' : '#FF9A4A'}>{val} ₽</text>
+        <text x={0} y={240} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={44} fill={P.cream}>{label || (mode === 'fare' ? 'ПОЕЗДКА' : mode === 'crazy' ? 'ПЕРЕПЛАТА БАНКУ' : 'ПЕРЕПЛАТА ↓')}</text>
       </g>
       {mode === 'crazy' && <>
         {[[-300, -380], [120, -420], [380, -360]].map(([x, y], i) => <circle key={i} cx={540 + x} cy={880 + y} r={70 + i * 20} fill="#8C8079" opacity={0.6} />)}
@@ -595,6 +595,63 @@ export const ShotFreeze: React.FC = () => {
         <text y={44} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={124} fill={P.terracotta}>400 ₽</text>
       </g>
       <Sub text="четыреста рублей" keys={['четыреста', 'рублей']} />
+    </svg>
+  );
+};
+
+// ---------- Хук «Ипотека» v2: визг тормозов. Такси летит, резко тормозит: клюёт носом, дым, следы шин.
+// lt — сек от начала плана, tb — момент торможения, ts — полная остановка (сек от начала плана)
+export const ShotBrake: React.FC<{lt: number; tb?: number; ts?: number}> = ({lt, tb = 0.3, ts = 0.9}) => {
+  const v0 = 1;                                        // скорость «улицы» до тормоза
+  const d = Math.max(0, Math.min(lt, ts) - tb), D = ts - tb;
+  const tt = lt < tb ? lt : tb + (d - d * d / (2 * D)); // равнозамедленно до нуля
+  const braking = lt >= tb && lt < ts + 0.05;
+  const dip = lt < tb ? 0 : lt < ts ? 4 * Math.min(1, (lt - tb) / 0.12) : 4 * Math.max(0, Math.cos((lt - ts) * 9)) * Math.exp(-(lt - ts) * 5) - 1.2 * Math.sin(Math.min(1, (lt - ts) / 0.15) * Math.PI);
+  const carX = 520 + (lt < tb ? (lt - tb) * 600 : 0);
+  return (
+    <svg viewBox="0 0 1080 1920">
+      <NightStreet t={tt * v0} />
+      {/* следы шин */}
+      {lt > tb && [-250, 255].map((x) => <path key={x} d={`M${carX + x * 1.15 - 30},${1440 + 74} l${-Math.min(420, (lt - tb) * 900)},0`} stroke="#151217" strokeWidth={16} strokeLinecap="round" opacity={0.85} />)}
+      {!braking && lt < tb && <Lines x={90} y={1060} n={5} len={260} />}
+      <g transform={`translate(${carX},1440) scale(1.15) rotate(${-1.5 + dip})`}><TaxiSide t={tt} /></g>
+      {/* дым из-под колёс */}
+      {lt > tb && Array.from({length: 10}, (_, i) => {
+        const k = (lt - tb) * 2.2 - i * 0.09; if (k <= 0 || k > 1.4) return null;
+        const x = carX + (i % 2 ? -250 : 255) * 1.15 - 60 - k * 160, y = 1500 - k * 140;
+        return <circle key={i} cx={x} cy={y} r={40 + k * 90} fill="#D9D2CC" opacity={Math.max(0, 0.55 - k * 0.4)} />;
+      })}
+      {/* «визг»: штрихи у колёс */}
+      {braking && [0, 1, 2].map((i) => <path key={i} d={`M${carX + 420},${1330 + i * 60} l${70 + i * 20},${-20 + i * 20}`} stroke={P.cream} strokeWidth={12} strokeLinecap="round" opacity={0.8} />)}
+      {braking && <text x={540} y={760} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={150} fill={P.mustard} stroke={P.ink} strokeWidth={14} paintOrder="stroke" transform={`rotate(-6 540 760) scale(${1 + 0.04 * Math.sin(lt * 60)})`} style={{transformOrigin: '540px 760px'}}>ВИИИЗГ!</text>}
+    </svg>
+  );
+};
+
+// ---------- Хук v2: в салоне Тимура бросает вперёд, телефон «ИПОТЕКА ОДОБРЕНА» вылетает на передний ряд
+export const ShotJolt: React.FC<{lt: number; rider?: Rider}> = ({lt, rider = RIDERS[0]}) => {
+  const j = Math.min(1, lt / 0.18), back = Math.max(0, Math.min(1, (lt - 0.35) / 0.3));
+  const lean = j * (1 - back * 0.7);                     // рывок вперёд и откат
+  const pk = Math.min(1, lt / 0.6);                      // полёт телефона
+  const px = 560 - pk * 360, py = 880 - Math.sin(pk * Math.PI) * 380 + pk * 220, pr = -8 - pk * 540;
+  return (
+    <svg viewBox="0 0 1080 1920">
+      <g transform={`translate(${-260 + lean * 20},${-420 - lean * 30}) scale(1.5)`}><CabinBack t={0} /></g>
+      <g transform={`translate(540,${1300 - lean * 120}) scale(${1.9 + lean * 0.45}) rotate(${lean * -6})`}><RiderFigure r={rider} e={{...EMO.shock, look: [-0.5, -0.6]}} /></g>
+      {/* полосы движения — рывок */}
+      {lt < 0.3 && Array.from({length: 6}, (_, i) => <path key={i} d={`M${120 + i * 170},${1700 - i * 30} l0,${-200 - i * 20}`} stroke={P.cream} strokeWidth={10} strokeLinecap="round" opacity={0.5 * (1 - lt / 0.3)} />)}
+      <g transform={`translate(${px},${py}) rotate(${pr}) scale(${0.62 - pk * 0.12})`} opacity={pk < 1 ? 1 : 0.9}>
+        <rect x={-210} y={-380} width={420} height={760} rx={56} fill="#1D1A1F" stroke={P.ink} strokeWidth={12} />
+        <rect x={-184} y={-344} width={368} height={688} rx={38} fill={P.cream} />
+        <circle cx={0} cy={-150} r={86} fill={P.sage} stroke={P.ink} strokeWidth={8} />
+        <path d="M-40,-150 L-8,-116 L46,-186" fill="none" stroke={P.cream} strokeWidth={20} strokeLinecap="round" strokeLinejoin="round" />
+        <text y={-10} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.ink}>ИПОТЕКА</text>
+        <text y={50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.sageDark}>ОДОБРЕНА ✓</text>
+        <rect x={-150} y={100} width={300} height={90} rx={20} fill={P.beige} stroke={P.ink} strokeWidth={5} />
+        <text y={160} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={P.ink}>5 000 000 ₽</text>
+      </g>
+      {/* след полёта */}
+      {pk > 0.05 && pk < 1 && <path d={`M560,880 Q${(560 + px) / 2},${py - 160} ${px},${py}`} fill="none" stroke={P.cream} strokeWidth={8} strokeDasharray="20 22" opacity={0.5} />}
     </svg>
   );
 };

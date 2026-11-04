@@ -3,3 +3,4 @@ public/voice/
 public/*.wav
 prev*/
 out*.mp4
+parts/
