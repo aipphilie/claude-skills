@@ -17,14 +17,14 @@ const base: AshotState = {t: 0, turn: 0.62, browL: 0, browR: 0.25, blink: 0, win
 const TIM = RIDERS[0];
 
 // Шашечки такси по кругу
-const CheckerRing: React.FC<{r: number; w: number; n: number}> = ({r, w, n}) => (
+const CheckerRing: React.FC<{r: number; w: number; n: number; light?: string; dark?: string}> = ({r, w, n, light = '#FFF6E2', dark: dk = P.ink}) => (
   <g>
     {Array.from({length: n}, (_, i) => [0, 1].map((row) => {
       const a0 = (i / n) * Math.PI * 2, a1 = ((i + 1) / n) * Math.PI * 2;
       const r0 = r - w + row * (w / 2), r1 = r0 + w / 2;
       const p = (rr: number, a: number) => `${540 + rr * Math.cos(a)},${540 + rr * Math.sin(a)}`;
       const dark = (i + row) % 2 === 0;
-      return <path key={i + '-' + row} d={`M${p(r0, a0)} L${p(r1, a0)} A${r1},${r1} 0 0 1 ${p(r1, a1)} L${p(r0, a1)} A${r0},${r0} 0 0 0 ${p(r0, a0)}Z`} fill={dark ? P.ink : '#FFF6E2'} />;
+      return <path key={i + '-' + row} d={`M${p(r0, a0)} L${p(r1, a0)} A${r1},${r1} 0 0 1 ${p(r1, a1)} L${p(r0, a1)} A${r0},${r0} 0 0 0 ${p(r0, a0)}Z`} fill={dark ? dk : light} />;
     }))}
   </g>
 );
@@ -38,7 +38,7 @@ const Coin: React.FC<{x: number; y: number; r: number}> = ({x, y, r}) => (
   </g>
 );
 
-export type AvatarId = 'A' | 'B' | 'C' | 'D' | 'E';
+export type AvatarId = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 export const AVATARS: {id: AvatarId; name: string; note: string}[] = [
   {id: 'A', name: 'Классика', note: 'Ашот с ухмылкой на горчичном'},
   {id: 'B', name: 'Шашечки', note: 'подмигивает, рамка-шашки такси'},
@@ -69,6 +69,15 @@ export const AvatarArt: React.FC<{v: AvatarId}> = ({v}) => {
         <circle cx={540} cy={470} r={400} fill="#93C07F" />
         <svg x={0} y={0} width={1080} height={1080} viewBox="-340 -520 680 680"><Ashot s={{...base, turn: 0.5, look: [0.5, 0.1]}} /></svg>
         <Coin x={790} y={760} r={120} />
+      </svg>
+    );
+    case 'F': return ( // выбор автора: C + чёрно-белые шашечки по краю
+      <svg width={1080} height={1080} viewBox="0 0 1080 1080">
+        <rect width={1080} height={1080} fill={P.sage} />
+        <circle cx={540} cy={470} r={400} fill="#93C07F" />
+        <svg x={0} y={0} width={1080} height={1080} viewBox="-360 -540 720 720"><Ashot s={{...base, turn: 0.5, look: [0.5, 0.1]}} /></svg>
+        <Coin x={745} y={730} r={110} />
+        <CheckerRing r={540} w={86} n={36} light="#FFFFFF" dark="#111111" />
       </svg>
     );
     case 'D': return (
