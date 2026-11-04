@@ -9,13 +9,13 @@ import {clamp, easeInOut, easeOut, lerp, pop} from '../lib';
 // (ниже — субтитры). Тимур — RIDERS[0], менеджер банка — RIDERS[5] (клерк).
 
 const F = 'Rubik';
-const TIM = RIDERS[0], CLERK = RIDERS[5];
-const fmt = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-const emo = (e: Partial<Emotion>): Emotion => ({...EMO.calm, ...e});
+export const TIM = RIDERS[0], CLERK = RIDERS[5];
+export const fmt = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+export const emo = (e: Partial<Emotion>): Emotion => ({...EMO.calm, ...e});
 const after = (lt: number, a: number, d = 0.3) => clamp((lt - a) / d);
 
 // плашка-подпись места («ВЧЕРА · БАНК»)
-const Tag: React.FC<{text: string; lt: number; fill?: string; color?: string}> = ({text, lt, fill = P.ink, color = P.cream}) => {
+export const Tag: React.FC<{text: string; lt: number; fill?: string; color?: string}> = ({text, lt, fill = P.ink, color = P.cream}) => {
   const w = text.length * 26 + 70;
   return (
     <g transform={`translate(${100 + w / 2},300) scale(${pop(after(lt, 0, 0.4))}) rotate(-3)`}>
@@ -24,14 +24,14 @@ const Tag: React.FC<{text: string; lt: number; fill?: string; color?: string}> =
     </g>
   );
 };
-const Coin: React.FC<{x: number; y: number; r?: number; rot?: number; o?: number}> = ({x, y, r = 34, rot = 0, o = 1}) => (
+export const Coin: React.FC<{x: number; y: number; r?: number; rot?: number; o?: number}> = ({x, y, r = 34, rot = 0, o = 1}) => (
   <g transform={`translate(${x},${y}) rotate(${rot})`} opacity={o}>
     <circle r={r} fill={P.gold} stroke={P.ink} strokeWidth={6} />
     <circle r={r * 0.72} fill="none" stroke={P.goldDark} strokeWidth={4} />
     <text y={r * 0.38} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={r * 1.05} fill={P.goldDark}>₽</text>
   </g>
 );
-const Note: React.FC<{x: number; y: number; s?: number; rot?: number; v?: string; o?: number}> = ({x, y, s = 1, rot = 0, v = '5000', o = 1}) => (
+export const Note: React.FC<{x: number; y: number; s?: number; rot?: number; v?: string; o?: number}> = ({x, y, s = 1, rot = 0, v = '5000', o = 1}) => (
   <g transform={`translate(${x},${y}) rotate(${rot}) scale(${s})`} opacity={o}>
     <rect x={-120} y={-58} width={240} height={116} rx={12} fill="#E9A06B" stroke={P.ink} strokeWidth={6} />
     <rect x={-104} y={-42} width={208} height={84} rx={8} fill="none" stroke="#B56E40" strokeWidth={4} />
@@ -39,14 +39,14 @@ const Note: React.FC<{x: number; y: number; s?: number; rot?: number; v?: string
     <text x={52} y={16} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill="#7A3E1E">{v}</text>
   </g>
 );
-const sky = (top: string, bot: string, id: string) => (
+export const sky = (top: string, bot: string, id: string) => (
   <>
     <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={top} /><stop offset="1" stopColor={bot} /></linearGradient></defs>
     <rect width={1080} height={1920} fill={`url(#${id})`} />
   </>
 );
 // «камера» сцены: медленный наезд + лёгкий сдвиг
-const Cam: React.FC<{k: number; z0?: number; z1?: number; cx?: number; cy?: number; children: React.ReactNode}> = ({k, z0 = 1, z1 = 1.12, cx = 540, cy = 900, children}) => {
+export const Cam: React.FC<{k: number; z0?: number; z1?: number; cx?: number; cy?: number; children: React.ReactNode}> = ({k, z0 = 1, z1 = 1.12, cx = 540, cy = 900, children}) => {
   const z = lerp(z0, z1, easeInOut(k));
   return <g transform={`translate(${cx},${cy}) scale(${z}) translate(${-cx},${-cy})`}>{children}</g>;
 };

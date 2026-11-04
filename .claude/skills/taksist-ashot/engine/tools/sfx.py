@@ -66,6 +66,13 @@ if intro == 'brake':  # хук: визг тормозов, удар, рывок,
     put(sfx, ts, thump(), .7); put(sfx, ts + .02, bp(noise(.15), 300, 3000) * env(int(.15 * SR), .002, .04), .4)
     put(sfx, cue('joltIn') + .05, whoosh(.3), .32)
     put(sfx, cue('phoneLand'), click(), .7); put(sfx, cue('phoneLand') + .07, click(), .4)
+elif intro == 'bump':  # хук «Вычет»: мотор, удар о «лежачего», Тимура подкидывает, Ашот ловит телефон
+    b = cue('bumpAt')
+    put(sfx, 0.0, bp(noise(b + .3), 60, 400) * .8, .25)
+    put(sfx, b, thump(), .8); put(sfx, b + .18, thump(), .5)
+    put(sfx, b + .02, bp(noise(.2), 200, 2500) * env(int(.2 * SR), .002, .05), .45)
+    put(sfx, cue('joltIn') + .05, whoosh(.3), .32)
+    put(sfx, cue('phoneLand'), click(), .7)
 else:
     # поворотник на старте
     for i in range(4): put(sfx, 0.05 + i * 0.42, tick(i % 2 == 0), .55)
@@ -77,19 +84,22 @@ for s in story['shots'][1:]:
 for x in story.get('inserts', []):
     if x['from'] != 0 and x['shot'] not in ('brake', 'jolt'): put(sfx, cue(x['from']) - .1, whoosh(.26), .28)
 # звуки сцен вне такси: inserts[].sfx = [[сдвиг от начала, 'thump'|'kaching'|'pop'|'click'|'whoosh'], …]
-SND = {'thump': (thump, .5), 'kaching': (kaching, .35), 'pop': (pop, .25), 'click': (click, .35), 'whoosh': (lambda: whoosh(.4), .25)}
+SND = {'shutter': (shutter, .45), 'scratch': (scratch, .45), 'tick': (tick, .5), 'thump': (thump, .5), 'kaching': (kaching, .35), 'pop': (pop, .25), 'click': (click, .35), 'whoosh': (lambda: whoosh(.4), .25)}
 for x in story.get('inserts', []):
     for off, name in x.get('sfx', []):
         f, g = SND[name]; put(sfx, cue(x['from']) + off, f(), g)
-put(sfx, cue('n5'), pop(), .25)
-put(sfx, cue('cross'), bp(noise(.18), 1500, 6000) * env(int(.18 * SR), .01, .06), .22)
-put(sfx, cue('n12'), kaching(), .42)
-put(sfx, cue('shock') + .02, thump(), .55); put(sfx, cue('shock'), scratch(), .5)
-put(sfx, cue('explain'), pop(), .2); put(sfx, cue('years'), whoosh(.6), .15)
-for i in range(10): put(sfx, cue('years') + .05 + i * .085, click(), .08)  # листаются годы
-put(sfx, cue('buttons'), pop(), .22); put(sfx, cue('buttons') + .12, pop(), .2)
-put(sfx, cue('poke'), click(), .5); put(sfx, cue('poke') + .03, tone(1568, .4, .12) + tone(2093, .4, .1) * .6, .18)
-put(sfx, cue('less'), pop(), .2)
+if 'n12' in story['cues']:  # фирменные звуки серии «Ипотека»
+    put(sfx, cue('n5'), pop(), .25)
+    put(sfx, cue('cross'), bp(noise(.18), 1500, 6000) * env(int(.18 * SR), .01, .06), .22)
+    put(sfx, cue('n12'), kaching(), .42)
+    put(sfx, cue('shock') + .02, thump(), .55); put(sfx, cue('shock'), scratch(), .5)
+    put(sfx, cue('explain'), pop(), .2); put(sfx, cue('years'), whoosh(.6), .15)
+    for i in range(10): put(sfx, cue('years') + .05 + i * .085, click(), .08)  # листаются годы
+    put(sfx, cue('buttons'), pop(), .22); put(sfx, cue('buttons') + .12, pop(), .2)
+    put(sfx, cue('poke'), click(), .5); put(sfx, cue('poke') + .03, tone(1568, .4, .12) + tone(2093, .4, .1) * .6, .18)
+    put(sfx, cue('less'), pop(), .2)
+for at, name in story.get('sfx', []):  # точечные звуки серии: [[cue, 'pop'|'kaching'|…], …]
+    f, g = SND[name]; put(sfx, cue(at), f(), g)
 put(sfx, cue('n400'), kaching(), .5)
 put(sfx, cue('freeze'), shutter(), .5); put(sfx, cue('freeze'), thump(), .3)
 

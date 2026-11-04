@@ -10,6 +10,7 @@ import {Cards, Score, ShotCheat} from './overlays/Episode';
 import {Subtitles} from './overlays/Subtitles';
 import * as SH from './boards/Shots';
 import * as W from './boards/World';
+import * as W2 from './boards/World02';
 
 // врезки-ракурсы поверх салона (story.json → inserts)
 const inserts = (story.inserts || []).map((x: any) => ({...x, a: cue(x.from), b: cue(x.to)}));
@@ -18,7 +19,22 @@ const renderInsert = (x: any, t: number, lt: number, dur: number) => {
   switch (x.shot) {
     case 'exterior': return <SH.ShotExterior t={t} />;
     case 'brake': return <SH.ShotBrake lt={lt} tb={x.tb ?? 0.3} ts={x.ts ?? 0.9} />;
-    case 'jolt': return <SH.ShotJolt lt={lt} />;
+    case 'jolt': return <SH.ShotJolt lt={lt} phone={x.phone} bad={x.bad} />;
+    // серия 2 «Налоговый вычет» (boards/World02.tsx)
+    case 'bump': return <W2.SceneBump lt={lt} bump={cue('bumpAt') - x.a} />;
+    case 'salary': return <W2.SceneSalary lt={lt} dur={dur} split={clamp((cue(x.splitAt) - x.a) / dur)} />;
+    case 'calc': return <W2.SceneCalc lt={lt} dur={dur} split={clamp((cue(x.splitAt) - x.a) / dur)} />;
+    case 'yearPaid': return <W2.SceneYearPaid lt={lt} dur={dur} />;
+    case 'ndfl': return <W2.SceneNdfl lt={lt} dur={dur} split={clamp((cue(x.splitAt) - x.a) / dur)} />;
+    case 'envelopeShut': return <W2.SceneEnvelopeShut lt={lt} dur={dur} />;
+    case 'triple': return <W2.SceneTriple lt={lt} dur={dur} />;
+    case 'teeth': return <W2.SceneTeeth lt={lt} dur={dur} />;
+    case 'queue': return <W2.SceneQueue lt={lt} dur={dur} />;
+    case 'phoneLK': return <W2.ScenePhoneLK lt={lt} dur={dur} />;
+    case 'yearsBack': return <W2.SceneYearsBack lt={lt} dur={dur} />;
+    case 'callMom': return <W2.SceneCallMom lt={lt} dur={dur} />;
+    case 'teaser': return <W2.SceneTeaser lt={lt} dur={dur} />;
+    case 'meterRefund': { const [a, b] = x.value || [0, 650000]; return <SH.ShotMeter mode="refund" value={lerp(a, b, easeInOut(clamp(lt / Math.max(0.3, dur - 0.4))))} label={x.label} />; }
     // сцены вне такси (boards/World.tsx)
     case 'bankStamp': return <W.SceneBankStamp lt={lt} dur={dur} />;
     case 'newBuilding': return <W.SceneNewBuilding lt={lt} dur={dur} split={x.splitAt !== undefined ? clamp((cue(x.splitAt) - x.a) / dur) : 0.5} />;
@@ -120,7 +136,7 @@ export const Video: React.FC<{sub?: string}> = ({sub}) => {
   const fare = t < cue('n400') ? 287 + t * 0.9 : 400;
   const fl = Math.max(...shots.filter((s: any) => s.whoosh).map((s: any) => 1 - clamp(Math.abs(t - s.t) * 8)), ...inserts.map((x: any) => 1 - clamp(Math.abs(t - x.a) * 10)), 0);
   const ins = inserts.find((x: any) => t >= x.a && t < x.b);
-  const insShake = ins && ins.shot === 'meterCrazy' && t > cue('n12') ? 14 * Math.exp(-(t - cue('n12')) * 5) : 0;
+  const insShake = ins && ins.shot === 'meterCrazy' && story.cues.n12 && t > cue('n12') ? 14 * Math.exp(-(t - cue('n12')) * 5) : 0;
   const freezeFlash = real >= tf ? 1 - clamp((real - tf) * 3) : 0;
 
   return (
