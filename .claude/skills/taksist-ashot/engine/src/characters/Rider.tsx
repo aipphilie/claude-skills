@@ -158,7 +158,7 @@ export const RiderFigure: React.FC<{r: Rider; e: Emotion}> = ({r, e}) => {
   );
 };
 
-// Кристина, 32, кассир супермаркета, мама первоклассника (серия «До зарплаты не хватает»). Три варианта на выбор.
+// Кристина, 32, кассир супермаркета, мама первоклассника (серия «До зарплаты не хватает»). Автор выбрал вариант А (2026-11-05).
 export const KRISTINA: Rider[] = [
   {name: 'А · пучок, жилет', skin: '#E9BC9A', shade: '#CF9E7C', headScale: 1, bodyScale: 0.95, jaw: 'soft', hair: 'bun', hairColor: '#6B3E26', clothes: 'cashier', c1: '#C8553D', c2: '#F3EDE4', earrings: true, lips: true, lashes: true},
   {name: 'Б · каре, жилет', skin: '#EBC3A4', shade: '#D2A486', headScale: 1, bodyScale: 0.95, jaw: 'narrow', hair: 'bob', hairColor: '#C9A06A', clothes: 'cashier', c1: '#3E6E8E', c2: '#F3EDE4', lips: true, lashes: true},
