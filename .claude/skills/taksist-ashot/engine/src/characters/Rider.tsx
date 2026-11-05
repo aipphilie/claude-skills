@@ -16,9 +16,9 @@ export type Rider = {
   skin: string; shade: string;
   headScale: number; bodyScale: number;
   jaw: 'soft' | 'round' | 'narrow';
-  hair: 'messy' | 'perm' | 'cowlick' | 'ponytail' | 'bald' | 'sidepart' | 'bob';
+  hair: 'messy' | 'perm' | 'cowlick' | 'ponytail' | 'bald' | 'sidepart' | 'bob' | 'bun';
   hairColor: string;
-  clothes: 'hoodie' | 'cardigan' | 'schoolkid' | 'sweater' | 'jacket' | 'shirtTie';
+  clothes: 'hoodie' | 'cardigan' | 'schoolkid' | 'sweater' | 'jacket' | 'shirtTie' | 'cashier';
   c1: string; c2: string;
   glasses?: boolean; earrings?: boolean; beads?: boolean; lips?: boolean; freckles?: boolean;
   headphones?: boolean; beard?: boolean; wrinkles?: boolean; lashes?: boolean;
@@ -30,6 +30,7 @@ const Hair: React.FC<{r: Rider; back?: boolean}> = ({r, back}) => {
   if (back) {
     if (r.hair === 'ponytail') return <path d="M70,-200 Q170,-190 150,-60 Q140,0 110,30 Q120,-60 70,-120Z" {...st} />;
     if (r.hair === 'bob') return <path d="M-112,-160 Q-120,-50 -100,-30 L100,-30 Q120,-50 112,-160Z" {...st} />;
+    if (r.hair === 'bun') return <circle cx={0} cy={-262} r={46} {...st} />;
     if (r.hair === 'perm') return <g>{[-1, 1].map((s) => [0, 1, 2].map((i) => <circle key={s + '' + i} cx={s * (100 - i * 4)} cy={-170 + i * 40} r={30} {...st} />))}</g>;
     return null;
   }
@@ -40,6 +41,7 @@ const Hair: React.FC<{r: Rider; back?: boolean}> = ({r, back}) => {
     case 'ponytail': return <path d="M-100,-140 Q-110,-252 0,-254 Q110,-252 100,-140 Q90,-200 30,-210 Q-20,-180 -100,-140Z" {...st} />;
     case 'bob': return <path d="M-112,-110 Q-124,-256 0,-258 Q124,-256 112,-110 Q100,-190 40,-206 Q-30,-200 -60,-180 Q-96,-160 -112,-110Z" {...st} />;
     case 'bald': return <g>{[-1, 1].map((s) => <path key={s} d={`M${s * 92},-170 Q${s * 110},-130 ${s * 90},-96 L${s * 78},-130Z`} {...st} />)}<path d="M-40,-226 q20,-10 40,0" fill="none" stroke={P.ink} strokeWidth={4} opacity={0.3} /></g>;
+    case 'bun': return <g><path d="M-100,-128 Q-110,-252 0,-254 Q110,-252 100,-128 Q92,-196 40,-212 Q0,-196 -40,-212 Q-92,-196 -100,-128Z" {...st} /><path d="M-60,-236 Q-20,-250 0,-246 M20,-246 Q50,-250 70,-232" fill="none" stroke={P.ink} strokeWidth={4} opacity={0.35} /></g>;
     case 'sidepart': return <path d="M-98,-140 Q-106,-252 -10,-254 Q104,-254 100,-150 Q96,-196 30,-206 L-30,-212 Q-80,-200 -98,-140Z" {...st} />;
   }
 };
@@ -78,6 +80,15 @@ const Clothes: React.FC<{r: Rider}> = ({r}) => {
       <path d="M-40,-4 L0,120 L40,-4" fill={P.cream} {...st} />
       <path d="M-70,-4 L-10,200 L-90,120Z M70,-4 L10,200 L90,120Z" fill={r.c2} {...st} />
       <path d="M0,120 L0,420" stroke={P.ink} strokeWidth={5} />
+    </g>;
+    case 'cashier': return <g>
+      <path d={torso} fill={r.c2} {...st} />
+      <path d="M-56,-6 L0,46 L56,-6" fill={r.c2} {...st} />
+      <path d="M-190,60 Q-180,0 -66,-4 L-14,150 L-30,420 L-215,420Z" fill={r.c1} {...st} />
+      <path d="M190,60 Q180,0 66,-4 L14,150 L30,420 L215,420Z" fill={r.c1} {...st} />
+      <rect x={-150} y={70} width={92} height={40} rx={8} fill="#FFFBF2" stroke={P.ink} strokeWidth={5} />
+      <path d="M-138,86 h48 M-138,98 h30" stroke={P.ink} strokeWidth={4} strokeLinecap="round" />
+      <rect x={70} y={240} width={70} height={56} rx={6} fill="none" stroke={P.ink} strokeWidth={5} />
     </g>;
     case 'shirtTie': return <g>
       <path d={torso} fill={r.c1} {...st} />
@@ -146,6 +157,13 @@ export const RiderFigure: React.FC<{r: Rider; e: Emotion}> = ({r, e}) => {
     </g>
   );
 };
+
+// Кристина, 32, кассир супермаркета, мама первоклассника (серия «До зарплаты не хватает»). Три варианта на выбор.
+export const KRISTINA: Rider[] = [
+  {name: 'А · пучок, жилет', skin: '#E9BC9A', shade: '#CF9E7C', headScale: 1, bodyScale: 0.95, jaw: 'soft', hair: 'bun', hairColor: '#6B3E26', clothes: 'cashier', c1: '#C8553D', c2: '#F3EDE4', earrings: true, lips: true, lashes: true},
+  {name: 'Б · каре, жилет', skin: '#EBC3A4', shade: '#D2A486', headScale: 1, bodyScale: 0.95, jaw: 'narrow', hair: 'bob', hairColor: '#C9A06A', clothes: 'cashier', c1: '#3E6E8E', c2: '#F3EDE4', lips: true, lashes: true},
+  {name: 'В · хвост, кардиган', skin: '#E4B592', shade: '#C99673', headScale: 1, bodyScale: 0.95, jaw: 'soft', hair: 'ponytail', hairColor: '#3B2A22', clothes: 'cardigan', c1: '#8FA57E', c2: '#5E7350', earrings: true, lips: true, lashes: true, freckles: true},
+];
 
 export const RIDERS: Rider[] = [
   {name: 'Молодой пацан', skin: '#E7B996', shade: '#CC9A78', headScale: 1, bodyScale: 1, jaw: 'soft', hair: 'messy', hairColor: '#5A3B28', clothes: 'hoodie', c1: '#8FA57E', c2: '#738A64'},
