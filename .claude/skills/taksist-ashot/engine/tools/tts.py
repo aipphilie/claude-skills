@@ -12,6 +12,10 @@ EDGE = {  # голос, скорость, высота
 # id голосов из ElevenLabs (аккаунт автора, Voice Design): Ашот и Тимур (пассажир серии «Ипотека»)
 VOICES_11 = {"ashot": os.environ.get("EL_ASHOT", "aiETsjwAyUVKjNepebct"), "passenger": os.environ.get("EL_PASS", "Inof0Um2Sd8Y9OYSblWu")}
 SPEED = {"ashot": float(os.environ.get("EL_SPEED_ASHOT", "1.1")), "passenger": 1.05}
+# Акцент Ашота (решение автора 2026-11-05, проба №2): тег v3 перед каждой репликой + stability 0 (Creative).
+# Текст реплик — обычная орфография: написание «тэбе, дэньги» через «э» давало украинский оттенок.
+ACCENT = {"ashot": os.environ.get("EL_ACCENT_ASHOT", "[strong Armenian accent]"), "passenger": ""}
+STAB = {"ashot": 0.0, "passenger": 0.5}
 def edge(text, who, dst):
     import edge_tts.communicate as c
     c._SSL_CTX = ssl.create_default_context(cafile=os.environ.get("SSL_CERT_FILE", "/root/.ccr/ca-bundle.crt"))
@@ -25,8 +29,9 @@ def edge(text, who, dst):
     raise SystemExit("tts failed: " + text)
 def eleven(text, who, dst):
     k = "ashot" if who == "ashot" else "passenger"
+    if ACCENT[k]: text = ACCENT[k] + " " + text
     body = json.dumps({"text": text, "model_id": "eleven_v3",
-        "voice_settings": {"stability": 0.5, "similarity_boost": 0.75, "speed": SPEED[k]}}).encode()
+        "voice_settings": {"stability": STAB[k], "similarity_boost": 0.75, "speed": SPEED[k]}}).encode()
     vid = VOICES_11[k]
     rq = urllib.request.Request(f"https://api.elevenlabs.io/v1/text-to-speech/{vid}", body,
         {"xi-api-key": os.environ["ELEVENLABS_API_KEY"], "Content-Type": "application/json"})

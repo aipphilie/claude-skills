@@ -65,7 +65,7 @@ export const TaxiSide: React.FC<{t?: number}> = ({t = 0}) => (
   </g>
 );
 
-const NightStreet: React.FC<{t: number}> = ({t}) => (
+export const NightStreet: React.FC<{t: number}> = ({t}) => (
   <g>
     <rect width={1080} height={1920} fill={P.sky1} />
     <g transform="translate(-100,-60) scale(1.2,1.6)"><City t={t} /></g>
@@ -132,7 +132,7 @@ const SideCabin: React.FC<{t?: number}> = ({t = 0}) => (
   </g>
 );
 const fmt = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: number; label?: string}> = ({mode, value, label}) => {
+export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare' | 'refund'; value?: number; label?: string}> = ({mode, value, label}) => {
   const val = value !== undefined ? fmt(value) : mode === 'crazy' ? '12 000 000' : mode === 'rewind' ? '− − − − −' : '400';
   return (
     <svg viewBox="0 0 1080 1920">
@@ -143,13 +143,23 @@ export const ShotMeter: React.FC<{mode: 'crazy' | 'rewind' | 'fare'; value?: num
         <text x={-400} y={-200} fontFamily={F} fontWeight={800} fontSize={46} fill="#8A7A70">ТАКСОМЕТР</text>
         <circle cx={380} cy={-214} r={22} fill={mode === 'crazy' ? '#E0523E' : P.sage} />
         <rect x={-420} y={-140} width={840} height={300} rx={30} fill="#3A1F14" />
-        <text x={0} y={70} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={mode === 'fare' ? 220 : val.length > 9 ? 112 : 140} fill={mode === 'rewind' ? '#9FD18A' : '#FF9A4A'}>{val} ₽</text>
+        <text x={0} y={70} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={mode === 'fare' ? 220 : val.length > 9 ? 112 : 140} fill={mode === 'rewind' || mode === 'refund' ? '#9FD18A' : '#FF9A4A'}>{mode === 'refund' ? '+' : ''}{val} ₽</text>
         <text x={0} y={240} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={44} fill={P.cream}>{label || (mode === 'fare' ? 'ПОЕЗДКА' : mode === 'crazy' ? 'ПЕРЕПЛАТА БАНКУ' : 'ПЕРЕПЛАТА ↓')}</text>
       </g>
       {mode === 'crazy' && <>
         {[[-300, -380], [120, -420], [380, -360]].map(([x, y], i) => <circle key={i} cx={540 + x} cy={880 + y} r={70 + i * 20} fill="#8C8079" opacity={0.6} />)}
         {Array.from({length: 8}, (_, i) => <path key={i} d={`M${540 + Math.cos(i) * 500},${880 + Math.sin(i) * 340} l${Math.cos(i) * 60},${Math.sin(i) * 60}`} stroke={P.mustard} strokeWidth={12} strokeLinecap="round" />)}
         <Sub text="Отдашь больше двенадцати" keys={['двенадцати']} />
+      </>}
+      {mode === 'refund' && <>
+        {Array.from({length: 8}, (_, i) => <path key={i} d={`M${540 + Math.cos(i) * 500},${880 + Math.sin(i) * 340} l${Math.cos(i) * 60},${Math.sin(i) * 60}`} stroke={P.sage} strokeWidth={12} strokeLinecap="round" />)}
+        {Array.from({length: 7}, (_, i) => (
+          <g key={i} transform={`translate(${170 + i * 125},${1420 - (i % 3) * 60})`}>
+            <path d="M0,150 l0,-90" stroke={P.sage} strokeWidth={8} strokeLinecap="round" opacity={0.7} />
+            <circle r={40} fill={P.gold} stroke={P.ink} strokeWidth={6} />
+            <text y={14} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={40} fill={P.goldDark}>₽</text>
+          </g>
+        ))}
       </>}
       {mode === 'rewind' && <>
         {Array.from({length: 6}, (_, i) => (
@@ -629,7 +639,7 @@ export const ShotBrake: React.FC<{lt: number; tb?: number; ts?: number}> = ({lt,
 };
 
 // ---------- Хук v2: в салоне Тимура бросает вперёд, телефон «ИПОТЕКА ОДОБРЕНА» вылетает на передний ряд
-export const ShotJolt: React.FC<{lt: number; rider?: Rider}> = ({lt, rider = RIDERS[0]}) => {
+export const ShotJolt: React.FC<{lt: number; rider?: Rider; phone?: [string, string, string]; bad?: boolean}> = ({lt, rider = RIDERS[0], phone = ['ИПОТЕКА', 'ОДОБРЕНА ✓', '5 000 000 ₽'], bad}) => {
   const j = Math.min(1, lt / 0.18), back = Math.max(0, Math.min(1, (lt - 0.35) / 0.3));
   const lean = j * (1 - back * 0.7);                     // рывок вперёд и откат
   const pk = Math.min(1, lt / 0.6);                      // полёт телефона
@@ -643,12 +653,12 @@ export const ShotJolt: React.FC<{lt: number; rider?: Rider}> = ({lt, rider = RID
       <g transform={`translate(${px},${py}) rotate(${pr}) scale(${0.62 - pk * 0.12})`} opacity={pk < 1 ? 1 : 0.9}>
         <rect x={-210} y={-380} width={420} height={760} rx={56} fill="#1D1A1F" stroke={P.ink} strokeWidth={12} />
         <rect x={-184} y={-344} width={368} height={688} rx={38} fill={P.cream} />
-        <circle cx={0} cy={-150} r={86} fill={P.sage} stroke={P.ink} strokeWidth={8} />
-        <path d="M-40,-150 L-8,-116 L46,-186" fill="none" stroke={P.cream} strokeWidth={20} strokeLinecap="round" strokeLinejoin="round" />
-        <text y={-10} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.ink}>ИПОТЕКА</text>
-        <text y={50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.sageDark}>ОДОБРЕНА ✓</text>
-        <rect x={-150} y={100} width={300} height={90} rx={20} fill={P.beige} stroke={P.ink} strokeWidth={5} />
-        <text y={160} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={P.ink}>5 000 000 ₽</text>
+        <circle cx={0} cy={-150} r={86} fill={bad ? P.terracotta : P.sage} stroke={P.ink} strokeWidth={8} />
+        {bad ? <path d="M-40,-150 L40,-150" stroke={P.cream} strokeWidth={22} strokeLinecap="round" /> : <path d="M-40,-150 L-8,-116 L46,-186" fill="none" stroke={P.cream} strokeWidth={20} strokeLinecap="round" strokeLinejoin="round" />}
+        <text y={-10} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.ink}>{phone[0]}</text>
+        <text y={50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={bad ? P.terracotta : P.sageDark}>{phone[1]}</text>
+        <rect x={-160} y={100} width={320} height={90} rx={20} fill={P.beige} stroke={P.ink} strokeWidth={5} />
+        <text y={160} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={phone[2].length > 10 ? 40 : 46} fill={bad ? P.terracotta : P.ink}>{phone[2]}</text>
       </g>
       {/* след полёта */}
       {pk > 0.05 && pk < 1 && <path d={`M560,880 Q${(560 + px) / 2},${py - 160} ${px},${py}`} fill="none" stroke={P.cream} strokeWidth={8} strokeDasharray="20 22" opacity={0.5} />}

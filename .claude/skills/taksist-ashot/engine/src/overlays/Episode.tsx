@@ -50,26 +50,28 @@ export const Score: React.FC<{t: number}> = ({t}) => {
   return (
     <g opacity={o} transform={`translate(${922 - 190},300) scale(${pop(after(t, a, 0.5)) * (1 + bump)})`}>
       <rect x={-190} y={-70} width={380} height={140} rx={30} fill={P.ink} opacity={0.88} stroke={P.sage} strokeWidth={6} />
-      <text y={-22} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={28} fill={P.cream}>ОТЫГРАЛИ У БАНКА</text>
+      <text y={-22} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={28} fill={P.cream}>{sc.label || 'ОТЫГРАЛИ У БАНКА'}</text>
       <text y={44} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={56} fill="#9FD18A">{fmt(val)} ₽</text>
     </g>
   );
 };
 
 // шпаргалка в конце: скриншотабельная, 4 пункта + призыв
-const CHEAT = [
+const CHEAT_01 = [
   ['1', 'Смотри в графике платежей', 'ОБЩУЮ СУММУ выплат'],
   ['2', 'Сначала подушка —', '3 месяца жизни'],
   ['3', 'Лишнее — в досрочку,', 'на СРОК'],
   ['4', 'Ставка −1%', '= −806 000 ₽'],
 ];
+const CH = story.cheat || {};
+const CHEAT: string[][] = CH.items || CHEAT_01;
 export const ShotCheat: React.FC<{lt: number}> = ({lt}) => (
   <svg viewBox="0 0 1080 1920">
     <rect width={1080} height={1920} fill="#231B18" />
     {Array.from({length: 18}, (_, i) => <circle key={i} cx={(i * 211) % 1080} cy={(i * 347) % 1920} r={60 + (i % 4) * 30} fill={P.mustard} opacity={0.05} />)}
     <g transform={`translate(0,${lerp(40, 0, easeOut(lt / 0.4))})`} opacity={clamp(lt / 0.2)}>
-      <text x={540} y={330} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={86} fill={P.mustard}>ШПАРГАЛКА АШОТА</text>
-      <text x={540} y={400} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={38} fill={P.cream} opacity={0.8}>ипотека · сохрани</text>
+      <text x={540} y={330} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={86} fill={P.mustard}>{CH.title || 'ШПАРГАЛКА АШОТА'}</text>
+      <text x={540} y={400} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={38} fill={P.cream} opacity={0.8}>{CH.sub || 'ипотека · сохрани'}</text>
       {CHEAT.map(([n, a, b], i) => {
         const k = pop(after(lt, 0.15 + i * 0.18, 0.4));
         const y = 520 + i * 230;
@@ -85,9 +87,9 @@ export const ShotCheat: React.FC<{lt: number}> = ({lt}) => (
       })}
       <g transform={`translate(540,1480) scale(${pop(after(lt, 1.0, 0.45))})`}>
         <rect x={-430} y={-70} width={860} height={140} rx={70} fill={P.mustard} stroke={P.ink} strokeWidth={8} />
-        <text y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.ink}>Скинь тому, кто берёт ипотеку</text>
+        <text y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.ink}>{CH.cta || 'Скинь тому, кто берёт ипотеку'}</text>
       </g>
-      <text x={540} y={1610} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={34} fill={P.cream} opacity={clamp((lt - 1.3) / 0.3)}>Ты на срок или на платёж? Пиши в комменты</text>
+      <text x={540} y={1610} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={34} fill={P.cream} opacity={clamp((lt - 1.3) / 0.3)}>{CH.ask || 'Ты на срок или на платёж? Пиши в комменты'}</text>
     </g>
   </svg>
 );
