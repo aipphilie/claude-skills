@@ -334,7 +334,7 @@ export const ShotPhone: React.FC<{rider?: Rider}> = ({rider = RIDERS[0]}) => (
 );
 
 // 3 / 13. С заднего сиденья: голова Ашота наполовину перекрывает зеркало, во второй половине — его глаза
-export const ShotMirror: React.FC<{wink?: number; brow?: number}> = ({wink = 0, brow = 0.9}) => (
+export const ShotMirror: React.FC<{wink?: number; brow?: number; sub?: string | null; subKeys?: string[]}> = ({wink = 0, brow = 0.9, sub, subKeys}) => (
   <svg viewBox="0 0 1080 1920">
     <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
     <RoadAhead />
@@ -365,7 +365,7 @@ export const ShotMirror: React.FC<{wink?: number; brow?: number}> = ({wink = 0, 
       </g>
     ))}
     <g transform="translate(340,730) scale(0.9)"><AshotBack /></g>
-    <Sub text={wink ? 'Запомнил?' : 'пять лямов. Норм же?'} keys={['пять', 'лямов.']} />
+    {sub !== null && <Sub text={sub ?? (wink ? 'Запомнил?' : 'пять лямов. Норм же?')} keys={subKeys ?? ['пять', 'лямов.']} />}
   </svg>
 );
 
@@ -562,12 +562,12 @@ export const ShotTopDown: React.FC<{k?: number}> = ({k = 0}) => {
 };
 
 // 14. Глазами пассажира: Ашот повернулся, тянет ОДНУ правую руку ладонью в камеру
-export const ShotPOV: React.FC = () => (
+export const ShotPOV: React.FC<{fare?: string; text?: string; keys?: string[]}> = ({fare = '400', text = 'С тебя четыреста рублей', keys = ['четыреста', 'рублей']}) => (
   <svg viewBox="0 0 1080 1920">
     <defs><filter id="blur8"><feGaussianBlur stdDeviation="8" /></filter></defs>
     <RoadAhead />
     <path d="M0,0 L1080,0 L1080,200 Q540,160 0,200Z" fill={P.cabinMid} />
-    <Dash2107 fare="400" />
+    <Dash2107 fare={fare} />
     <g transform="translate(340,1330) scale(1.05)"><Ashot s={{...A0, turn: 1, mouth: 2, smirk: 1, look: [0.3, 0.1], noRightArm: true}} /></g>
     {/* спинка его кресла между ним и камерой */}
     <path d="M90,1500 Q90,1440 160,1436 L560,1436 Q630,1440 630,1500 L650,1920 L70,1920Z" fill={P.seatDark} stroke={P.ink} strokeWidth={10} />
@@ -582,7 +582,7 @@ export const ShotPOV: React.FC = () => (
       {[-34, -12, 10, 32].map((fx, i) => <path key={i} d={`M${fx},-24 q-4,-26 8,-28 q12,2 8,28`} fill={P.skin} stroke={P.ink} strokeWidth={5} />)}
       <path d="M-30,10 Q0,22 34,8" fill="none" stroke={P.skinShade} strokeWidth={3} />
     </g>
-    <Sub text="С тебя четыреста рублей" keys={['четыреста', 'рублей']} />
+    <Sub text={text} keys={keys} />
   </svg>
 );
 
