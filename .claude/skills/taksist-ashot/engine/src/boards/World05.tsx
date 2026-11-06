@@ -16,12 +16,15 @@ const em = (e: Partial<Emotion>): Emotion => ({...EMO.calm, ...e});
 export const CH_COLORS = ['#C8553D', '#EDB447', '#7FAF6B'];
 const CH_BG = ['#F0D3C6', '#F6E3B8', '#DCEBD3'];
 
-const Plate: React.FC<{x: number; y: number; text: string; s?: number; rot?: number; fill?: string; color?: string; size?: number}> = ({x, y, text, s = 1, rot = 0, fill = P.terracotta, color = P.cream, size = 64}) => {
-  const w = text.length * size * 0.62 + 90;
+// ширина текста Rubik 900: заглавные и цифры шире строчных; длинное ужимаем textLength, чтобы не вылезало за плашку
+export const textW = (t: string, size: number) => [...t].reduce((a, ch) => a + size * (ch === ' ' ? 0.3 : /[А-ЯЁA-Z0-9₽%]/.test(ch) ? 0.74 : /[—–]/.test(ch) ? 0.8 : 0.6), 0);
+const Plate: React.FC<{x: number; y: number; text: string; s?: number; rot?: number; fill?: string; color?: string; size?: number; maxW?: number}> = ({x, y, text, s = 1, rot = 0, fill = P.terracotta, color = P.cream, size = 64, maxW = 860}) => {
+  const tw = textW(text, size), pad = size * 0.9;
+  const w = Math.min(maxW, tw + pad * 2), fit = tw > w - pad * 2;
   return (
     <g transform={`translate(${x},${y}) rotate(${rot}) scale(${s})`}>
       <rect x={-w / 2} y={-size * 0.95} width={w} height={size * 1.9} rx={size * 0.5} fill={fill} stroke={P.ink} strokeWidth={8} />
-      <text y={size * 0.36} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={size} fill={color}>{text}</text>
+      <text y={size * 0.36} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={size} fill={color} {...(fit ? {textLength: w - pad * 2, lengthAdjust: 'spacingAndGlyphs' as const} : {})}>{text}</text>
     </g>
   );
 };
@@ -129,12 +132,13 @@ export const SceneChapter: React.FC<{lt: number; dur: number; n: number; title: 
           <rect x={-250} y={-430} width={500} height={860} rx={60} fill="#1D1A1F" stroke={P.ink} strokeWidth={12} />
           <rect x={-222} y={-394} width={444} height={788} rx={40} fill={P.cream} />
           <rect x={-200} y={-300} width={400} height={300} rx={30} fill="#FFFBF2" stroke={P.ink} strokeWidth={5} />
-          <text y={-230} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={34} fill="#8A7A70">Минимальный платёж</text>
-          <text y={-120} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={110} fill={P.ink}>1 570 ₽</text>
-          <text y={-50} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill="#8A7A70">Удобно! Всего 3%</text>
+          <text y={-236} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={30} fill="#8A7A70">Минимальный</text>
+          <text y={-200} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={30} fill="#8A7A70">платёж</text>
+          <text y={-110} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84} fill={P.ink}>1 570 ₽</text>
+          <text y={-42} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={28} fill="#8A7A70">Удобно! Всего 3%</text>
           <g transform={`translate(0,170) scale(${1 + Math.sin(lt * 6) * 0.03})`}>
             <rect x={-170} y={-60} width={340} height={120} rx={60} fill={P.sage} stroke={P.ink} strokeWidth={7} />
-            <text y={18} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={52} fill={P.cream}>Оплатить</text>
+            <text x={34} y={16} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.cream}>Оплатить</text>
             <circle cx={-120} cy={0} r={34} fill={P.cream} stroke={P.ink} strokeWidth={5} />
             <path d="M-136,-6 l0,0 M-104,-6 l0,0" stroke={P.ink} strokeWidth={9} strokeLinecap="round" />
             <path d="M-136,8 Q-120,22 -104,8" fill="none" stroke={P.ink} strokeWidth={5} strokeLinecap="round" />
@@ -168,8 +172,7 @@ export const SceneAtm: React.FC<{lt: number; dur: number; biteAt: number; debtAt
         <rect x={330} y={980} width={320} height={50} rx={12} fill="#2B3540" stroke={P.ink} strokeWidth={6} />
         {/* пачка 50 000 выезжает из щели */}
         <g transform={`translate(${lerp(490, 300, cash)},${lerp(1000, 1080, cash)}) rotate(${-cash * 10})`} opacity={cash}>
-          <Note x={0} y={0} s={1.25} v="50 000" />
-          <Note x={10} y={-14} s={1.25} v="50 000" />
+          {[0, 1].map((i) => <g key={i} transform={`translate(${i * 10},${-i * 14})`}><rect x={-150} y={-70} width={300} height={140} rx={14} fill="#E9A06B" stroke={P.ink} strokeWidth={7} /><rect x={-132} y={-52} width={264} height={104} rx={9} fill="none" stroke="#B56E40" strokeWidth={4} /><text y={18} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={52} fill="#7A3E1E">50 000</text></g>)}
         </g>
         {bit > 0 && <Plate x={700} y={760} text="−2 340 ₽" s={pop(bit)} rot={6} size={74} />}
       </Cam>
@@ -270,7 +273,7 @@ export const SceneHourglass: React.FC<{lt: number; dur: number; flipAt: number; 
         <path d={`M-200,350 L200,350 Q${120},${350 - 260 * sand} 0,${350 - 300 * sand} Q-120,${350 - 260 * sand} -200,350Z`} fill={P.mustard} stroke={P.ink} strokeWidth={5} />
         <rect x={-260} y={-420} width={520} height={50} rx={14} fill="#8C6D5B" stroke={P.ink} strokeWidth={8} />
         <rect x={-260} y={370} width={520} height={50} rx={14} fill="#8C6D5B" stroke={P.ink} strokeWidth={8} />
-        <text y={-440} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.ink} transform={flip > 0.5 ? 'rotate(180 0 -460)' : undefined}>100 ДНЕЙ</text>
+        {flip < 0.3 && <text y={-440} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.ink}>100 ДНЕЙ</text>}
         {/* застрявшее зерно-монета */}
         {flip < 0.5 && <Coin x={0} y={-30 + Math.sin(lt * 20) * 3} r={30} />}
       </g>
@@ -279,13 +282,13 @@ export const SceneHourglass: React.FC<{lt: number; dur: number; flipAt: number; 
         <g transform={`translate(540,${lerp(-200, 980, bill)}) rotate(${lerp(-12, -3, bill)})`}>
           <rect x={-400} y={-110} width={800} height={220} rx={24} fill={P.cream} stroke={P.ink} strokeWidth={9} />
           <text y={-24} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={60} fill={P.ink}>ПРОЦЕНТЫ</text>
-          <text y={60} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={60} fill={P.terracotta}>ЗА ВСЕ 100 ДНЕЙ</text>
+          <text y={60} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={56} fill={P.terracotta} textLength={680} lengthAdjust="spacingAndGlyphs">ЗА ВСЕ 100 ДНЕЙ</text>
         </g>
       )}
       {st > 0 && (
-        <g transform={`translate(560,1200) scale(${lerp(2.2, 1, easeOut(st))}) rotate(-8)`} opacity={clamp(st * 3)}>
-          <rect x={-320} y={-70} width={640} height={140} rx={20} fill="none" stroke={P.terracotta} strokeWidth={14} />
-          <text y={30} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84} fill={P.terracotta}>НЕ СЧИТАЕТСЯ</text>
+        <g transform={`translate(540,1270) scale(${lerp(2.2, 1, easeOut(st))}) rotate(-6)`} opacity={clamp(st * 3)}>
+          <rect x={-380} y={-70} width={760} height={140} rx={20} fill="none" stroke={P.terracotta} strokeWidth={14} />
+          <text y={26} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.terracotta} textLength={660} lengthAdjust="spacingAndGlyphs">НЕ СЧИТАЕТСЯ</text>
         </g>
       )}
       <TrapBadge n={3} lit={after(lt, 0.6, 0.6)} />
@@ -329,8 +332,8 @@ export const SceneRules: React.FC<{lt: number; dur: number; steps: number[]; fli
       {done > 0 && (
         <g transform={`translate(540,1180) scale(${pop(done)}) rotate(-2)`}>
           <rect x={-330} y={-80} width={660} height={160} rx={30} fill="#FFFBF2" stroke={P.ink} strokeWidth={8} />
-          <text x={-150} y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={54} fill={P.ink}>ДЕНЬ 99</text>
-          <text x={150} y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={P.sageDark}>ПОГАШЕНО ✓</text>
+          <text x={-185} y={18} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={48} fill={P.ink}>ДЕНЬ 99</text>
+          <text x={135} y={18} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill={P.sageDark}>ПОГАШЕНО ✓</text>
         </g>
       )}
     </svg>
@@ -345,7 +348,7 @@ export const ShotSveta: React.FC<{lt?: number; e?: Partial<Emotion>; lean?: numb
       <g transform="translate(-260,-420) scale(1.5)"><CabinBack t={lt} /></g>
       <g transform={`translate(540,${1300 - lean * 110 - hop}) scale(${1.9 + lean * 0.4}) rotate(${lean * -4})`}><RiderFigure r={SVE} e={em(e)} /></g>
       {phone && (
-        <g transform={`translate(600,1060) rotate(-6) scale(${0.62 * pop(after(lt, 0, 0.35))})`}>
+        <g transform={`translate(820,1180) rotate(8) scale(${0.56 * pop(after(lt, 0, 0.35))})`}>
           <rect x={-210} y={-380} width={420} height={760} rx={56} fill="#1D1A1F" stroke={P.ink} strokeWidth={12} />
           <rect x={-184} y={-344} width={368} height={688} rx={38} fill={P.cream} />
           <circle cy={-190} r={80} fill={P.sage} stroke={P.ink} strokeWidth={6} />
@@ -353,7 +356,7 @@ export const ShotSveta: React.FC<{lt?: number; e?: Partial<Emotion>; lean?: numb
           <text y={-50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={54} fill={P.sageDark}>ОДОБРЕНО</text>
           <text y={20} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={36} fill="#8A7A70">кредитная карта</text>
           <rect x={-160} y={70} width={320} height={170} rx={24} fill={P.mustard} stroke={P.ink} strokeWidth={5} />
-          <text y={150} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={66} fill={P.ink}>100 ДНЕЙ</text>
+          <text y={150} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={54} fill={P.ink}>100 ДНЕЙ</text>
           <text y={214} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={P.ink}>БЕЗ %</text>
         </g>
       )}

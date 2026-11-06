@@ -70,7 +70,7 @@ export const ShotCheat: React.FC<{lt: number}> = ({lt}) => (
     <rect width={1080} height={1920} fill="#231B18" />
     {Array.from({length: 18}, (_, i) => <circle key={i} cx={(i * 211) % 1080} cy={(i * 347) % 1920} r={60 + (i % 4) * 30} fill={P.mustard} opacity={0.05} />)}
     <g transform={`translate(0,${lerp(40, 0, easeOut(lt / 0.4))})`} opacity={clamp(lt / 0.2)}>
-      <text x={540} y={330} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={86} fill={P.mustard}>{CH.title || 'ШПАРГАЛКА АШОТА'}</text>
+      <text x={540} y={330} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={74} fill={P.mustard} {...((CH.title || 'ШПАРГАЛКА АШОТА').length * 74 * 0.72 > 840 ? {textLength: 840, lengthAdjust: 'spacingAndGlyphs'} : {})}>{CH.title || 'ШПАРГАЛКА АШОТА'}</text>
       <text x={540} y={400} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={38} fill={P.cream} opacity={0.8}>{CH.sub || 'ипотека · сохрани'}</text>
       {CHEAT.map(([n, a, b], i) => {
         const k = pop(after(lt, 0.15 + i * 0.18, 0.4));
