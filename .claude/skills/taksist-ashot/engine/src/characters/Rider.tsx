@@ -165,6 +165,13 @@ export const KRISTINA: Rider[] = [
   {name: 'В · хвост, кардиган', skin: '#E4B592', shade: '#C99673', headScale: 1, bodyScale: 0.95, jaw: 'soft', hair: 'ponytail', hairColor: '#3B2A22', clothes: 'cardigan', c1: '#8FA57E', c2: '#5E7350', earrings: true, lips: true, lashes: true, freckles: true},
 ];
 
+// Света, 22, студентка (серия 5 «Кредитка»). Выбор — после листа SvetaSheet.
+export const SVETA: Rider[] = [
+  {name: 'А · хвост, свитер', skin: '#E9BC9A', shade: '#CF9E7C', headScale: 0.97, bodyScale: 0.92, jaw: 'narrow', hair: 'ponytail', hairColor: '#3B2A22', clothes: 'sweater', c1: '#E3B04B', c2: '#C8553D', headphones: true, lashes: true, lips: true},
+  {name: 'Б · гулька, худи', skin: '#EBC3A4', shade: '#D2A486', headScale: 0.97, bodyScale: 0.9, jaw: 'soft', hair: 'bun', hairColor: '#C98A4B', clothes: 'hoodie', c1: '#B9A3D6', c2: '#8E78B0', earrings: true, lashes: true, lips: true, freckles: true},
+  {name: 'В · каре, жакет', skin: '#E4B592', shade: '#C99673', headScale: 0.97, bodyScale: 0.92, jaw: 'narrow', hair: 'bob', hairColor: '#2E2420', clothes: 'jacket', c1: '#5E7FA0', c2: '#46627F', headphones: true, earrings: true, lashes: true, lips: true},
+];
+
 export const RIDERS: Rider[] = [
   {name: 'Молодой пацан', skin: '#E7B996', shade: '#CC9A78', headScale: 1, bodyScale: 1, jaw: 'soft', hair: 'messy', hairColor: '#5A3B28', clothes: 'hoodie', c1: '#8FA57E', c2: '#738A64'},
   {name: 'Тётя Люда, 60', skin: '#EBC3A4', shade: '#D2A486', headScale: 1, bodyScale: 1.08, jaw: 'round', hair: 'perm', hairColor: '#B7A7C4', clothes: 'cardigan', c1: '#B5677A', c2: '#8E4A5C', glasses: true, earrings: true, beads: true, lips: true, wrinkles: true},
