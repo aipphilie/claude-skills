@@ -44,9 +44,10 @@ export const ShotKristina: React.FC<{lt?: number; e?: Partial<Emotion>; lean?: n
 );
 
 // 1. Вывеска «ЗАЙМЫ · 0,8%» мигает неоном, трескается, вываливается «292% ГОДОВЫХ»
-export const SceneLoanSign: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
-  const crack = after(lt, dur * 0.45, 0.25), drop = easeOut(after(lt, dur * 0.55, 0.4));
-  const flick = lt < dur * 0.45 ? (Math.sin(lt * 40) > -0.6 ? 1 : 0.35) : 1;
+export const SceneLoanSign: React.FC<{lt: number; dur: number; crack?: number}> = ({lt, dur, crack: ca}) => {
+  const c0 = ca ?? dur * 0.45;
+  const crack = after(lt, c0, 0.25), drop = easeOut(after(lt, c0 + 0.3, 0.4));
+  const flick = lt < c0 ? (Math.sin(lt * 40) > -0.6 ? 1 : 0.35) : 1;
   return (
     <svg viewBox="0 0 1080 1920">
       <rect width={1080} height={1920} fill="#1E1A26" />
@@ -94,9 +95,9 @@ export const SceneLoanCalendar: React.FC<{lt: number; dur: number}> = ({lt, dur}
 };
 
 // 3. «НЕ КОФЕ» → «НЕ ДОСТАВКА»: стаканчик 300 ₽ перечёркнут, курьер с пакетом перечёркнут
-export const SceneNotCoffee: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
-  const half = dur * 0.55, second = lt > half;
-  const x1 = after(lt, 0.4, 0.25), x2 = after(lt, half + 0.3, 0.25);
+export const SceneNotCoffee: React.FC<{lt: number; dur: number; s1?: number; half?: number}> = ({lt, dur, s1 = 0.4, half: h0}) => {
+  const half = h0 ?? dur * 0.55, second = lt > half;
+  const x1 = after(lt, s1, 0.25), x2 = after(lt, half + 0.3, 0.25);
   return (
     <svg viewBox="0 0 1080 1920">
       <rect width={1080} height={1920} fill={second ? '#E3EBDD' : '#EFE0CC'} />
@@ -155,8 +156,9 @@ export const SceneSurprises: React.FC<{lt: number; dur: number; steps?: [number,
 };
 
 // 5. Метеорит падает у ёлки, на ёлке табличка «31 декабря · каждый год»
-export const SceneMeteor: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
-  const k = easeInOut(clamp(lt / (dur * 0.45))), boom = after(lt, dur * 0.45, 0.3);
+export const SceneMeteor: React.FC<{lt: number; dur: number; boom?: number}> = ({lt, dur, boom: b0}) => {
+  const bt = b0 ?? dur * 0.45;
+  const k = easeInOut(clamp(lt / bt)), boom = after(lt, bt, 0.3);
   const mx = lerp(1000, 760, k), my = lerp(150, 1000, k);
   return (
     <svg viewBox="0 0 1080 1920">
@@ -185,14 +187,14 @@ export const SceneMeteor: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
           <text y={-190} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.mustard} stroke={P.ink} strokeWidth={8} paintOrder="stroke">БУМ</text>
         </g>
       )}
-      <Plate x={540} y={300} text="ВНЕЗАПНО = МЕТЕОРИТ" s={pop(after(lt, dur * 0.5, 0.4))} rot={-3} size={54} fill={P.ink} />
+      <Plate x={540} y={300} text="ВНЕЗАПНО = МЕТЕОРИТ" s={pop(after(lt, bt + 0.2, 0.4))} rot={-3} size={54} fill={P.ink} />
     </svg>
   );
 };
 
 // 6. 120 000 ÷ 12 = 10 000, плашка-вопрос переворачивается в «ЭТО РАСПИСАНИЕ»
-export const SceneDivide: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
-  const eq = pop(after(lt, dur * 0.35, 0.4)), flip = after(lt, dur * 0.6, 0.35);
+export const SceneDivide: React.FC<{lt: number; dur: number; eqAt?: number; flipAt?: number}> = ({lt, dur, eqAt, flipAt}) => {
+  const eq = pop(after(lt, eqAt ?? dur * 0.35, 0.4)), flip = after(lt, flipAt ?? dur * 0.6, 0.35);
   const sy = Math.abs(Math.cos(flip * Math.PI));
   return (
     <svg viewBox="0 0 1080 1920">

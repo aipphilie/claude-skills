@@ -73,6 +73,10 @@ elif intro == 'bump':  # хук «Вычет»: мотор, удар о «леж
     put(sfx, b + .02, bp(noise(.2), 200, 2500) * env(int(.2 * SR), .002, .05), .45)
     put(sfx, cue('joltIn') + .05, whoosh(.3), .32)
     put(sfx, cue('phoneLand'), click(), .7)
+elif intro == 'door':  # хук «До зарплаты»: щёлк счётчика, хлопок двери, телефон
+    put(sfx, 0.03, click(), .8); put(sfx, 0.06, tone(1568, .25, .08) * .5, .25)
+    put(sfx, cue('doorAt'), thump(), .8); put(sfx, cue('doorAt') + .03, bp(noise(.2), 150, 2000) * env(int(.2 * SR), .002, .06), .5)
+    put(sfx, cue('doorAt') + .3, whoosh(.3), .25)
 else:
     # поворотник на старте
     for i in range(4): put(sfx, 0.05 + i * 0.42, tick(i % 2 == 0), .55)

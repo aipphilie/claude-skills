@@ -3,7 +3,7 @@ import {AbsoluteFill, Audio, staticFile, useCurrentFrame, continueRender, delayR
 import {P} from './palette';
 import {FPS, after, ampAt, blink, clamp, cue, easeInOut, easeOut, lerp, mouthShape, noise, story, freezeT, timeline} from './lib';
 import {Ashot, AshotState, ArmPose} from './characters/Ashot';
-import {RiderFigure, RIDERS, Emotion} from './characters/Rider';
+import {RiderFigure, RIDERS, KRISTINA, Emotion} from './characters/Rider';
 import {CabinBack, CabinFront, DriverSeat} from './scene/Cabin';
 import {Stamp400} from './overlays/Graphics';
 import {Cards, Score, ShotCheat} from './overlays/Episode';
@@ -11,6 +11,11 @@ import {Subtitles} from './overlays/Subtitles';
 import * as SH from './boards/Shots';
 import * as W from './boards/World';
 import * as W2 from './boards/World02';
+import * as W4 from './boards/World04';
+
+// пассажир серии (story.rider): 'kristina' → вариант А, иначе Тимур
+const RIDER = story.rider === 'kristina' ? KRISTINA[0] : RIDERS[0];
+const FARE0 = story.fareStart ?? 287, FARE1 = story.fareEnd ?? 400;
 
 // врезки-ракурсы поверх салона (story.json → inserts)
 const inserts = (story.inserts || []).map((x: any) => ({...x, a: cue(x.from), b: cue(x.to)}));
@@ -35,6 +40,16 @@ const renderInsert = (x: any, t: number, lt: number, dur: number) => {
     case 'callMom': return <W2.SceneCallMom lt={lt} dur={dur} />;
     case 'teaser': return <W2.SceneTeaser lt={lt} dur={dur} />;
     case 'meterRefund': { const [a, b] = x.value || [0, 650000]; return <SH.ShotMeter mode="refund" value={lerp(a, b, easeInOut(clamp(lt / Math.max(0.3, dur - 0.4))))} label={x.label} />; }
+    // серия 4 «До зарплаты не хватает» (boards/World04.tsx)
+    case 'kris': return <W4.ShotKristina lt={lt} e={x.e || {worry: 1, sweat: 1}} phone={x.phone} lean={x.lean || 0} />;
+    case 'loanSign': return <W4.SceneLoanSign lt={lt} dur={dur} crack={x.crack !== undefined ? cue(x.crack) - x.a : undefined} />;
+    case 'loanCalendar': return <W4.SceneLoanCalendar lt={lt} dur={dur} />;
+    case 'notCoffee': return <W4.SceneNotCoffee lt={lt} dur={dur} s1={cue(x.s1) - x.a} half={cue(x.half) - x.a} />;
+    case 'surprises': return <W4.SceneSurprises lt={lt} dur={dur} steps={x.steps.map((c: any) => cue(c) - x.a)} />;
+    case 'meteor': return <W4.SceneMeteor lt={lt} dur={dur} boom={x.boom !== undefined ? cue(x.boom) - x.a : undefined} />;
+    case 'divide': return <W4.SceneDivide lt={lt} dur={dur} eqAt={cue(x.eqAt) - x.a} flipAt={cue(x.flipAt) - x.a} />;
+    case 'envelope': return <W4.SceneEnvelope lt={lt} dur={dur} />;
+    case 'navHome': return <W4.SceneNavHome lt={lt} dur={dur} />;
     // сцены вне такси (boards/World.tsx)
     case 'bankStamp': return <W.SceneBankStamp lt={lt} dur={dur} />;
     case 'newBuilding': return <W.SceneNewBuilding lt={lt} dur={dur} split={x.splitAt !== undefined ? clamp((cue(x.splitAt) - x.a) / dur) : 0.5} />;
@@ -54,7 +69,7 @@ const renderInsert = (x: any, t: number, lt: number, dur: number) => {
     case 'meterCrazy': { const [a, b] = x.value || [287, 12000000]; return <SH.ShotMeter mode="crazy" value={lerp(a, b, easeInOut(clamp(lt / Math.max(0.3, dur - 0.35))))} label={x.label} />; }
     case 'meterRewind': { const [a, b] = x.value || [12000000, 9000000]; return <SH.ShotMeter mode="rewind" value={lerp(a, b, easeOut(k))} label={x.label} />; }
     case 'cheat': return <ShotCheat lt={lt} />;
-    case 'meterFare': return <SH.ShotMeter mode="fare" value={400} />;
+    case 'meterFare': return <SH.ShotMeter mode="fare" value={FARE1} />;
     case 'aging': { const st = Math.min(2, Math.floor(k * 3)); return <SH.ShotAging stage={st} year={Math.round(lerp(2026, 2046, easeOut(k)))} />; }
     case 'nav': return <SH.ShotNav pick={t >= cue('poke')} hand={easeOut(clamp((t - cue('navIn')) / (cue('poke') - cue('navIn'))))} />;
     case 'topdown': return <SH.ShotTopDown k={easeInOut(k)} />;
@@ -133,7 +148,7 @@ export const Video: React.FC<{sub?: string}> = ({sub}) => {
     blink: blink(t, 4), mouth: mouthShape(pAmp), shock: pe.shock, worry: pe.worry,
     look: turn < 0.5 ? [0.4, 0] : [-0.7, 0.1], sweat: seqNum(AN.sweat, t, 0.4),
   };
-  const fare = t < cue('n400') ? 287 + t * 0.9 : 400;
+  const fare = t < cue('n400') ? FARE0 + t * 0.9 : FARE1;
   const fl = Math.max(...shots.filter((s: any) => s.whoosh).map((s: any) => 1 - clamp(Math.abs(t - s.t) * 8)), ...inserts.map((x: any) => 1 - clamp(Math.abs(t - x.a) * 10)), 0);
   const ins = inserts.find((x: any) => t >= x.a && t < x.b);
   const insShake = ins && ins.shot === 'meterCrazy' && story.cues.n12 && t > cue('n12') ? 14 * Math.exp(-(t - cue('n12')) * 5) : 0;
@@ -144,7 +159,7 @@ export const Video: React.FC<{sub?: string}> = ({sub}) => {
       <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{position: 'absolute'}}>
         <g transform={`translate(${540 + shx},${960 + shy}) scale(${cam.z}) translate(${-cam.x},${-cam.y + vib})`}>
           <CabinBack t={t} />
-          <g transform={`translate(720,1000) rotate(${noise(t * 0.3, 0.2) * 1.2})`}><RiderFigure r={RIDERS[0]} e={pass} /></g>
+          <g transform={`translate(720,1000) rotate(${noise(t * 0.3, 0.2) * 1.2})`}><RiderFigure r={RIDER} e={pass} /></g>
           <DriverSeat />
           <g transform={`translate(330,1090) rotate(${lerp(-3, 2, turn)})`}><Ashot s={ashot} /></g>
           <CabinFront t={t} ashot={ashot} mirrorOn={1 - turn} fare={fare} shake={cam.sh / 20} />

@@ -1,6 +1,6 @@
 import React from 'react';
 import {P} from '../palette';
-import {after, clamp, cue, easeOut, lerp, pop} from '../lib';
+import {after, clamp, cue, easeOut, lerp, pop, story} from '../lib';
 
 // Инфографика в экранных координатах. Всё важное внутри безопасной зоны Reels:
 // x 56..922, y 250..1600.
@@ -160,7 +160,7 @@ export const Stamp400: React.FC<{t: number}> = ({t}) => {
     <g transform={`translate(489,470) scale(${s}) rotate(-7)`} opacity={clamp(k * 3)}>
       <rect x={-260} y={-95} width={520} height={190} rx={30} fill={P.cream} stroke={P.terracotta} strokeWidth={14} />
       <rect x={-240} y={-75} width={480} height={150} rx={20} fill="none" stroke={P.terracotta} strokeWidth={5} />
-      <text y={46} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={140} fill={P.terracotta}>400 ₽</text>
+      <text y={46} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={140} fill={P.terracotta}>{(story as any).fareEnd ?? 400} ₽</text>
     </g>
   );
 };
