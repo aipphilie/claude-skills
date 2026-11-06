@@ -77,6 +77,8 @@ elif intro == 'door':  # хук «До зарплаты»: щёлк счётчи
     put(sfx, 0.03, click(), .8); put(sfx, 0.06, tone(1568, .25, .08) * .5, .25)
     put(sfx, cue('doorAt'), thump(), .8); put(sfx, cue('doorAt') + .03, bp(noise(.2), 150, 2000) * env(int(.2 * SR), .002, .06), .5)
     put(sfx, cue('doorAt') + .3, whoosh(.3), .25)
+elif intro == 'click':  # хук «Кредитка»: щёлк счётчика и сразу объясняющий кадр
+    put(sfx, 0.03, click(), .8); put(sfx, 0.06, tone(1568, .25, .08) * .5, .25)
 else:
     # поворотник на старте
     for i in range(4): put(sfx, 0.05 + i * 0.42, tick(i % 2 == 0), .55)

@@ -3,7 +3,7 @@ import {AbsoluteFill, Audio, staticFile, useCurrentFrame, continueRender, delayR
 import {P} from './palette';
 import {FPS, after, ampAt, blink, clamp, cue, easeInOut, easeOut, lerp, mouthShape, noise, story, freezeT, timeline} from './lib';
 import {Ashot, AshotState, ArmPose} from './characters/Ashot';
-import {RiderFigure, RIDERS, KRISTINA, Emotion} from './characters/Rider';
+import {RiderFigure, RIDERS, KRISTINA, SVETA, Emotion} from './characters/Rider';
 import {CabinBack, CabinFront, DriverSeat} from './scene/Cabin';
 import {Stamp400} from './overlays/Graphics';
 import {Cards, Score, ShotCheat} from './overlays/Episode';
@@ -12,9 +12,10 @@ import * as SH from './boards/Shots';
 import * as W from './boards/World';
 import * as W2 from './boards/World02';
 import * as W4 from './boards/World04';
+import * as W5 from './boards/World05';
 
 // пассажир серии (story.rider): 'kristina' → вариант А, иначе Тимур
-const RIDER = story.rider === 'kristina' ? KRISTINA[0] : RIDERS[0];
+const RIDER = story.rider === 'kristina' ? KRISTINA[0] : story.rider === 'sveta' ? SVETA[2] : RIDERS[0];
 const FARE0 = story.fareStart ?? 287, FARE1 = story.fareEnd ?? 400;
 
 // врезки-ракурсы поверх салона (story.json → inserts)
@@ -50,6 +51,15 @@ const renderInsert = (x: any, t: number, lt: number, dur: number) => {
     case 'divide': return <W4.SceneDivide lt={lt} dur={dur} eqAt={cue(x.eqAt) - x.a} flipAt={cue(x.flipAt) - x.a} />;
     case 'envelope': return <W4.SceneEnvelope lt={lt} dur={dur} />;
     case 'navHome': return <W4.SceneNavHome lt={lt} dur={dur} />;
+    // серия 5 «Кредитка 100 дней» (boards/World05.tsx)
+    case 'sveta': return <W5.ShotSveta lt={lt} e={{...(x.e || {}), mouth: mouthShape(ampAt('passenger', t))}} phone={x.phone} scissors={x.scissors} lean={x.lean || 0} />;
+    case 'cutBill': return <W5.SceneCutBill lt={lt} dur={dur} cutAt={cue(x.cutAt) - x.a} coinAt={cue(x.coinAt) - x.a} labels={x.labels} badge={x.badge} />;
+    case 'chapter': return <W5.SceneChapter lt={lt} dur={dur} n={x.n} title={x.title} phoneAt={x.phoneAt !== undefined ? cue(x.phoneAt) - x.a : undefined} />;
+    case 'atm': return <W5.SceneAtm lt={lt} dur={dur} biteAt={cue(x.biteAt) - x.a} debtAt={cue(x.debtAt) - x.a} />;
+    case 'calFly': return <W5.SceneCalFly lt={lt} dur={dur} grabAt={x.grabAt !== undefined ? cue(x.grabAt) - x.a : undefined} />;
+    case 'beachAge': return <W5.SceneBeachAge lt={lt} dur={dur} endAt={cue(x.endAt) - x.a} angryAt={x.angryAt !== undefined ? cue(x.angryAt) - x.a : undefined} />;
+    case 'hourglass': return <W5.SceneHourglass lt={lt} dur={dur} flipAt={cue(x.flipAt) - x.a} stampAt={cue(x.stampAt) - x.a} />;
+    case 'rules': return <W5.SceneRules lt={lt} dur={dur} steps={x.steps.map((c: any) => cue(c) - x.a)} flipAt={cue(x.flipAt) - x.a} />;
     // сцены вне такси (boards/World.tsx)
     case 'bankStamp': return <W.SceneBankStamp lt={lt} dur={dur} />;
     case 'newBuilding': return <W.SceneNewBuilding lt={lt} dur={dur} split={x.splitAt !== undefined ? clamp((cue(x.splitAt) - x.a) / dur) : 0.5} />;
