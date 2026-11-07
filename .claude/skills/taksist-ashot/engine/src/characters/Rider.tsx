@@ -172,6 +172,13 @@ export const SVETA: Rider[] = [
   {name: 'В · каре, жакет', skin: '#E4B592', shade: '#C99673', headScale: 0.97, bodyScale: 0.92, jaw: 'narrow', hair: 'bob', hairColor: '#2E2420', clothes: 'jacket', c1: '#5E7FA0', c2: '#46627F', headphones: true, earrings: true, lashes: true, lips: true},
 ];
 
+// Баба Зина, 68, бывшая учительница (серия 6 «Звонок из службы безопасности»). По умолчанию вариант А, выбор — по листу ZinaSheet.
+export const ZINA: Rider[] = [
+  {name: 'А · седой пучок, кофта', skin: '#EBC3A4', shade: '#D2A486', headScale: 1, bodyScale: 1, jaw: 'round', hair: 'bun', hairColor: '#D9D4CF', clothes: 'cardigan', c1: '#7E6BA0', c2: '#5E4E7E', glasses: true, beads: true, wrinkles: true, earrings: true},
+  {name: 'Б · каре, свитер', skin: '#E9BC9A', shade: '#CF9E7C', headScale: 1, bodyScale: 1.02, jaw: 'soft', hair: 'bob', hairColor: '#C9C3BD', clothes: 'sweater', c1: '#5E8A7A', c2: '#E3B04B', glasses: true, wrinkles: true, lips: true},
+  {name: 'В · пучок, пальто', skin: '#E4B592', shade: '#C99673', headScale: 1, bodyScale: 1.04, jaw: 'round', hair: 'bun', hairColor: '#B9B2AC', clothes: 'jacket', c1: '#8C4A3E', c2: '#6E3830', beads: true, wrinkles: true, earrings: true, lips: true},
+];
+
 export const RIDERS: Rider[] = [
   {name: 'Молодой пацан', skin: '#E7B996', shade: '#CC9A78', headScale: 1, bodyScale: 1, jaw: 'soft', hair: 'messy', hairColor: '#5A3B28', clothes: 'hoodie', c1: '#8FA57E', c2: '#738A64'},
   {name: 'Тётя Люда, 60', skin: '#EBC3A4', shade: '#D2A486', headScale: 1, bodyScale: 1.08, jaw: 'round', hair: 'perm', hairColor: '#B7A7C4', clothes: 'cardigan', c1: '#B5677A', c2: '#8E4A5C', glasses: true, earrings: true, beads: true, lips: true, wrinkles: true},

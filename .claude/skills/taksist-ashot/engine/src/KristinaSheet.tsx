@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, staticFile, continueRender, delayRender} from 'remotion';
 import {P} from './palette';
-import {RiderFigure, KRISTINA, SVETA, EMO, Rider} from './characters/Rider';
+import {RiderFigure, KRISTINA, SVETA, ZINA, EMO, Rider} from './characters/Rider';
 const h = typeof window !== 'undefined' ? delayRender('f') : 0;
 if (typeof window !== 'undefined') {
   const fs = [800, 900].flatMap((w) => ['cyrillic', 'latin'].map((s) => new FontFace('Rubik', `url(${staticFile(`fonts/rubik-${s}-${w}-normal.woff2`)})`, {weight: String(w)})));
@@ -30,3 +30,4 @@ const Sheet: React.FC<{title: string; set: Rider[]}> = ({title, set}) => (
 
 export const KristinaSheet: React.FC = () => <Sheet title="Кристина, 32 · кассир, мама первоклассника" set={KRISTINA} />;
 export const SvetaSheet: React.FC = () => <Sheet title="Света, 22 · студентка, «кредитка на Турцию»" set={SVETA} />;
+export const ZinaSheet: React.FC = () => <Sheet title="Баба Зина, 68 · бывшая учительница, «безопасный счёт»" set={ZINA} />;
