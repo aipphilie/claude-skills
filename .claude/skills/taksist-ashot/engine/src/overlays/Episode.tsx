@@ -2,7 +2,7 @@ import React from 'react';
 import {P} from '../palette';
 import {after, clamp, cue, easeOut, lerp, pop, story, measure} from '../lib';
 // сжать текст до maxW, если реальная ширина больше
-const fitW = (t: string, size: number, maxW: number, weight = 900) => (measure(t, size, weight) > maxW ? {textLength: maxW, lengthAdjust: 'spacingAndGlyphs' as const} : {});
+const fitW = (t: string, size: number, maxW: number, weight = 900) => { const w = measure(t, size, weight); return w > maxW ? {fontSize: size * maxW / w} : {}; };
 
 // Плашки полной серии из story.json: cards (цифры и цитаты), score («ОТЫГРАЛИ У БАНКА»), шпаргалка.
 // Экранные координаты 1080×1920, всё внутри безопасной зоны x 56..922, y 250..1600.

@@ -21,11 +21,13 @@ const Plate: React.FC<{x: number; y: number; text: string; s?: number; rot?: num
   const tw = measure(text, size), pad = size * 0.7;
   // плашка в координатах экрана не вылезает за поля 56…1024
   if (x > 0) maxW = Math.min(maxW, 2 * Math.min(x - 56, 1024 - x));
-  const w = Math.min(maxW, tw + pad * 2), fit = tw > w - pad * 2;
+  const w = Math.min(maxW, tw + pad * 2);
+  // не влезает → шрифт меньше, рамка той же высоты
+  const fsz = tw > w - pad * 2 ? size * (w - pad * 2) / tw : size;
   return (
     <g transform={`translate(${x},${y}) rotate(${rot}) scale(${s})`}>
       <rect x={-w / 2} y={-size * 0.95} width={w} height={size * 1.9} rx={size * 0.5} fill={fill} stroke={P.ink} strokeWidth={8} />
-      <text y={size * 0.36} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={size} fill={color} {...(fit ? {textLength: w - pad * 2, lengthAdjust: 'spacingAndGlyphs' as const} : {})}>{text}</text>
+      <text y={fsz * 0.36} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={fsz} fill={color}>{text}</text>
     </g>
   );
 };
@@ -34,7 +36,9 @@ const T: React.FC<React.SVGProps<SVGTextElement> & {maxW?: number}> = ({maxW, ch
   const str = (c: any): string => (typeof c === 'string' || typeof c === 'number' ? String(c) : c?.props?.children !== undefined ? str(c.props.children) : Array.isArray(c) ? c.map(str).join('') : '');
   const txt = str(children);
   const w = measure(txt, Number(p.fontSize) || 40, Number(p.fontWeight) || 900);
-  const fit = maxW && w > maxW ? {textLength: maxW, lengthAdjust: 'spacingAndGlyphs' as const} : {};
+  // не влезает → уменьшаем шрифт (буквы не сплющиваем)
+  const fs = Number(p.fontSize) || 40;
+  const fit = maxW && w > maxW ? {fontSize: fs * maxW / w} : {};
   return <text {...p} {...fit}>{children}</text>;
 };
 const Caption: React.FC<{text: string; y?: number; o?: number}> = ({text, y = 1260, o = 1}) => (
