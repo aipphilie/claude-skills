@@ -95,7 +95,7 @@ export const Subtitles: React.FC<{t: number; style?: string}> = ({t, style}) => 
                 <React.Fragment key={i}>{i ? ' ' : ''}
                   <span style={{display: 'inline-block', padding: '0 8px', borderRadius: 16, background: cur ? chip : 'transparent',
                     color: cur ? P.cream : isKey(w.w) && said ? (pas ? P.ink : P.terracotta) : base, opacity: said ? 1 : 0.45,
-                    fontWeight: isKey(w.w) || cur ? 900 : 800, transform: `scale(${cur ? 1 + 0.08 * kk : 1})`}}>{w.w}</span>
+                    fontWeight: isKey(w.w) ? 900 : 800, transform: `scale(${cur ? 1 + 0.08 * kk : 1})`}}>{w.w}</span>
                 </React.Fragment>
               );
             })}

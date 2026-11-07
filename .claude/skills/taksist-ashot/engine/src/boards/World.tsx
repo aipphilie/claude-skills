@@ -1,7 +1,7 @@
 import React from 'react';
 import {P} from '../palette';
 import {RiderFigure, RIDERS, EMO, Emotion} from '../characters/Rider';
-import {clamp, easeInOut, easeOut, lerp, pop} from '../lib';
+import {clamp, easeInOut, easeOut, lerp, pop, measure} from '../lib';
 
 // Сцены ВНЕ такси (решение автора 2026-11-03: «чтобы не только такси, динамика до последнего кадра»).
 // Каждая мысль Ашота уходит в свою сцену: банк, новостройка, деньги, пробка, платная дорога, свобода.
@@ -36,7 +36,7 @@ export const Note: React.FC<{x: number; y: number; s?: number; rot?: number; v?:
     <rect x={-120} y={-58} width={240} height={116} rx={12} fill="#E9A06B" stroke={P.ink} strokeWidth={6} />
     <rect x={-104} y={-42} width={208} height={84} rx={8} fill="none" stroke="#B56E40" strokeWidth={4} />
     <circle cx={-50} cy={0} r={26} fill="#F2C49A" stroke="#B56E40" strokeWidth={4} />
-    <text x={52} y={16} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill="#7A3E1E">{v}</text>
+    <text x={52} y={16} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill="#7A3E1E" {...(measure(v, 42) > 120 ? {textLength: 120, lengthAdjust: 'spacingAndGlyphs' as const} : {})}>{v}</text>
   </g>
 );
 export const sky = (top: string, bot: string, id: string) => (

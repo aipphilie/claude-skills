@@ -36,3 +36,18 @@ export const blink = (t: number, seed = 0) => {
 };
 export const noise = (t: number, s = 1) => Math.sin(t * 37.1 * s + 1.3) * 0.5 + Math.sin(t * 23.7 * s + 4.1) * 0.3 + Math.sin(t * 61.3 * s) * 0.2;
 export const freezeT = () => cue('freeze');
+// реальная ширина текста Rubik через canvas (шрифт уже загружен до рендера кадра)
+let _ctx: CanvasRenderingContext2D | null = null;
+const _mc = new Map<string, number>();
+export const measure = (text: string, size: number, weight = 900) => {
+  weight = weight >= 850 ? 900 : weight >= 650 ? 800 : 600; // загружены только 600/800/900
+  const key = `${weight}|${size}|${text}`;
+  if (_mc.has(key)) return _mc.get(key)!;
+  if (typeof document === 'undefined') return text.length * size * 0.7;
+  if (!_ctx) _ctx = document.createElement('canvas').getContext('2d');
+  const font = `${weight} ${size}px Rubik`;
+  _ctx!.font = font;
+  const w = _ctx!.measureText(text).width;
+  if ((document as any).fonts?.check(font, text)) _mc.set(key, w);
+  return w;
+};

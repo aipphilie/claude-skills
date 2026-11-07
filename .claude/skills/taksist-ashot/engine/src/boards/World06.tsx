@@ -1,9 +1,8 @@
 import React from 'react';
 import {P} from '../palette';
 import {RiderFigure, ZINA, EMO, Emotion} from '../characters/Rider';
-import {clamp, easeInOut, easeOut, lerp, pop} from '../lib';
+import {clamp, easeInOut, easeOut, lerp, pop, measure} from '../lib';
 import {Cam, Note} from './World';
-import {textW} from './World05';
 import {CabinBack} from '../scene/Cabin';
 
 // Сцены серии 6 «Звонок из службы безопасности».
@@ -19,7 +18,9 @@ export const BTN_COLORS = ['#C8553D', '#EDB447', '#8E6FB8'];
 const BTN_NAMES = ['СТРАХ', 'СПЕШКА', 'СЕКРЕТ'];
 
 const Plate: React.FC<{x: number; y: number; text: string; s?: number; rot?: number; fill?: string; color?: string; size?: number; maxW?: number}> = ({x, y, text, s = 1, rot = 0, fill = P.terracotta, color = P.cream, size = 64, maxW = 860}) => {
-  const tw = textW(text, size), pad = size * 0.9;
+  const tw = measure(text, size), pad = size * 0.7;
+  // плашка в координатах экрана не вылезает за поля 56…1024
+  if (x > 0) maxW = Math.min(maxW, 2 * Math.min(x - 56, 1024 - x));
   const w = Math.min(maxW, tw + pad * 2), fit = tw > w - pad * 2;
   return (
     <g transform={`translate(${x},${y}) rotate(${rot}) scale(${s})`}>
@@ -28,16 +29,24 @@ const Plate: React.FC<{x: number; y: number; text: string; s?: number; rot?: num
     </g>
   );
 };
+// <text>, который сжимается до maxW, если не влезает (реальная ширина Rubik)
+const T: React.FC<React.SVGProps<SVGTextElement> & {maxW?: number}> = ({maxW, children, ...p}) => {
+  const str = (c: any): string => (typeof c === 'string' || typeof c === 'number' ? String(c) : c?.props?.children !== undefined ? str(c.props.children) : Array.isArray(c) ? c.map(str).join('') : '');
+  const txt = str(children);
+  const w = measure(txt, Number(p.fontSize) || 40, Number(p.fontWeight) || 900);
+  const fit = maxW && w > maxW ? {textLength: maxW, lengthAdjust: 'spacingAndGlyphs' as const} : {};
+  return <text {...p} {...fit}>{children}</text>;
+};
 const Caption: React.FC<{text: string; y?: number; o?: number}> = ({text, y = 1260, o = 1}) => (
-  <text x={540} y={y} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill={P.ink} opacity={0.7 * o}>{text}</text>
+  <T maxW={900} x={540} y={y} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill={P.ink} opacity={0.7 * o}>{text}</T>
 );
 
 // счётчик кнопок в углу
 export const BtnBadge: React.FC<{n: number}> = ({n}) => (
   <g transform="translate(790,300)">
     <rect x={-150} y={-56} width={300} height={112} rx={30} fill={P.ink} opacity={0.9} stroke={n ? BTN_COLORS[n - 1] : P.cream} strokeWidth={7} />
-    <text y={-10} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={28} fill={P.cream}>КНОПКА</text>
-    <text y={40} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={n ? BTN_COLORS[n - 1] : P.cream}>{n}/3</text>
+    <T maxW={260} y={-10} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={28} fill={P.cream}>КНОПКА</T>
+    <T maxW={260} y={40} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={n ? BTN_COLORS[n - 1] : P.cream}>{n}/3</T>
   </g>
 );
 
@@ -47,7 +56,7 @@ export const MiniZina: React.FC<{x?: number; y?: number; s?: number; e?: Partial
     <circle r={130} fill={P.cream} stroke={P.ink} strokeWidth={8} />
     <clipPath id="miniZn"><circle r={126} /></clipPath>
     <g clipPath="url(#miniZn)"><g transform="translate(0,175) scale(0.82)"><RiderFigure r={ZIN} e={em(e)} /></g></g>
-    {tape && <g transform="translate(0,58) rotate(-6)"><rect x={-62} y={-20} width={124} height={40} rx={6} fill="#E9DCC0" stroke={P.ink} strokeWidth={5} /><text y={12} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={26} fill={P.terracotta}>ТСС</text></g>}
+    {tape && <g transform="translate(0,58) rotate(-6)"><rect x={-62} y={-20} width={124} height={40} rx={6} fill="#E9DCC0" stroke={P.ink} strokeWidth={5} /><T maxW={110} y={12} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={26} fill={P.terracotta}>ТСС</T></g>}
   </g>
 );
 
@@ -65,10 +74,10 @@ const CallScreen: React.FC<{secs: number; label?: string; hang?: number}> = ({se
   return (
     <g>
       <circle cy={-200} r={84} fill={hang ? '#8A7A70' : P.sage} stroke={P.cream} strokeWidth={6} />
-      <text y={-176} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.cream}>{label === 'БАНК' ? 'Б' : '?'}</text>
-      <text y={-50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={label === 'БАНК' ? 66 : 90} fill={P.cream}>{label}</text>
-      <text y={0} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={32} fill="#C9BFB4">Служба безопасности</text>
-      <text y={110} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={hang ? 44 : 76} fill={hang ? P.terracotta : P.mustard}>{hang ? 'ЗВОНОК ЗАВЕРШЁН' : `${mm}:${String(ss).padStart(2, '0')}`}</text>
+      <T maxW={150} y={-176} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.cream}>{label === 'БАНК' ? 'Б' : '?'}</T>
+      <T maxW={330} y={-50} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={label === 'БАНК' ? 66 : 90} fill={P.cream}>{label}</T>
+      <T maxW={290} y={0} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill="#C9BFB4">Служба безопасности</T>
+      <T maxW={330} y={110} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={hang ? 44 : 76} fill={hang ? P.terracotta : P.mustard}>{hang ? 'ЗВОНОК ЗАВЕРШЁН' : `${mm}:${String(ss).padStart(2, '0')}`}</T>
       <g transform="translate(0,250)"><circle r={56} fill={P.terracotta} stroke={P.cream} strokeWidth={5} /><path d="M-26,6 Q0,-16 26,6" stroke={P.cream} strokeWidth={12} fill="none" strokeLinecap="round" /></g>
     </g>
   );
@@ -99,11 +108,11 @@ export const ShotZina: React.FC<{lt?: number; e?: Partial<Emotion>; lean?: numbe
 export const SceneCall: React.FC<{lt: number; dur: number}> = ({lt, dur}) => (
   <svg viewBox="0 0 1080 1920">
     <rect width={1080} height={1920} fill="#2A2034" />
-    <Cam k={clamp(lt / dur)} z0={1.15} z1={1.3} cy={820}>
-      <Phone x={540} y={820} s={1.15} rot={-3} dark><CallScreen secs={47 * 60 + 12 + lt} /></Phone>
+    <Cam k={clamp(lt / dur)} z0={1.15} z1={1.3} cy={740}>
+      <Phone x={540} y={740} s={1.15} rot={-3} dark><CallScreen secs={47 * 60 + 12 + lt} /></Phone>
       <path d={`M${lerp(1180, 900, easeOut(after(lt, 0.2, 0.5)))},620 q-140,40 -180,180 q-20,80 40,120`} fill={ZIN.skin} stroke={P.ink} strokeWidth={8} opacity={0.95} />
     </Cam>
-    <Plate x={540} y={1250} text="47 МИНУТ С «БАНКОМ»" s={pop(after(lt, 0.35, 0.4))} rot={-3} fill={P.mustard} color={P.ink} size={60} />
+    <Plate x={540} y={1285} text="47 МИНУТ С «БАНКОМ»" s={pop(after(lt, 0.35, 0.4))} rot={-3} fill={P.mustard} color={P.ink} size={60} />
   </svg>
 );
 
@@ -115,14 +124,14 @@ export const SceneBtnChapter: React.FC<{lt: number; dur: number; n: number}> = (
       <rect width={1080} height={1920} fill="#231B18" />
       <circle cx={540} cy={760} r={1400 * fill} fill={c} />
       <g transform={`translate(540,700) scale(${pop(after(lt, 0, 0.45))})`}>
-        <text y={-150} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84} fill={P.ink}>КНОПКА</text>
-        <text y={160} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={330} fill={P.cream} stroke={P.ink} strokeWidth={12}>{n}/3</text>
+        <T maxW={900} y={-150} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84} fill={P.ink}>КНОПКА</T>
+        <T maxW={900} y={160} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={330} fill={P.cream} stroke={P.ink} strokeWidth={12}>{n}/3</T>
       </g>
       {/* большая кнопка, которую давят */}
       <g transform={`translate(540,${1140 + Math.sin(clamp(after(lt, 0.5, 0.25)) * Math.PI) * 26})`}>
         <ellipse cy={40} rx={260} ry={70} fill={P.ink} />
         <rect x={-250} y={-60} width={500} height={110} rx={50} fill={P.cream} stroke={P.ink} strokeWidth={8} />
-        <text y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={76} fill={c}>{BTN_NAMES[n - 1]}</text>
+        <T maxW={440} y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={76} fill={c}>{BTN_NAMES[n - 1]}</T>
       </g>
       <g transform={`translate(${lerp(1100, 700, easeOut(after(lt, 0.25, 0.3)))},${lerp(1300, 1060, easeOut(after(lt, 0.25, 0.3)))}) rotate(-30)`}>
         <rect x={-30} y={-140} width={60} height={160} rx={30} fill={P.pSkin} stroke={P.ink} strokeWidth={7} />
@@ -144,9 +153,9 @@ export const SceneFear: React.FC<{lt: number; dur: number; lampAt: number}> = ({
           <rect x={-200} y={-80} width={90} height={160} rx={16} fill="#1D1A1F" stroke={P.ink} strokeWidth={9} />
           {[0, 1, 2].map((i) => <path key={i} d={`M${160 + ((wav + i / 3) % 1) * 140},-140 q60,140 0,280`} fill="none" stroke={P.terracotta} strokeWidth={10} opacity={1 - ((wav + i / 3) % 1)} />)}
         </g>
-        <Plate x={470} y={470} text="НА ВАС КРЕДИТ!" s={pop(after(lt, 0.2, 0.4))} rot={6} size={74} />
+        <Plate x={540} y={420} text="НА ВАС КРЕДИТ!" s={pop(after(lt, 0.2, 0.4))} rot={5} size={66} />
         {/* Зина и лампочки */}
-        <g transform="translate(700,1000)">
+        <g transform="translate(700,1080)">
           <g transform="translate(0,-330)">
             <circle r={70} fill={off > 0.5 ? '#8A7A70' : '#FFE38A'} stroke={P.ink} strokeWidth={7} />
             <rect x={-28} y={64} width={56} height={40} fill="#B9C0C8" stroke={P.ink} strokeWidth={6} />
@@ -202,22 +211,22 @@ export const SceneTimer: React.FC<{lt: number; dur: number; sonAt: number}> = ({
       <g transform={`translate(540,640) scale(${z}) rotate(${(beat % 2 ? 1 : -1) * 3})`}>
         <circle r={300} fill={P.cream} stroke={P.ink} strokeWidth={12} />
         <path d={`M0,0 L${Math.sin(lt * 6.28) * 230},${-Math.cos(lt * 6.28) * 230}`} stroke={P.terracotta} strokeWidth={14} strokeLinecap="round" />
-        <text y={120} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={130} fill={P.ink}>{`${Math.floor(left / 60)}:${String(Math.floor(left % 60)).padStart(2, '0')}`}</text>
+        <T maxW={500} y={120} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={130} fill={P.ink}>{`${Math.floor(left / 60)}:${String(Math.floor(left % 60)).padStart(2, '0')}`}</T>
         <circle r={20} fill={P.ink} />
       </g>
       {son > 0 && (
         <g>
-          <Phone x={540} y={1150} s={0.45} rot={-4}>
+          <Phone x={360} y={1150} s={0.45} rot={-4}>
             <circle cy={-160} r={90} fill={P.sage} stroke={P.ink} strokeWidth={6} />
-            <text y={-130} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={80} fill={P.cream}>С</text>
-            <text y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.ink}>Сынок</text>
+            <T maxW={150} y={-130} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={80} fill={P.cream}>С</T>
+            <T maxW={330} y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.ink}>Сынок</T>
             <rect x={-140} y={110} width={280} height={110} rx={55} fill={P.sage} stroke={P.ink} strokeWidth={6} />
-            <text y={182} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={P.cream}>Позвонить</text>
+            <T maxW={250} y={182} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={46} fill={P.cream}>Позвонить</T>
           </Phone>
-          <g transform={`translate(${lerp(980, 660, easeOut(son)) + push * 200},${1500 - push * 40}) rotate(-35)`}>
+          <g transform={`translate(${lerp(800, 480, easeOut(son)) + push * 200},${1500 - push * 40}) rotate(-35)`}>
             <rect x={-30} y={-150} width={60} height={170} rx={30} fill={ZIN.skin} stroke={P.ink} strokeWidth={7} />
           </g>
-          <Plate x={830} y={1020} text="1 МИНУТА" s={pop(after(lt, sonAt + 0.3, 0.4))} rot={-4} fill={P.sage} size={64} />
+          <Plate x={720} y={1060} text="1 МИНУТА" s={pop(after(lt, sonAt + 0.3, 0.4))} rot={-4} fill={P.sage} size={64} />
         </g>
       )}
       <MiniZina x={180} y={360} s={0.75} e={{worry: 1, sweat: 1}} />
@@ -242,7 +251,7 @@ export const SceneSecret: React.FC<{lt: number; dur: number; crackAt: number}> =
       <rect width={1080} height={1920} fill="#3A2D55" opacity={0.35 + crack * 0.5} />
       <rect width={1080} height={1920} fill="url(#torch)" />
       <g transform={`translate(260,1000) scale(${0.95})`}><RiderFigure r={ZIN} e={em({worry: 1})} /></g>
-      <g transform="translate(260,860) rotate(-6)"><rect x={-70} y={-22} width={140} height={44} rx={6} fill="#E9DCC0" stroke={P.ink} strokeWidth={5} /><text y={13} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={30} fill={P.terracotta}>ТСС</text></g>
+      <g transform="translate(260,860) rotate(-6)"><rect x={-70} y={-22} width={140} height={44} rx={6} fill="#E9DCC0" stroke={P.ink} strokeWidth={5} /><T maxW={125} y={13} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={30} fill={P.terracotta}>ТСС</T></g>
       {/* стена */}
       <g opacity={1 - crack * 0.85}>
         <rect x={470} y={420} width={140} height={1000} fill="#6B5A52" stroke={P.ink} strokeWidth={8} />
@@ -252,7 +261,7 @@ export const SceneSecret: React.FC<{lt: number; dur: number; crackAt: number}> =
       <g transform={`translate(830,1000) scale(0.95)`} opacity={0.35 + crack * 0.65}>
         <RiderFigure r={{name: 'сын', skin: '#E7B996', shade: '#CC9A78', headScale: 1, bodyScale: 1, jaw: 'soft', hair: 'sidepart', hairColor: '#5A3B28', clothes: 'jacket', c1: '#5E7FA0', c2: '#46627F'}} e={em({smile: 1})} />
       </g>
-      {crack > 0 && <Plate x={830} y={560} text="МАМ, ТЫ ЧЕГО?" s={pop(after(lt, crackAt + 0.2, 0.4))} rot={4} fill={P.sage} size={50} />}
+      {crack > 0 && <Plate x={600} y={520} text="МАМ, ТЫ ЧЕГО?" s={pop(after(lt, crackAt + 0.2, 0.4))} rot={4} fill={P.sage} size={50} />}
       <BtnBadge n={3} />
     </svg>
   );
@@ -267,14 +276,14 @@ export const SceneButtons: React.FC<{lt: number; dur: number}> = ({lt}) => (
       return (
         <g key={n} transform={`translate(540,${520 + i * 230}) scale(${0.9 + pop(on) * 0.1})`}>
           <rect x={-300} y={-80} width={600} height={160} rx={70} fill={on > 0.5 ? BTN_COLORS[i] : '#4A4054'} stroke={P.ink} strokeWidth={9} />
-          <text y={28} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84} fill={P.cream}>{n}</text>
+          <T maxW={520} y={28} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={84} fill={P.cream}>{n}</T>
         </g>
       );
     })}
     <g transform="translate(540,1250)">
       <circle r={110} fill={P.cream} stroke={P.ink} strokeWidth={9} />
       <rect x={-20} y={-150} width={40} height={40} fill={P.ink} />
-      <text y={26} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.ink}>0:10</text>
+      <T maxW={200} y={26} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.ink}>0:10</T>
     </g>
     <Plate x={540} y={300} text="= МОШЕННИК" s={pop(after(lt, 0.9, 0.4))} rot={-3} fill={P.terracotta} size={80} />
   </svg>
@@ -282,10 +291,10 @@ export const SceneButtons: React.FC<{lt: number; dur: number}> = ({lt}) => (
 
 // ---------- откуда номер: карточка Зины разлетается на кусочки ----------
 const PIECES = [
-  {x: 230, y: 820, t: 'КАРТА МАГАЗИНА', s: '☑ передавать партнёрам'},
-  {x: 830, y: 820, t: 'ДОСТАВКА', s: 'Альбина Г., +7 9…'},
-  {x: 230, y: 1180, t: 'ЗАПИСЬ К ВРАЧУ', s: 'телефон, возраст'},
-  {x: 830, y: 1180, t: 'ОБЪЯВЛЕНИЕ', s: '«продам дачу»'},
+  {x: 270, y: 820, t: 'КАРТА МАГАЗИНА', s: '☑ передавать партнёрам'},
+  {x: 810, y: 820, t: 'ДОСТАВКА', s: 'Альбина Г., +7 9…'},
+  {x: 270, y: 1180, t: 'ЗАПИСЬ К ВРАЧУ', s: 'телефон, возраст'},
+  {x: 810, y: 1180, t: 'ОБЪЯВЛЕНИЕ', s: '«продам дачу»'},
 ];
 export const ScenePuzzle: React.FC<{lt: number; dur: number}> = ({lt}) => {
   const br = easeInOut(after(lt, 0.5, 0.8));
@@ -294,17 +303,17 @@ export const ScenePuzzle: React.FC<{lt: number; dur: number}> = ({lt}) => {
       <rect width={1080} height={1920} fill="#D6E2F0" />
       <g transform="translate(540,460)" opacity={1 - br * 0.3}>
         <rect x={-330} y={-110} width={660} height={220} rx={24} fill={P.cream} stroke={P.ink} strokeWidth={8} />
-        <text y={-20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={54} fill={P.ink}>Альбина Григорьевна</text>
-        <text y={56} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={48} fill="#5E7FA0">+7 9•• •••-••-••</text>
+        <T maxW={610} y={-20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={54} fill={P.ink}>Альбина Григорьевна</T>
+        <T maxW={610} y={56} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={48} fill="#5E7FA0">+7 9•• •••-••-••</T>
       </g>
       {PIECES.map((p, i) => {
         const k = easeOut(after(lt, 0.55 + i * 0.12, 0.6));
         return (
           <g key={i} transform={`translate(${lerp(540, p.x, k)},${lerp(460, p.y, k)}) scale(${0.4 + k * 0.6}) rotate(${(1 - k) * (i % 2 ? 20 : -20)})`} opacity={clamp(k * 3)}>
-            <rect x={-200} y={-120} width={400} height={240} rx={22} fill={['#F6E3B8', '#E9D4B4', '#FFFBF2', '#DCEBD3'][i]} stroke={P.ink} strokeWidth={7} />
+            <rect x={-180} y={-120} width={360} height={240} rx={22} fill={['#F6E3B8', '#E9D4B4', '#FFFBF2', '#DCEBD3'][i]} stroke={P.ink} strokeWidth={7} />
             <path d="M-40,-120 q40,-40 80,0" fill={['#F6E3B8', '#E9D4B4', '#FFFBF2', '#DCEBD3'][i]} stroke={P.ink} strokeWidth={7} />
-            <text y={-20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={38} fill={P.ink}>{p.t}</text>
-            <text y={44} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill={P.terracotta}>{p.s}</text>
+            <T maxW={330} y={-20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={38} fill={P.ink}>{p.t}</T>
+            <T maxW={330} y={44} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill={P.terracotta}>{p.s}</T>
           </g>
         );
       })}
@@ -315,7 +324,7 @@ export const ScenePuzzle: React.FC<{lt: number; dur: number}> = ({lt}) => {
 
 // ---------- трубы из компаний в ларёк «БАЗА», сотрудник выносит папку ----------
 export const ScenePipes: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
-  const B = [{x: 200, t: 'МАГАЗИН', c: '#E3B04B'}, {x: 540, t: 'ДОСТАВКА', c: '#C8553D'}, {x: 880, t: 'КЛИНИКА', c: '#7FAF6B'}];
+  const B = [{x: 230, t: 'МАГАЗИН', c: '#E3B04B'}, {x: 540, t: 'ДОСТАВКА', c: '#C8553D'}, {x: 850, t: 'КЛИНИКА', c: '#7FAF6B'}];
   const emp = easeInOut(after(lt, dur * 0.5, 1.2));
   return (
     <svg viewBox="0 0 1080 1920">
@@ -323,10 +332,10 @@ export const ScenePipes: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
       <Cam k={clamp(lt / dur)} z1={1.06}>
         {B.map((b) => (
           <g key={b.t}>
-            <rect x={b.x - 140} y={330} width={280} height={260} fill={b.c} stroke={P.ink} strokeWidth={8} />
-            <rect x={b.x - 150} y={290} width={300} height={60} fill={P.cream} stroke={P.ink} strokeWidth={8} />
-            <text x={b.x} y={334} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={34} fill={P.ink}>{b.t}</text>
-            {[0, 1].map((r) => [0, 1, 2].map((c) => <rect key={r + '' + c} x={b.x - 110 + c * 80} y={380 + r * 90} width={50} height={60} fill="#FFFBF2" stroke={P.ink} strokeWidth={4} />))}
+            <rect x={b.x - 130} y={330} width={260} height={260} fill={b.c} stroke={P.ink} strokeWidth={8} />
+            <rect x={b.x - 140} y={290} width={280} height={60} fill={P.cream} stroke={P.ink} strokeWidth={8} />
+            <T maxW={250} x={b.x} y={334} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={34} fill={P.ink}>{b.t}</T>
+            {[0, 1].map((r) => [0, 1, 2].map((c) => <rect key={r + '' + c} x={b.x - 105 + c * 80} y={380 + r * 90} width={50} height={60} fill="#FFFBF2" stroke={P.ink} strokeWidth={4} />))}
             <path d={`M${b.x},590 L${b.x},760 Q${b.x},860 ${lerp(b.x, 540, 0.6)},900 L540,1000`} fill="none" stroke="#6B5A52" strokeWidth={40} />
             <path d={`M${b.x},590 L${b.x},760 Q${b.x},860 ${lerp(b.x, 540, 0.6)},900 L540,1000`} fill="none" stroke={P.ink} strokeWidth={4} strokeDasharray="12 30" strokeDashoffset={-lt * 120} />
           </g>
@@ -335,10 +344,10 @@ export const ScenePipes: React.FC<{lt: number; dur: number}> = ({lt, dur}) => {
         <g transform="translate(540,1180)">
           <rect x={-260} y={-180} width={520} height={330} fill="#3A2D45" stroke={P.ink} strokeWidth={9} />
           <path d="M-290,-180 L290,-180 L250,-250 L-250,-250Z" fill={P.terracotta} stroke={P.ink} strokeWidth={8} />
-          <text y={-198} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.cream}>БАЗА</text>
+          <T maxW={380} y={-198} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.cream}>БАЗА</T>
           <rect x={-210} y={-120} width={420} height={170} rx={14} fill={P.cream} stroke={P.ink} strokeWidth={6} opacity={clamp(lt / 1.5)} />
-          <text y={-60} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={34} fill={P.ink} opacity={clamp(lt / 1.5)}>Альбина Григорьевна · 68</text>
-          <text y={0} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={32} fill={P.terracotta} opacity={clamp((lt - 1) / 1)}>вклад · пенсия</text>
+          <T maxW={390} y={-60} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={34} fill={P.ink} opacity={clamp(lt / 1.5)}>Альбина Григорьевна · 68</T>
+          <T maxW={390} y={0} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={32} fill={P.terracotta} opacity={clamp((lt - 1) / 1)}>вклад · пенсия</T>
         </g>
         {/* сотрудник выносит папку из двери */}
         <g transform={`translate(${lerp(880, 780, emp)},${lerp(640, 1100, emp)}) scale(0.55)`} opacity={after(lt, dur * 0.5, 0.2)}>
@@ -357,7 +366,7 @@ export const SceneLeak: React.FC<{lt: number; dur: number}> = ({lt}) => {
   return (
     <svg viewBox="0 0 1080 1920">
       <rect width={1080} height={1920} fill="#F0D3C6" />
-      <text x={540} y={560} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={230} fill={P.terracotta} stroke={P.ink} strokeWidth={10}>{n}</text>
+      <T maxW={880} x={540} y={560} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={230} fill={P.terracotta} stroke={P.ink} strokeWidth={10}>{n}</T>
       <Plate x={540} y={700} text="МЛН ЗАПИСЕЙ УТЕКЛО" s={pop(after(lt, 0.4, 0.4))} rot={-3} fill={P.ink} size={56} />
       <Caption text="2024 · Роскомнадзор" y={800} />
       {[0, 1, 2, 3, 4].map((i) => {
@@ -387,23 +396,23 @@ export const SceneRobot: React.FC<{lt: number; dur: number; stampAt: number}> = 
         <rect x={-50} y={40} width={100} height={20} rx={8} fill={P.ink} />
         <path d="M-150,-40 Q-160,-170 0,-170 Q160,-170 150,-40" fill="none" stroke={P.ink} strokeWidth={14} />
         <rect x={-120} y={110} width={240} height={200} rx={30} fill="#9AA3AD" stroke={P.ink} strokeWidth={9} />
-        <text x={0} y={-200} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={34} fill={P.ink}>ОБЗВОН 24/7</text>
+        <T maxW={300} x={0} y={-200} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={34} fill={P.ink}>ОБЗВОН 24/7</T>
       </g>
       {/* телефон Зины: тишина */}
       <Phone x={780} y={760} s={0.55} rot={6}>
-        <text y={-120} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={60} fill={P.ink}>Неизвестный</text>
-        <text y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={110} fill="#8A7A70">• • •</text>
-        <text y={140} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={44} fill="#8A7A70">тишина…</text>
+        <T maxW={330} y={-120} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={60} fill={P.ink}>Неизвестный</T>
+        <T maxW={330} y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={110} fill="#8A7A70">• • •</T>
+        <T maxW={330} y={140} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={44} fill="#8A7A70">тишина…</T>
       </Phone>
       {/* карточка в базе + штамп */}
       <g transform="translate(540,1260)">
         <rect x={-300} y={-110} width={600} height={220} rx={22} fill={P.cream} stroke={P.ink} strokeWidth={8} />
-        <text y={-30} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill={P.ink}>Альбина Григорьевна</text>
-        <text y={40} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={36} fill="#5E7FA0">+7 9•• •••-••-••</text>
-        {st > 0 && <g transform={`rotate(-12) scale(${lerp(2.2, 1, st)})`} opacity={st}><rect x={-170} y={-60} width={340} height={120} rx={14} fill="none" stroke={P.sageDark} strokeWidth={12} /><text y={28} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={80} fill={P.sageDark}>ЖИВОЙ</text></g>}
+        <T maxW={560} y={-30} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={42} fill={P.ink}>Альбина Григорьевна</T>
+        <T maxW={560} y={40} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={36} fill="#5E7FA0">+7 9•• •••-••-••</T>
+        {st > 0 && <g transform={`rotate(-12) scale(${lerp(2.2, 1, st)})`} opacity={st}><rect x={-170} y={-60} width={340} height={120} rx={14} fill="none" stroke={P.sageDark} strokeWidth={12} /><T maxW={310} y={28} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={80} fill={P.sageDark}>ЖИВОЙ</T></g>}
         <g transform={`translate(260,-150) rotate(10) scale(${1 + Math.sin(after(lt, stampAt + 0.2, 0.6) * Math.PI) * 0.2})`}>
           <path d="M-70,-40 L60,-40 L100,0 L60,40 L-70,40Z" fill={P.mustard} stroke={P.ink} strokeWidth={6} />
-          <text x={10} y={14} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={38} fill={P.ink}>{st > 0 ? `×${Math.round(price / 5)}` : '×1'}</text>
+          <T maxW={150} x={10} y={14} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={38} fill={P.ink}>{st > 0 ? `×${Math.round(price / 5)}` : '×1'}</T>
         </g>
       </g>
       <MiniZina x={180} y={380} s={0.75} e={{shock: st, mouth: st ? 2 : 0}} />
@@ -419,23 +428,23 @@ export const SceneSafe: React.FC<{lt: number; dur: number; openAt: number}> = ({
       <rect width={1080} height={1920} fill="#D9DCE0" />
       <Cam k={clamp(lt / dur)} z1={1.08}>
         {/* куртка мошенника за сейфом */}
-        <g transform={`translate(${lerp(540, 720, op)},820)`} opacity={op}>
-          <path d="M-260,-300 L260,-300 L300,320 L-300,320Z" fill="#2E2B33" stroke={P.ink} strokeWidth={9} />
+        <g transform={`translate(${lerp(540, 760, op)},820)`} opacity={op}>
+          <path d="M-220,-300 L220,-300 L250,320 L-250,320Z" fill="#2E2B33" stroke={P.ink} strokeWidth={9} />
           <path d="M-160,40 L160,40 L150,240 L-150,240Z" fill="#46424D" stroke={P.ink} strokeWidth={7} />
-          <text y={-200} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.cream}>КАРМАН</text>
-          <text y={-150} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.cream}>МОШЕННИКА</text>
+          <T maxW={400} y={-200} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.cream}>КАРМАН</T>
+          <T maxW={400} y={-150} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.cream}>МОШЕННИКА</T>
         </g>
-        <g transform={`translate(${lerp(540, 300, op)},820)`}>
+        <g transform={`translate(${lerp(540, 330, op)},820)`}>
           <rect x={-260} y={-300} width={520} height={600} rx={30} fill="#7D858F" stroke={P.ink} strokeWidth={10} />
           <rect x={-220} y={-260} width={440} height={520} rx={20} fill="#5E6670" stroke={P.ink} strokeWidth={7} />
           <circle cx={150} cy={0} r={50} fill="#B9C0C8" stroke={P.ink} strokeWidth={7} />
-          <Plate x={0} y={-370} text="БЕЗОПАСНЫЙ СЧЁТ" size={48} fill={P.sage} />
+          <Plate x={0} y={-370} text="БЕЗОПАСНЫЙ СЧЁТ" size={44} maxW={460} fill={P.sage} />
         </g>
         <g transform={`translate(${lerp(540, 900, gone)},${lerp(1400, 900, inn) + gone * 40})`} opacity={1 - gone * 0.9}>
           <Note x={0} y={0} s={1.3} v="800 000" />
         </g>
       </Cam>
-      <MiniZina x={900} y={1180} s={0.75} e={{shock: gone, worry: 1 - gone, mouth: gone > 0.5 ? 3 : 0}} />
+      <MiniZina x={180} y={1220} s={0.75} e={{shock: gone, worry: 1 - gone, mouth: gone > 0.5 ? 3 : 0}} />
     </svg>
   );
 };
@@ -466,9 +475,9 @@ export const SceneStats: React.FC<{lt: number; dur: number; splitAt: number}> = 
       <path d="M0,1250 L0,1100 L80,1100 L80,1000 L140,1000 L140,1120 L230,1120 L240,880 L260,820 L280,880 L290,1120 L380,1120 L380,960 L460,960 L460,1120 L520,1120 L540,760 L560,1120 L640,1120 L640,1010 L720,1010 L730,900 L760,860 L790,900 L800,1120 L900,1120 L900,1040 L1080,1040 L1080,1250Z" fill="#1E1730" stroke={P.ink} strokeWidth={6} />
       <rect y={1250} width={1080} height={670} fill="#1E1730" />
       {Array.from({length: 18}, (_, i) => <Note key={i} x={200 + (i % 6) * 136} y={lerp(-200, 1060 - Math.floor(i / 6) * 70, easeOut(clamp(l2 / 0.9 - i * 0.03)))} s={0.7} rot={(i * 37) % 30 - 15} />)}
-      <text x={540} y={560} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={140} fill={P.mustard} stroke={P.ink} strokeWidth={8} opacity={k}>{Math.round(33 * k)} МЛРД ₽</text>
-      <text x={540} y={660} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill={P.cream} opacity={0.75 * k}>Москва · 9 месяцев 2026 · МВД</text>
-      <MiniZina x={880} y={330} s={0.7} e={{shock: k, mouth: 3}} />
+      <T maxW={860} x={540} y={560} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={140} fill={P.mustard} stroke={P.ink} strokeWidth={8} opacity={k}>{Math.round(33 * k)} МЛРД <tspan strokeWidth={0}>₽</tspan></T>
+      <T maxW={860} x={540} y={660} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill={P.cream} opacity={0.75 * k}>Москва · 9 месяцев 2026 · МВД</T>
+      <MiniZina x={790} y={320} s={0.7} e={{shock: k, mouth: 3}} />
     </svg>
   );
 };
@@ -492,18 +501,18 @@ export const SceneCard: React.FC<{lt: number; dur: number; flipAt: number; bubbl
       <Cam k={clamp(lt / dur)} z1={1.05}>
         <g transform={`translate(540,640) scale(${sx},1) rotate(-4)`}>
           <rect x={-330} y={-200} width={660} height={400} rx={36} fill={back ? '#F3EDE4' : '#5E7FA0'} stroke={P.ink} strokeWidth={10} />
-          {!back && <g><rect x={-260} y={-90} width={110} height={80} rx={12} fill={P.gold} stroke={P.ink} strokeWidth={6} /><text x={-260} y={120} fontFamily={F} fontWeight={800} fontSize={44} fill={P.cream}>•••• 1234</text><text x={260} y={-120} textAnchor="end" fontFamily={F} fontWeight={900} fontSize={50} fill={P.cream}>БАНК</text></g>}
-          {back && <g><rect x={-330} y={-150} width={660} height={80} fill={P.ink} /><text y={40} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={34} fill="#8A7A70">телефон банка</text><text y={120} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={64} fill={P.ink}>8 800 •••-••-••</text><rect x={-300} y={70} width={600} height={80} rx={20} fill="none" stroke={P.sage} strokeWidth={8} opacity={0.5 + Math.sin(lt * 8) * 0.5} /></g>}
+          {!back && <g><rect x={-260} y={-90} width={110} height={80} rx={12} fill={P.gold} stroke={P.ink} strokeWidth={6} /><T maxW={420} x={-260} y={120} fontFamily={F} fontWeight={800} fontSize={44} fill={P.cream}>•••• 1234</T><T maxW={240} x={260} y={-120} textAnchor="end" fontFamily={F} fontWeight={900} fontSize={50} fill={P.cream}>БАНК</T></g>}
+          {back && <g><rect x={-330} y={-150} width={660} height={80} fill={P.ink} /><T maxW={560} y={40} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={34} fill="#8A7A70">телефон банка</T><T maxW={580} y={120} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={64} fill={P.ink}>8 800 •••-••-••</T><rect x={-300} y={70} width={600} height={80} rx={20} fill="none" stroke={P.sage} strokeWidth={8} opacity={0.5 + Math.sin(lt * 8) * 0.5} /></g>}
         </g>
         {b > 0 && (
-          <g transform={`translate(640,1010) scale(${pop(b)*0.95})`}>
+          <g transform={`translate(560,1010) scale(${pop(b)*0.88})`}>
             <path d="M-330,-110 L330,-110 Q370,-110 370,-70 L370,70 Q370,110 330,110 L-200,110 L-260,170 L-250,110 L-330,110 Q-370,110 -370,70 L-370,-70 Q-370,-110 -330,-110Z" fill={P.cream} stroke={P.ink} strokeWidth={8} />
-            <text y={-10} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.sageDark}>Ваши деньги на месте ✓</text>
-            <text y={56} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={32} fill="#8A7A70">безопасных счетов не бывает</text>
+            <T maxW={680} y={-10} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={50} fill={P.sageDark}>Ваши деньги на месте ✓</T>
+            <T maxW={680} y={56} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={32} fill="#8A7A70">безопасных счетов не бывает</T>
           </g>
         )}
       </Cam>
-      <MiniZina x={160} y={1190} s={0.8} e={{smile: b, worry: 1 - b}} />
+      <MiniZina x={160} y={1230} s={0.75} e={{smile: b, worry: 1 - b}} />
       <Plate x={540} y={330} text="ПОЛОЖИЛ — ПОЗВОНИЛ САМ" s={pop(after(lt, 0.2, 0.4))} rot={-3} fill={P.sage} size={54} />
     </svg>
   );

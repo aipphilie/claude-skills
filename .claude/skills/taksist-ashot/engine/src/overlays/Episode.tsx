@@ -1,6 +1,8 @@
 import React from 'react';
 import {P} from '../palette';
-import {after, clamp, cue, easeOut, lerp, pop, story} from '../lib';
+import {after, clamp, cue, easeOut, lerp, pop, story, measure} from '../lib';
+// сжать текст до maxW, если реальная ширина больше
+const fitW = (t: string, size: number, maxW: number, weight = 900) => (measure(t, size, weight) > maxW ? {textLength: maxW, lengthAdjust: 'spacingAndGlyphs' as const} : {});
 
 // Плашки полной серии из story.json: cards (цифры и цитаты), score («ОТЫГРАЛИ У БАНКА»), шпаргалка.
 // Экранные координаты 1080×1920, всё внутри безопасной зоны x 56..922, y 250..1600.
@@ -22,7 +24,7 @@ export const Cards: React.FC<{t: number}> = ({t}) => (
       const o = clamp(Math.min((t - c.a) / 0.08, (c.b + 0.15 - t) / 0.15));
       const s = pop(after(t, c.a, 0.45));
       const [bg, fg] = FILL[c.fill] || FILL.cream;
-      let size = c.size; let w = textW(c.text, size) + 90;
+      let size = c.size; let w = measure(c.text, size) + size * 1.4;
       if (w > 860) { size *= 860 / w; w = 860; }
       const h = size * 1.75;
       return (
@@ -70,7 +72,7 @@ export const ShotCheat: React.FC<{lt: number}> = ({lt}) => (
     <rect width={1080} height={1920} fill="#231B18" />
     {Array.from({length: 18}, (_, i) => <circle key={i} cx={(i * 211) % 1080} cy={(i * 347) % 1920} r={60 + (i % 4) * 30} fill={P.mustard} opacity={0.05} />)}
     <g transform={`translate(0,${lerp(40, 0, easeOut(lt / 0.4))})`} opacity={clamp(lt / 0.2)}>
-      <text x={540} y={330} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={74} fill={P.mustard} {...((CH.title || 'ШПАРГАЛКА АШОТА').length * 74 * 0.72 > 840 ? {textLength: 840, lengthAdjust: 'spacingAndGlyphs'} : {})}>{CH.title || 'ШПАРГАЛКА АШОТА'}</text>
+      <text x={540} y={330} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={74} fill={P.mustard} {...fitW(CH.title || 'ШПАРГАЛКА АШОТА', 74, 840)}>{CH.title || 'ШПАРГАЛКА АШОТА'}</text>
       <text x={540} y={400} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={38} fill={P.cream} opacity={0.8}>{CH.sub || 'ипотека · сохрани'}</text>
       {CHEAT.map(([n, a, b], i) => {
         const k = pop(after(lt, 0.15 + i * 0.18, 0.4));
@@ -80,14 +82,14 @@ export const ShotCheat: React.FC<{lt: number}> = ({lt}) => (
             <rect x={-430} y={-90} width={860} height={190} rx={40} fill={P.cream} stroke={P.ink} strokeWidth={8} />
             <circle cx={-340} cy={5} r={56} fill={P.terracotta} stroke={P.ink} strokeWidth={6} />
             <text x={-340} y={30} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={70} fill={P.cream}>{n}</text>
-            <text x={-250} y={-12} fontFamily={F} fontWeight={700} fontSize={44} fill={P.ink}>{a}</text>
-            <text x={-250} y={56} fontFamily={F} fontWeight={900} fontSize={52} fill={P.terracotta}>{b}</text>
+            <text x={-250} y={-12} fontFamily={F} fontWeight={700} fontSize={44} fill={P.ink} {...fitW(a, 44, 650, 700)}>{a}</text>
+            <text x={-250} y={56} fontFamily={F} fontWeight={900} fontSize={52} fill={P.terracotta} {...fitW(b, 52, 650)}>{b}</text>
           </g>
         );
       })}
       <g transform={`translate(540,1480) scale(${pop(after(lt, 1.0, 0.45))})`}>
         <rect x={-430} y={-70} width={860} height={140} rx={70} fill={P.mustard} stroke={P.ink} strokeWidth={8} />
-        <text y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.ink}>{CH.cta || 'Скинь тому, кто берёт ипотеку'}</text>
+        <text y={20} textAnchor="middle" fontFamily={F} fontWeight={900} fontSize={44} fill={P.ink} {...fitW(CH.cta || 'Скинь тому, кто берёт ипотеку', 44, 760)}>{CH.cta || 'Скинь тому, кто берёт ипотеку'}</text>
       </g>
       <text x={540} y={1610} textAnchor="middle" fontFamily={F} fontWeight={800} fontSize={34} fill={P.cream} opacity={clamp((lt - 1.3) / 0.3)}>{CH.ask || 'Ты на срок или на платёж? Пиши в комменты'}</text>
     </g>
