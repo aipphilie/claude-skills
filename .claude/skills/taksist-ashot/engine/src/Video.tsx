@@ -3,7 +3,7 @@ import {AbsoluteFill, Audio, staticFile, useCurrentFrame, continueRender, delayR
 import {P} from './palette';
 import {FPS, after, ampAt, blink, clamp, cue, easeInOut, easeOut, lerp, mouthShape, noise, story, freezeT, timeline} from './lib';
 import {Ashot, AshotState, ArmPose} from './characters/Ashot';
-import {RiderFigure, RIDERS, KRISTINA, SVETA, ZINA, Emotion} from './characters/Rider';
+import {RiderFigure, RIDERS, KRISTINA, SVETA, ZINA, VLAD, Emotion} from './characters/Rider';
 import {CabinBack, CabinFront, DriverSeat} from './scene/Cabin';
 import {Stamp400} from './overlays/Graphics';
 import {Cards, Score, ShotCheat} from './overlays/Episode';
@@ -14,9 +14,10 @@ import * as W2 from './boards/World02';
 import * as W4 from './boards/World04';
 import * as W5 from './boards/World05';
 import * as W6 from './boards/World06';
+import * as W7 from './boards/World07';
 
 // пассажир серии (story.rider): 'kristina' → вариант А, иначе Тимур
-const RIDER = story.rider === 'kristina' ? KRISTINA[0] : story.rider === 'sveta' ? SVETA[2] : story.rider === 'zina' ? ZINA[0] : RIDERS[0];
+const RIDER = story.rider === 'kristina' ? KRISTINA[0] : story.rider === 'sveta' ? SVETA[2] : story.rider === 'zina' ? ZINA[0] : story.rider === 'vlad' ? VLAD[1] : RIDERS[0];
 const FARE0 = story.fareStart ?? 287, FARE1 = story.fareEnd ?? 400;
 
 // врезки-ракурсы поверх салона (story.json → inserts)
@@ -77,6 +78,17 @@ const renderInsert = (x: any, t: number, lt: number, dur: number) => {
     case 'safe': return <W6.SceneSafe lt={lt} dur={dur} openAt={cue(x.openAt) - x.a} />;
     case 'stats': return <W6.SceneStats lt={lt} dur={dur} splitAt={cue(x.splitAt) - x.a} />;
     case 'hangup': return <W6.SceneHangup lt={lt} dur={dur} />;
+    case 'vlad': return <W7.ShotVlad lt={lt} e={{...(x.e || {}), mouth: x.e?.mouth ?? mouthShape(ampAt('passenger', t))}} lean={x.lean || 0} phone={x.phone || 'none'} />;
+    case 'disclaimer': return <W7.SceneDisclaimer lt={lt} dur={dur} />;
+    case 'washer': return <W7.SceneWasher lt={lt} dur={dur} washAt={cue(x.washAt) - x.a} />;
+    case 'drum': return <W7.SceneDrum lt={lt} dur={dur} stainAt={cue(x.stainAt) - x.a} talk={ampAt('passenger', t)} />;
+    case 'chek': return <W7.SceneChek lt={lt} dur={dur} n={x.n} />;
+    case 'block': return <W7.SceneBlock lt={lt} dur={dur} dbAt={cue(x.dbAt) - x.a} allAt={cue(x.allAt) - x.a} />;
+    case 'trail': return <W7.SceneTrail lt={lt} dur={dur} lensAt={cue(x.lensAt) - x.a} talk={ampAt('passenger', t)} />;
+    case 'jail': return <W7.SceneJail lt={lt} dur={dur} countAt={cue(x.countAt) - x.a} />;
+    case 'island': return <W7.SceneIsland lt={lt} dur={dur} paperAt={cue(x.paperAt) - x.a} talk={ampAt('passenger', t)} vladUntil={cue(x.vladUntil) - x.a} />;
+    case 'boutique': return <W7.SceneBoutique lt={lt} dur={dur} plateAt={cue(x.plateAt) - x.a} />;
+    case 'director': return <W7.SceneDirector lt={lt} dur={dur} fallAt={cue(x.fallAt) - x.a} lawAt={cue(x.lawAt) - x.a} />;
     case 'card': return <W6.SceneCard lt={lt} dur={dur} flipAt={cue(x.flipAt) - x.a} bubbleAt={cue(x.bubbleAt) - x.a} />;
     // сцены вне такси (boards/World.tsx)
     case 'bankStamp': return <W.SceneBankStamp lt={lt} dur={dur} />;

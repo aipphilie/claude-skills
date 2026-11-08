@@ -10,14 +10,14 @@ import {CabinBack} from '../scene/Cabin';
 // Реплики Зины в объясняющей части звучат поверх картинок через мини-аватар в углу.
 // Правила как в World.tsx: 1080×1920, lt — сек от начала врезки, dur — длина, важное в зоне x 56..922, y 250..1300.
 
-const F = 'Rubik';
+export const F = 'Rubik';
 const after = (lt: number, a: number, d = 0.3) => clamp((lt - a) / d);
 export const ZIN = ZINA[0];
-const em = (e: Partial<Emotion>): Emotion => ({...EMO.calm, ...e});
+export const em = (e: Partial<Emotion>): Emotion => ({...EMO.calm, ...e});
 export const BTN_COLORS = ['#C8553D', '#EDB447', '#8E6FB8'];
 const BTN_NAMES = ['СТРАХ', 'СПЕШКА', 'СЕКРЕТ'];
 
-const Plate: React.FC<{x: number; y: number; text: string; s?: number; rot?: number; fill?: string; color?: string; size?: number; maxW?: number}> = ({x, y, text, s = 1, rot = 0, fill = P.terracotta, color = P.cream, size = 64, maxW = 860}) => {
+export const Plate: React.FC<{x: number; y: number; text: string; s?: number; rot?: number; fill?: string; color?: string; size?: number; maxW?: number}> = ({x, y, text, s = 1, rot = 0, fill = P.terracotta, color = P.cream, size = 64, maxW = 860}) => {
   const tw = measure(text, size), pad = size * 0.7;
   // плашка в координатах экрана не вылезает за поля 56…1024
   if (x > 0) maxW = Math.min(maxW, 2 * Math.min(x - 56, 1024 - x));
@@ -32,7 +32,7 @@ const Plate: React.FC<{x: number; y: number; text: string; s?: number; rot?: num
   );
 };
 // <text>, который сжимается до maxW, если не влезает (реальная ширина Rubik)
-const T: React.FC<React.SVGProps<SVGTextElement> & {maxW?: number}> = ({maxW, children, ...p}) => {
+export const T: React.FC<React.SVGProps<SVGTextElement> & {maxW?: number}> = ({maxW, children, ...p}) => {
   const str = (c: any): string => (typeof c === 'string' || typeof c === 'number' ? String(c) : c?.props?.children !== undefined ? str(c.props.children) : Array.isArray(c) ? c.map(str).join('') : '');
   const txt = str(children);
   const w = measure(txt, Number(p.fontSize) || 40, Number(p.fontWeight) || 900);
@@ -41,7 +41,7 @@ const T: React.FC<React.SVGProps<SVGTextElement> & {maxW?: number}> = ({maxW, ch
   const fit = maxW && w > maxW ? {fontSize: fs * maxW / w} : {};
   return <text {...p} {...fit}>{children}</text>;
 };
-const Caption: React.FC<{text: string; y?: number; o?: number}> = ({text, y = 1260, o = 1}) => (
+export const Caption: React.FC<{text: string; y?: number; o?: number}> = ({text, y = 1260, o = 1}) => (
   <T maxW={900} x={540} y={y} textAnchor="middle" fontFamily={F} fontWeight={700} fontSize={30} fill={P.ink} opacity={0.7 * o}>{text}</T>
 );
 
@@ -65,7 +65,7 @@ export const MiniZina: React.FC<{x?: number; y?: number; s?: number; e?: Partial
 );
 
 // телефон: корпус + экран (children рисуются в координатах экрана, центр 0,0, экран 368×688)
-const Phone: React.FC<{x: number; y: number; s?: number; rot?: number; children?: React.ReactNode; dark?: boolean}> = ({x, y, s = 1, rot = 0, children, dark}) => (
+export const Phone: React.FC<{x: number; y: number; s?: number; rot?: number; children?: React.ReactNode; dark?: boolean}> = ({x, y, s = 1, rot = 0, children, dark}) => (
   <g transform={`translate(${x},${y}) rotate(${rot}) scale(${s})`}>
     <rect x={-210} y={-380} width={420} height={760} rx={56} fill="#1D1A1F" stroke={P.ink} strokeWidth={12} />
     <rect x={-184} y={-344} width={368} height={688} rx={38} fill={dark ? '#2A2630' : P.cream} />
