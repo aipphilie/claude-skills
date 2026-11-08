@@ -48,3 +48,18 @@ python3 ne-tupi/chelovechek/grid.py out              # общий превью (
 ```
 
 Кадры 1080×1920 появятся в `out/kadry/<имя>/`, гифки в `out/gif/`, ролики в `out/mp4/`. Кадры в репозиторий не кладём, они собираются за минуту.
+
+## 3D-версия
+
+Тот же человечек в объёме (Three.js): капсулы по пропорциям 2D-рига, матово-чёрный, мягкая тень на белом.
+
+![3D](3d/pozy-3d.png)
+
+- `3d/index.html` — модель. В странице есть `window.pose({la, ra, head, mouth, yaw, lean, laF, raF, dy})`: углы рук как в 2D, `yaw` — поворот, `laF/raF` — вынос рук вперёд.
+- `3d/shot.js` — рендер поз в PNG через Playwright.
+- `3d/sheet.py` — лист поз и гифка поворота.
+
+```bash
+cd ne-tupi/chelovechek && python3 -m http.server 8777 &   # страница грузит three.js с CDN
+mkdir -p 3d/out && python3 3d/sheet.py
+```
