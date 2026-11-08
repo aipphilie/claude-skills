@@ -172,6 +172,13 @@ export const SVETA: Rider[] = [
   {name: 'В · каре, жакет', skin: '#E4B592', shade: '#C99673', headScale: 0.97, bodyScale: 0.92, jaw: 'narrow', hair: 'bob', hairColor: '#2E2420', clothes: 'jacket', c1: '#5E7FA0', c2: '#46627F', headphones: true, earrings: true, lashes: true, lips: true},
 ];
 
+// Влад, 19, студент (серия 7 «Подработка в прачечной»). Выбор — по листу VladSheet.
+export const VLAD: Rider[] = [
+  {name: 'А · лохматый, худи, наушники', skin: '#E7B996', shade: '#CC9A78', headScale: 1, bodyScale: 0.95, jaw: 'narrow', hair: 'messy', hairColor: '#2E2420', clothes: 'hoodie', c1: '#3A4656', c2: '#2A3442', headphones: true},
+  {name: 'Б · рыжий хохолок, худи', skin: '#F0C6A2', shade: '#D8A783', headScale: 1, bodyScale: 0.93, jaw: 'soft', hair: 'cowlick', hairColor: '#C07A3A', clothes: 'hoodie', c1: '#E07A3A', c2: '#B85E28', freckles: true},
+  {name: 'В · пробор, куртка', skin: '#E4B592', shade: '#C99673', headScale: 1, bodyScale: 0.96, jaw: 'narrow', hair: 'sidepart', hairColor: '#5A3B28', clothes: 'jacket', c1: '#5E8A7A', c2: '#46705F', headphones: true},
+];
+
 // Баба Зина, 68, бывшая учительница (серия 6 «Звонок из службы безопасности»). По умолчанию вариант А, выбор — по листу ZinaSheet.
 export const ZINA: Rider[] = [
   {name: 'А · седой пучок, кофта', skin: '#EBC3A4', shade: '#D2A486', headScale: 1, bodyScale: 1, jaw: 'round', hair: 'bun', hairColor: '#D9D4CF', clothes: 'cardigan', c1: '#7E6BA0', c2: '#5E4E7E', glasses: true, beads: true, wrinkles: true, earrings: true},
