@@ -210,7 +210,7 @@ def sc_void(G, t, cx=440):
     if g > 0:
         cloud(G, cx, 545, 0.25 + 0.55 * eo(g), wob=t)
         bolt(G, cx + 10, 560, back((t - T['doris'] - 0.7) / 0.25) * 0.9)
-    plate(G, t, T['strash'] - 0.3, 'САМЫЙ СТРАШНЫЙ', cx - 130, 820, 52, RED, WHITE, rot=-3)
+    plate(G, t, T['strash'] - 0.3, 'САМЫЙ СТРАШНЫЙ', cx - 20, 820, 44, RED, WHITE, rot=-3)
 def sc_meta(G, t):
     d = card(G, 700, 400, 440, 520, k=back((t - B[9]) / 0.28))
     if t >= B[9] + 0.25:
