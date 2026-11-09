@@ -42,9 +42,9 @@
 
 ```bash
 pip install cairosvg            # плюс ffmpeg в системе
-python3 ne-tupi/chelovechek/anim.py out              # все анимации
-python3 ne-tupi/chelovechek/anim.py out kivok mashet # только выбранные
-python3 ne-tupi/chelovechek/grid.py out              # общий превью (после anim.py)
+python3 ne-tupi/anim.py out              # все анимации
+python3 ne-tupi/anim.py out kivok mashet # только выбранные
+python3 ne-tupi/grid.py out              # общий превью (после anim.py)
 ```
 
 Кадры 1080×1920 появятся в `out/kadry/<имя>/`, гифки в `out/gif/`, ролики в `out/mp4/`. Кадры в репозиторий не кладём, они собираются за минуту.
