@@ -57,7 +57,7 @@ personal finance, money tips, budgeting, how to save money, saving money, coffee
 ```
 Зарплата:
 ```
-personal finance, money tips, budgeting, how to save money, saving money, paycheck, pay yourself first, paycheck to paycheck, automatic savings, how to budget, emergency fund, financial literacy, money mistakes, money saving tips
+personal finance, money tips, budgeting, how to save money, saving money, paycheck, pay yourself first, paycheck to paycheck, money management, how to budget, emergency fund, financial literacy, money mistakes, money saving tips
 ```
 Первые 200 знаков описания теперь начинаются с ключевых слов (personal finance, budgeting, save money), это то, на что ругался vidIQ.
 
