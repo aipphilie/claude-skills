@@ -43,5 +43,5 @@ def banner(out, guides=False):
     svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}">{"".join(parts)}</svg>'
     cairosvg.svg2png(bytestring=svg.encode(), write_to=out)
 
-banner(os.path.join(HERE, "banner-2560x1440.png"))
+banner(os.path.join(HERE, "banner-v2-2560x1440.png"))
 banner(os.path.join(HERE, "banner-guides.png"), guides=True)
