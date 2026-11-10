@@ -101,7 +101,7 @@ Ne Tupi, personal finance, money habits, self improvement, bad habits, procrasti
 
 | Куда | Файл | Размер |
 |---|---|---|
-| Фото профиля | `../avatarki/avatarka-final.png` (аватарка №5 на белом, как в Instagram) | 1080×1080 |
+| Фото профиля | `avatarka-yt-800.png` (аватарка №5, кадр подогнан под круг YouTube) | 800×800 |
 | Баннер (шапка) | `banner-2048x1152.png` (запасной `banner-v2-2560x1440.png`) | 2048×1152, до 6 МБ, текст и человечек в зоне, которую видно на телефоне (проверка: `banner-guides.png`, `preview-phone.png`) |
 | Водяной знак | `watermark-300.png` | 300×300, в видео работает как кнопка «Подписаться», показывать «на протяжении всего видео» |
 
