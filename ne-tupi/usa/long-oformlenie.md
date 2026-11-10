@@ -122,7 +122,7 @@ What's the last thing you said yes to only because saying no felt awkward? I'll 
 
 ---
 
-## 3. «Тебе 30, и ты не знаешь, чего хочешь» — ne-znayu-chego-hochu (рендер после озвучки последних глав)
+## 3. «Тебе 30, и ты не знаешь, чего хочешь» — ne-znayu-chego-hochu/render/ne-znayu-chego-hochu-en-v1.mp4 (10:18)
 
 **Обложка:** ★ `cover-ne-znayu-a-stop-looking.png` (STOP LOOKING) / `cover-ne-znayu-c-too-late.png` (TOO LATE?) / запасная `cover-ne-znayu-b-wrong-move.png` (WRONG MOVE)
 
@@ -138,7 +138,16 @@ Don't know what you want to do with your life at 30? How to find your passion, h
 
 It's Sunday night, work tomorrow, and the same question again: is this really my life? In this video: why passion is grown, not found, why a hundred options keep you stuck, which choices you made at twenty, whose dreams you're chasing, and how to try new things without going broke.
 
-ТАЙМКОДЫ: впишу по готовой озвучке (главы: The passion myth, A hundred roads, What you did at twenty, Whose dream is this?, Why you don't want anything, It's too late, You do first then you want, How to try without going broke, Your plan for today)
+00:00 Is this really my life?
+00:29 The passion myth
+01:40 A hundred roads
+02:42 What you did at twenty
+03:48 Whose dream is this?
+04:44 Why you don't want anything
+06:02 "It's too late"
+07:05 You do first, then you want
+08:15 How to try without going broke
+09:21 Your plan for today
 
 Your plan for today: write down three things you'd like to try and pick one for a one-month experiment. Not the perfect one. Any one.
 
