@@ -36,10 +36,21 @@
 - **Тебе 30:** «поступил куда прошёл по баллам» → "picked a major based on where you got in"; убрана армия; «одноклассница в сторис» → "high school classmate posts the ocean on Instagram".
 
 ## Готовые рендеры
-- «Кофе» EN v1: /mnt/project-files/ne-tupi-usa/kofe/render/kofe-en-v1.mp4 (62 сек), код kofe/kod/.
-- «Зарплата» EN v1: /mnt/project-files/ne-tupi-usa/zarplata/render/zarplata-en-v1.mp4 (51 сек), код zarplata/kod/ (без жидкого стекла).
-- Оформление Shorts, названия и описания: [shorts-oformlenie.md](shorts-oformlenie.md).
-- Код запускается как русские рилсы: tts.py → track.py → node 3d/frames.js track.json kadry flat 1080 1920 (http.server 8777) → mix → compose → склейка.
+Все рендеры лежат в /mnt/project-files/ne-tupi-usa/<ролик>/render/<ролик>-en-v1.mp4, обложки в /mnt/project-files/ne-tupi-usa/<ролик>/oblozhka/.
+
+| Ролик | Длина | Код монтажа | Обложки (код) |
+|---|---|---|---|
+| Кофе | 62 сек | kofe/kod/ | oblozhka/cover_en.py |
+| Зарплата | 51 сек | zarplata/kod/ (без жидкого стекла) | oblozhka/cover_en.py |
+| Я выгорел | 57 сек | vygoranie/kod/ | oblozhka/vygoranie/ |
+| Он не ответил | 72 сек | ne-otvetil/kod/ | oblozhka/ne-otvetil/ |
+| Извините | 53 сек | izvinite/kod/ | oblozhka/izvinite/ |
+| Работа | 68 сек | rabota/kod/ | oblozhka/rabota/ |
+
+- Shorts до 3 минут YouTube принимает, так что 68–72 сек проходят как Shorts.
+- Оформление Shorts, названия, описания и теги: [shorts-oformlenie.md](shorts-oformlenie.md).
+- Код запускается как русские рилсы: tts.py → words.py → track.py → node 3d/frames.js track.json kadry flat 1080 1920 (http.server 8777) → mix.py → compose.py → склейка ffmpeg.
+- Что заменено в коде монтажа по сравнению с русской версией: якоря (слова, по которым появляется графика) ищутся в английской озвучке, все надписи на английском, плашки «Стоп» и «Не тупи» по-английски, жидкое стекло убрано, звуки ×0.5.
 
 ## Статус
 - Голос: ElevenLabs Grant `QvlD90AkjGTCqc9685Rq` (американский), eleven_v3.

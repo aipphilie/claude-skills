@@ -62,3 +62,91 @@ personal finance, money tips, budgeting, how to save money, saving money, payche
 Первые 200 знаков описания теперь начинаются с ключевых слов (personal finance, budgeting, save money), это то, на что ругался vidIQ.
 
 Источники: hashtagtools.io/blog/youtube-shorts-hashtags-title-vs-description-2026, touhfa.art/blog/seo/youtube-hashtags-guide, metadatareactor.com/blog/youtube-shorts-seo-guide, joinbrands.com/blog/youtube-shorts-best-practices.
+
+---
+
+## Остальные Shorts (сделаны 2026-11-11, по той же схеме: теги из первых 200 знаков описания, слабые теги не берём)
+
+### 3. «Я выгорел» — vygoranie/render/vygoranie-en-v1.mp4
+Обложка: **VACATION WON'T HELP** (cover-vygoranie-a-vacation-wont-help.png), запасная RUNNING ON EMPTY.
+
+**Название:**
+```
+Why a Vacation Won't Fix Your Burnout
+```
+(«Почему отпуск не вылечит выгорание»)
+
+**Описание:**
+```
+Burnout recovery and work life balance: why a vacation won't fix burnout, and 3 rules that actually help. Mental health tip: mute the work chat after 7, take one day off work a week, and sleep every night.
+
+#burnout #mentalhealth #worklifebalance #selfcare #shorts
+```
+
+**Теги:**
+```
+burnout, burnout recovery, work life balance, mental health, self care, stress relief, how to avoid burnout, work stress, sleep, productivity tips, mental health tips, wellness, healthy habits, job burnout
+```
+
+### 4. «Он не ответил» — ne-otvetil/render/ne-otvetil-en-v1.mp4
+Обложка: **HE WAS JUST AT LUNCH** (cover-ne-otvetil-a-at-lunch.png), запасная READ. NO REPLY.
+
+**Название:**
+```
+Left on Read? Your Brain Is Lying to You
+```
+(«Оставили на "прочитано"? Мозг тебе врёт»)
+
+**Описание:**
+```
+Left on read and overthinking it? Anxiety psychology: your brain hates a blank and fills it with the worst story. 3 steps to stop overthinking a text: separate facts, find boring reasons, and just ask.
+
+#overthinking #anxiety #psychology #relationships #shorts
+```
+
+**Теги:**
+```
+overthinking, anxiety, psychology, left on read, relationship advice, how to stop overthinking, anxiety tips, texting, dating advice, mental health, communication, psychology facts, self improvement, relationships
+```
+
+### 5. «Извините, что беспокою» — izvinite/render/izvinite-en-v1.mp4
+Обложка: **STOP SAYING SORRY** (cover-izvinite-a-stop-saying-sorry.png), запасная SORRY... FOR WHAT?
+
+**Название:**
+```
+Why You Should Stop Saying Sorry So Much
+```
+(«Почему пора перестать постоянно извиняться»)
+
+**Описание:**
+```
+Stop saying sorry: communication skills and confidence tips. Over-apologizing sounds like "I'm in your way." Swap "sorry" for "thank you," and apologize only when you actually messed up.
+
+#communication #confidence #selfimprovement #psychology #shorts
+```
+
+**Теги:**
+```
+stop saying sorry, communication skills, confidence, self improvement, over apologizing, how to be confident, people pleasing, assertiveness, psychology, workplace communication, self esteem, soft skills, communication tips, personal growth
+```
+
+### 6. «Почему не уходишь с работы» — rabota/render/rabota-en-v1.mp4
+Обложка: **THE DOOR IS OPEN** (cover-rabota-a-door-is-open.png), запасная I HATE IT, BUT I GO.
+
+**Название:**
+```
+Why You Don't Quit the Job You Hate
+```
+(«Почему ты не уходишь с работы, которую ненавидишь»)
+
+**Описание:**
+```
+Hate your job but can't quit? Career advice from psychology: learned helplessness explained (Seligman and Maier, 1967 and 2016). How to quit your job the smart way: one small step a week, and leave only when you know where.
+
+#careeradvice #psychology #jobsearch #learnedhelplessness #shorts
+```
+
+**Теги:**
+```
+career advice, psychology, learned helplessness, hate my job, how to quit your job, job search, career change, motivation, self improvement, psychology facts, mental health, work life, job hunting, career tips
+```
