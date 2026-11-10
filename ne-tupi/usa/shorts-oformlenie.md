@@ -51,11 +51,11 @@ How to save money from every paycheck: pay yourself first. Broke three days afte
 
 Кофе:
 ```
-personal finance, money tips, budgeting, how to save money, saving money, coffee, latte factor, credit card debt, credit card interest, spending habits, budget tips, frugal living, financial literacy, money mistakes
+personal finance, money tips, budgeting, how to save money, saving money, coffee, money saving tips, credit card debt, credit card interest, spending habits, how to budget, frugal living, financial literacy, money mistakes
 ```
 Зарплата:
 ```
-personal finance, money tips, budgeting, how to save money, saving money, paycheck, pay yourself first, paycheck to paycheck, automatic savings, budget tips, emergency fund, financial literacy, money mistakes, spending habits
+personal finance, money tips, budgeting, how to save money, saving money, paycheck, pay yourself first, paycheck to paycheck, automatic savings, how to budget, emergency fund, financial literacy, money mistakes, money saving tips
 ```
 Первые 200 знаков описания теперь начинаются с ключевых слов (personal finance, budgeting, save money), это то, на что ругался vidIQ.
 
