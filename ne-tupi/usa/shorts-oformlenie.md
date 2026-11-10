@@ -41,7 +41,9 @@ Where Does Your Paycheck Go?
 
 **Описание (Description):**
 ```
-How to save money from every paycheck: pay yourself first. Broke three days after payday? It's not your salary, it's the order you spend it in. Set up an automatic transfer to savings on payday.
+Personal finance and money tips: how to save money when you live paycheck to paycheck. Pay yourself first. Budgeting starts on payday: set up automatic savings before you spend a dollar.
+
+Broke three days after payday? It's not your salary, it's the order you spend it in.
 
 #personalfinance #paycheck #savingmoney #moneytips #shorts
 ```
