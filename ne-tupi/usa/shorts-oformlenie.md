@@ -25,7 +25,7 @@ It's Not Your Coffee Making You Broke
 
 **Описание (Description):**
 ```
-Everyone says skip the latte to get rich. Do the math: the real money leaks are Uber, takeout, and credit card interest. Here's how to find yours in 2 minutes.
+Personal finance tip: is coffee really making you broke? Budgeting math says no. Your real money leaks are Uber, takeout, and credit card interest. Here's how to save money: check your spending by category.
 
 #personalfinance #moneytips #budgeting #savingmoney #shorts
 ```
@@ -41,12 +41,22 @@ Where Does Your Paycheck Go?
 
 **Описание (Description):**
 ```
-Broke three days after payday? It's not your salary, it's the order you spend it in. Pay yourself first: set up an automatic transfer to savings on payday.
+How to save money from every paycheck: pay yourself first. Broke three days after payday? It's not your salary, it's the order you spend it in. Set up an automatic transfer to savings on payday.
 
 #personalfinance #paycheck #savingmoney #moneytips #shorts
 ```
 («Пусто через три дня после зарплаты? Дело не в размере, а в порядке трат. Сначала заплати себе: поставь автоперевод на сбережения в день зарплаты.»)
 
-**Теги для обоих (по желанию):** personal finance, money tips, budgeting, saving money
+**Теги (поле «Теги» в Studio, через запятую, vidIQ хочет от 10):**
+
+Кофе:
+```
+personal finance, money tips, budgeting, how to save money, saving money, coffee, latte factor, credit card debt, credit card interest, spending habits, budget tips, frugal living, financial literacy, money mistakes
+```
+Зарплата:
+```
+personal finance, money tips, budgeting, how to save money, saving money, paycheck, pay yourself first, paycheck to paycheck, automatic savings, budget tips, emergency fund, financial literacy, money mistakes, spending habits
+```
+Первые 200 знаков описания теперь начинаются с ключевых слов (personal finance, budgeting, save money), это то, на что ругался vidIQ.
 
 Источники: hashtagtools.io/blog/youtube-shorts-hashtags-title-vs-description-2026, touhfa.art/blog/seo/youtube-hashtags-guide, metadatareactor.com/blog/youtube-shorts-seo-guide, joinbrands.com/blog/youtube-shorts-best-practices.
