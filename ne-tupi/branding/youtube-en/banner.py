@@ -8,7 +8,6 @@ W, H = 2560, 1440
 SX, SY, SW, SH = (W - 1546) // 2, (H - 423) // 2, 1546, 423   # safe area (all devices)
 YEL, INK = "#FFD60A", "#111111"
 NAME = "NE TUPI"
-GLOSS = "Russian for &#8220;don&#8217;t be dumb&#8221;"
 TAG1 = "Your personal life assistant."
 TAG2 = "Money. Habits. Your head."
 
@@ -20,7 +19,7 @@ def fig(x, y, h, **pose):
 def banner(out, guides=False):
     words = NAME.rsplit(" ", 1)
     fs = 170
-    tx, ty = SX + 20, SY + 150
+    tx, ty = SX + 20, SY + 175
     # yellow marker behind the last word
     from PIL import ImageFont
     f = ImageFont.truetype("/usr/share/fonts/opentype/inter/Inter-Black.otf", fs)
@@ -35,9 +34,8 @@ def banner(out, guides=False):
         f'<circle cx="{SX+SW+180}" cy="{SY+20}" r="12" fill="{INK}"/>',
         f'<rect x="{tx+first_w-14}" y="{ty-fs*0.62}" width="{last_w+28}" height="{fs*0.78}" rx="10" fill="{YEL}"/>',
         f'<text x="{tx}" y="{ty}" font-family="Inter" font-weight="900" font-size="{fs}" fill="{INK}" letter-spacing="-3">{NAME}</text>',
-        f'<text x="{tx+6}" y="{ty+62}" font-family="Inter" font-style="italic" font-weight="500" font-size="40" fill="#777">{GLOSS}</text>',
-        f'<text x="{tx+4}" y="{ty+165}" font-family="Inter" font-weight="800" font-size="62" fill="{INK}">{TAG1}</text>',
-        f'<text x="{tx+4}" y="{ty+240}" font-family="Inter" font-weight="500" font-size="54" fill="#555">{TAG2}</text>',
+        f'<text x="{tx+4}" y="{ty+125}" font-family="Inter" font-weight="800" font-size="62" fill="{INK}">{TAG1}</text>',
+        f'<text x="{tx+4}" y="{ty+200}" font-family="Inter" font-weight="500" font-size="54" fill="#555">{TAG2}</text>',
         fig(SX + SW - 330, SY + 16, 395, mouth="smile", la=(98, -6), ra=(20, 2), head=6),
     ]
     if guides:

@@ -1,6 +1,6 @@
 # Ne Tupi — YouTube channel setup (English, US audience)
 
-Name stays **Ne Tupi** (approved 2026-11-10). It is explained everywhere as *Russian for "don't be dumb"*.
+Name stays **Ne Tupi** (approved 2026-11-10). The banner has no "Russian for..." line; the explanation lives only in the description.
 Style: black-and-white on white, yellow accent #FFD60A, the black figure with only a mouth. No Liquid Glass.
 
 ---
