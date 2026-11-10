@@ -35,6 +35,12 @@
 - **Не умеешь говорить нет:** «да ладно, неудобно» → "eh, it's fine, I don't want to be rude" / "eh, it's fine"; «косметика у знакомой» → leggings from a friend who's "just getting her business started" (узнаваемая в США тема MLM).
 - **Тебе 30:** «поступил куда прошёл по баллам» → "picked a major based on where you got in"; убрана армия; «одноклассница в сторис» → "high school classmate posts the ocean on Instagram".
 
+## Готовые рендеры
+- «Кофе» EN v1: /mnt/project-files/ne-tupi-usa/kofe/render/kofe-en-v1.mp4 (62 сек), код kofe/kod/.
+- «Зарплата» EN v1: /mnt/project-files/ne-tupi-usa/zarplata/render/zarplata-en-v1.mp4 (51 сек), код zarplata/kod/ (без жидкого стекла).
+- Оформление Shorts, названия и описания: [shorts-oformlenie.md](shorts-oformlenie.md).
+- Код запускается как русские рилсы: tts.py → track.py → node 3d/frames.js track.json kadry flat 1080 1920 (http.server 8777) → mix → compose → склейка.
+
 ## Статус
 - Голос: ElevenLabs Grant `QvlD90AkjGTCqc9685Rq` (американский), eleven_v3.
 - Правило: все будущие ролики сразу адаптируются под США, при несостыковке уточняем у Ярослава (см. PRAVILA.md).
