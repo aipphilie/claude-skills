@@ -18,7 +18,7 @@ ev = [('pop', 0.15, 0.35), ('pop', T['zavtra'], 0.4), ('pop', T['dumaesh'], 0.4)
 inp = ['-i', 'voice.mp3']; fl = []; lab = ['[0:a]']
 for k, (n, t, v) in enumerate(ev):
     inp += ['-i', f'sfx/{n}.mp3']; ms = int(max(0, t) * 1000)
-    fl.append(f'[{k+1}:a]volume={v},adelay={ms}|{ms}[s{k}]'); lab.append(f'[s{k}]')
+    fl.append(f'[{k+1}:a]volume={v*0.5},adelay={ms}|{ms}[s{k}]'); lab.append(f'[s{k}]')
 fl.append(''.join(lab) + f'amix=inputs={len(lab)}:normalize=0,apad,atrim=0:{DUR},loudnorm=I=-14:TP=-1.5[out]')
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error'] + inp + ['-filter_complex', ';'.join(fl), '-map', '[out]', '-ar', '44100', '-c:a', 'aac', '-b:a', '192k', 'mix.m4a'], check=True)
 print('ok', DUR)
