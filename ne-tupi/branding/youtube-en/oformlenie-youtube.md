@@ -74,13 +74,13 @@ Business: [email]
 
 Где: YouTube Studio → Настройки → Канал → Основная информация → Ключевые слова.
 
-Вставить одной строкой (меньше лимита в 500 знаков, кавычки держат фразы вместе):
+Вставить одной строкой, через запятую, без кавычек (177 знаков; длинный вариант с кавычками YouTube не принял):
 
 ```
-"Ne Tupi" "personal finance" "money habits" "self improvement" "bad habits" "how to stop procrastinating" "procrastination" "dopamine detox" "phone addiction" "saving money" "budgeting for beginners" "psychology explained" "why you can't save money" "motivation" "productivity" "life advice" "adulting" "stop wasting money" "habits" "mindset" "animated explainer"
+Ne Tupi, personal finance, money habits, self improvement, bad habits, procrastination, phone addiction, saving money, psychology, motivation, productivity, life advice, mindset
 ```
 
-**Перевод:** личные финансы, денежные привычки, саморазвитие, плохие привычки, как перестать откладывать, прокрастинация, дофаминовый детокс, зависимость от телефона, как копить деньги, бюджет для новичков, психология простыми словами, почему не получается копить, мотивация, продуктивность, советы по жизни, взрослая жизнь, перестать сливать деньги, привычки, мышление, анимированные объяснялки.
+**Перевод:** Не тупи, личные финансы, денежные привычки, саморазвитие, плохие привычки, прокрастинация, зависимость от телефона, как копить деньги, психология, мотивация, продуктивность, советы по жизни, мышление.
 
 ---
 
