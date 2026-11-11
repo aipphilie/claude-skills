@@ -23,7 +23,7 @@ Why You're Still Broke After a Raise
 
 **Описание (Description):**
 ```
-Lifestyle inflation is why you're broke after a raise. Personal finance and money psychology: where your money goes, and how to save money with one simple rule before your next raise arrives.
+Lifestyle inflation is why you're broke after a raise. Personal finance, money psychology, budgeting: how to save money, avoid money mistakes, and keep your next raise with one simple rule.
 
 You got a raise, and the night before payday your bank app still says zero. In this video: why the joy of a raise fades in a few months, how your neighbors spend your money, why paying by card makes you spend more, and what you're really buying with every raise.
 
@@ -56,7 +56,7 @@ This is not investment advice.
 
 **Теги:**
 ```
-lifestyle inflation, personal finance, money psychology, how to save money, broke after a raise, where does my money go, paycheck to paycheck, save more tomorrow, psychology of money, hedonic treadmill, spending habits, emergency fund, financial literacy, money tips
+lifestyle inflation, personal finance, money psychology, how to save money, psychology of money, hedonic treadmill, emergency fund, financial literacy, money tips, budgeting, money management, how to budget, saving money, money mistakes
 ```
 
 **Закреп-комментарий:**
