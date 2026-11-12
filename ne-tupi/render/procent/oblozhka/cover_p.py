@@ -18,9 +18,9 @@ def ptext(d, cx, y, s, sz, bg=None, fg=INK, rot=0, img=None):
         p = p.rotate(rot, Image.BICUBIC, expand=True); img.paste(p, (int(cx - p.width / 2), int(y)), p)
     else: d.text((cx, y), s, font=f, fill=fg, anchor='ma')
 def mountain(img, top=1350, gnd=1700, sx=430):
-    d = ImageDraw.Draw(img); pts = [(-10, gnd), (sx, top), (W + 10, gnd + 60)]
-    d.polygon(pts + [(W + 10, H), (-10, H)], fill=(232, 229, 223)); d.line(pts, fill=INK, width=10, joint='curve')
-    return lambda x: gnd - (gnd - top) * x / sx if x <= sx else top + (gnd + 60 - top) * (x - sx) / (W - sx)
+    d = ImageDraw.Draw(img); rgnd = gnd + 60
+    C.draw_mountain(d, lambda x, y: (int(x), int(y)), (-10, gnd + 10 * (gnd - top) / sx), (sx, top), (W + 10, rgnd), H, 10, sun=True)
+    return lambda x: gnd - (gnd - top) * x / sx if x <= sx else top + (rgnd - top) * (x - sx) / (W - sx)
 def coinp(img, cx, cy, r, lab, rot=0):
     im = C.coin_img(r, lab, rot); img.paste(im, (int(cx - im.width / 2), int(cy - im.height / 2)), im)
 

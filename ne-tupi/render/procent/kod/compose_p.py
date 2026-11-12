@@ -2,11 +2,11 @@
 Палитра: белый / оранжевый / чёрный / красный."""
 import json, math, os, sys, subprocess, numpy as np
 from functools import lru_cache
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from words import W, B, END, DUR
 from tm import T
 FPS = 24; N = int(DUR * FPS); WD, HT = 1080, 1920; SS = 2
-BG = (244, 242, 238); OR = (255, 122, 0); ORL = (255, 214, 170); RED = (226, 45, 45); INK = (17, 17, 17); WHITE = (255, 255, 255)
+YEL = (255, 214, 10); BG = (244, 242, 238); OR = (255, 122, 0); ORL = (255, 214, 170); RED = (226, 45, 45); INK = (17, 17, 17); WHITE = (255, 255, 255)
 GREY = (150, 150, 150); LG = (232, 229, 223); OWN = (38, 38, 38)
 FB = '/usr/share/fonts/opentype/inter/Inter-Black.otf'; FX = '/usr/share/fonts/opentype/inter/Inter-ExtraBold.otf'
 @lru_cache(None)
@@ -97,7 +97,7 @@ def dashed(d, p0, p1, k, col=RED, w=7, dash=22, gap=14):
         e = min(L, s + dash); d.line([S(p0[0] + ux * s), S(p0[1] + uy * s), S(p0[0] + ux * e), S(p0[1] + uy * e)], fill=col, width=S(w)); s += dash + gap
 
 # ---------------- раскладка кадра ----------------
-CX0, CY0, CW, CH = 50, 452, 880, 712          # карточка (справа 150 px — зона кнопок Reels)
+CX0, CY0, CW, CH = 100, 452, 880, 712          # карточка (справа 150 px — зона кнопок Reels)
 SUB_Y = 1236; NOTE_Y = 1462                   # субтитры, нижняя плашка-сноска (выше 390 px снизу)
 # график внутри карточки (локальные координаты)
 PX0, PX1, PY0, PY1 = 110, 846, 178, 500
@@ -171,10 +171,38 @@ def chips(G, t, vals, t0=0):
 SUMX, SUMY, GND = 440, 300, 640
 def slope(x):  # высота склона в точке x (локально)
     return GND - (GND - SUMY) * (x / SUMX if x <= SUMX else (CW - x) / (CW - SUMX))
+def draw_mountain(d, X, L, P, Rt, bottom, lw, sun=True):
+    """гора: солнце, дальние холмы, светлый и теневой склоны, снежная шапка, камни. X(x, y) — в пиксели холста."""
+    (lx, ly), (px, py), (rx, ry) = L, P, Rt; h = ly - py
+    def poly(pts, **kw): d.polygon([X(x, y) for x, y in pts], **kw)
+    if sun:
+        cx, cy, r = px + 230, py - 10, 70
+        (x0, y0), (x1, y1) = X(cx - r, cy - r), X(cx + r, cy + r); d.ellipse([x0, y0, x1, y1], fill=ORL)
+    far = [(lx - 40, ly - h * 0.2), (px - 330, py + h * 0.28), (px - 200, py + h * 0.5), (px - 90, py + h * 0.4), (px + 120, py + h * 0.62),
+           (px + 300, py + h * 0.22), (rx + 40, py + h * 0.5), (rx + 40, bottom), (lx - 40, bottom)]
+    poly(far, fill=(236, 232, 225)); d.line([X(x, y) for x, y in far[:7]], fill=(200, 195, 186), width=max(1, lw // 2), joint='curve')
+    for (cx_, cy_, w_) in ((px - 280, py - 150, 120), (px + 60, py - 210, 90)):   # облака
+        for (ox, oy, rr) in ((-0.35, 0.1, 0.28), (0, -0.08, 0.38), (0.35, 0.1, 0.28)):
+            (x0, y0), (x1, y1) = X(cx_ + ox * w_ - rr * w_, cy_ + oy * w_ - rr * w_), X(cx_ + ox * w_ + rr * w_, cy_ + oy * w_ + rr * w_)
+            d.ellipse([x0, y0, x1, y1], fill=(240, 238, 234))
+    poly([L, P, Rt, (rx, bottom), (lx, bottom)], fill=(228, 224, 216))
+    poly([P, Rt, (rx, bottom), (px + (rx - px) * 0.25, bottom), (px + (rx - px) * 0.05, py + h * 0.55)], fill=(206, 201, 191))
+    k = 0.24; a = (px + (lx - px) * k, py + h * k); b = (px + (rx - px) * k, py + (ry - py) * k)
+    zz = [a]
+    for j in range(1, 5):
+        u = j / 5; x = a[0] + (b[0] - a[0]) * u; y = a[1] + (b[1] - a[1]) * u + (h * 0.07 if j % 2 else -h * 0.02)
+        zz.append((x, y))
+    poly([P, b] + zz[::-1][:-1] + [a], fill=WHITE)
+    d.line([X(x, y) for x, y in zz + [b]], fill=INK, width=max(1, lw // 2), joint='curve')
+    for (u, v, l) in ((0.55, 0.62, 40), (0.35, 0.8, 30), (0.7, 0.45, 26)):
+        x = lx + (px - lx) * u + 30; y = ly - (ly - py) * u + 40 * v + 30
+        d.line([X(x, y), X(x + l, y - l * 0.35)], fill=(150, 145, 136), width=max(1, lw // 2))
+        x2 = px + (rx - px) * (1 - u) * 0.9 + 40; y2 = py + (ry - py) * (1 - u) * 0.9 + 60
+        d.line([X(x2, y2), X(x2 + l, y2 + l * 0.3)], fill=(150, 145, 136), width=max(1, lw // 2))
+    d.line([X(*L), X(*P), X(*Rt)], fill=INK, width=lw, joint='curve')
 def mountain(G):
-    d = ImageDraw.Draw(G); pts = [(-10, GND + 5), (SUMX, SUMY), (CW + 10, GND + 5)]
-    d.polygon([(S(x), S(y)) for x, y in pts + [(CW + 10, CH + 10), (-10, CH + 10)]], fill=LG)
-    d.line([(S(x), S(y)) for x, y in pts], fill=INK, width=S(6), joint='curve')
+    d = ImageDraw.Draw(G)
+    draw_mountain(d, lambda x, y: (S(x), S(y)), (-10, slope(-10)), (SUMX, SUMY), (CW + 10, slope(CW + 10)), CH + 10, S(6))
 
 # ---------------- сцены карточки: рисуют в G (локально, 2x), возвращают позицию персонажа (x, ноги, масштаб) локально ----------------
 CHS = 0.13
@@ -191,7 +219,7 @@ def sc_hook(G, t, i):
     if k > 0.05: paste(G, plate_img('8 МЕС', 56, WHITE, OR, pad=0), CW - 105, 92, k)
     # монета 10 МЛН катится вниз по правому склону, человечек едет сверху
     u = clamp((t - td) / (B[1] + 1.3 - td)); u = u * u * 0.85 + u * 0.15
-    x = SUMX + 10 + (CW - 190 - SUMX) * u; r = 92 + 18 * u
+    x = SUMX + 110 + (CW - 120 - SUMX - 110) * u; r = 74 + 16 * u
     ang = (x - SUMX) / CW * (CW - SUMX)
     # центр монеты над склоном по нормали
     nx, ny = math.sin(math.atan2(GND - SUMY, CW - SUMX)), math.cos(math.atan2(GND - SUMY, CW - SUMX))
@@ -200,7 +228,7 @@ def sc_hook(G, t, i):
         if u > 0.02 and u < 0.98:
             yy = cy - r * 0.5 + j * r * 0.5; d.line([S(cx - r - 40 - j * 20), S(yy - 30), S(cx - r - 110 - j * 20), S(yy - 60)], fill=GREY, width=S(5))
     coin(G, cx, cy, r, '10 МЛН', rot=-ang * 1.4)
-    return (cx, cy - r + 4, 0.17), None
+    return (cx, cy - r + 4, 0.15), None
 
 def sc_why(G, t, i):
     st = sc_hook(G, t, i)
@@ -339,7 +367,7 @@ def sc_cta(G, t, i):
     return (tip[0] - 2, tip[1], CHS), None
 
 def sc_final(G, t, i):
-    plate(G, t, T['netupi'] - 0.3, 'ВСЁ.\nНЕ ТУПИ', 440, 150, 80, OR, INK, rot=-4)
+    plate(G, t, T['netupi'] - 0.3, 'ВСЁ.\nНЕ ТУПИ', 440, 150, 80, YEL, INK, rot=-4)
     return (440, 660, 0.24), None
 
 SCENES = [sc_hook, sc_why, sc_setup, sc_line, sc_stop, sc_count, sc_snow, sc_count, sc_count, sc_pie, sc_month, sc_twist, sc_cta, sc_final]
@@ -350,7 +378,7 @@ CARD_CHANGE = [B[2], B[5], B[6], B[7], B[9], B[10], B[11], B[12], B[13]]
 def header(img, t):
     G = Image.new('RGBA', (WD * SS, 220 * SS), (0, 0, 0, 0)); d = ImageDraw.Draw(G)
     text(d, (WD / 2, 6), 'ПЕРВЫЙ МИЛЛИОН', 62, INK, True, 'ma')
-    paste(G, plate_img('И ДЕСЯТЫЙ', 58, OR, INK, pad=16), WD / 2, 112)
+    paste(G, plate_img('И ДЕСЯТЫЙ', 58, YEL, INK, pad=16), WD / 2, 112)
     L = line_of(t)
     tag = None
     if L == 3 and t >= T['tridcat'] - 0.1: tag = ('ПО ПРЯМОЙ — 30 ЛЕТ', WHITE, RED, RED, T['tridcat'] - 0.1)
@@ -380,11 +408,11 @@ def nir_img():
     im = plate_img('Не является индивидуальной инвестиционной рекомендацией', 23, WHITE, RED, pad=12, border=RED, ss=1)
     return im
 def bottom(img, t):
-    n = note_img(); img.paste(n, (int(490 - n.width / 2), NOTE_Y - n.height // 2), n)
+    n = note_img(); img.paste(n, (int(540 - n.width / 2), NOTE_Y - n.height // 2), n)
     if t < 5.0:
         a = 1 if t < 4.7 else (5.0 - t) / 0.3; m = nir_img().copy()
         if a < 1: m.putalpha(m.getchannel('A').point(lambda v: int(v * a)))
-        img.paste(m, (int(490 - m.width / 2), NOTE_Y - 42 - m.height), m)
+        img.paste(m, (int(540 - m.width / 2), NOTE_Y - 42 - m.height), m)
 
 # ---------------- субтитры ----------------
 SUBF = ImageFont.truetype(FB, 54); SP = 13; MAXW = 800
@@ -409,10 +437,10 @@ def subs(img, t, y0=SUB_Y):
     if not g: return
     d = ImageDraw.Draw(img); lines = wrap(g); y = y0 if len(lines) == 1 else y0 - 36
     for ln in lines:
-        ws = [wlen(w) for w in ln]; x = 490 - (sum(ws) + SP * (len(ws) - 1)) / 2
+        ws = [wlen(w) for w in ln]; x = 540 - (sum(ws) + SP * (len(ws) - 1)) / 2
         for w, wd in zip(ln, ws):
             on = w[1] <= t < w[2] + 0.15
-            if on: d.rounded_rectangle([x - 9, y - 6, x + wd + 9, y + 66], radius=12, fill=OR)
+            if on: d.rounded_rectangle([x - 9, y - 6, x + wd + 9, y + 66], radius=12, fill=YEL)
             d.text((x, y), w[0].upper().strip('«»'), font=SUBF, fill=INK)
             x += wd + SP
         y += 74
@@ -455,6 +483,7 @@ def frame(i):
     cx, feet, s = CX0 + dx + lx, CY0 + lf, ls
     x0, y0, cw, chh = char_box(i, cx, feet, s)
     ch = Image.open(f'kadry/main/{i:03d}.png').convert('RGB').crop(CH_CROP).resize((cw, chh), Image.LANCZOS)
+    if L == 6 and t < T['kom'] - 0.05: ch = ImageOps.mirror(ch)   # толкает ком лицом вперёд
     layer = Image.new('RGB', (WD, HT), WHITE); layer.paste(ch, (x0, y0))
     cl = Image.new('L', (WD, HT), 0); ImageDraw.Draw(cl).rounded_rectangle([CX0 + dx + 3, CY0 - 40, CX0 + dx + CW - 3, CY0 + CH - 3], radius=24, fill=255)
     layer = Image.composite(layer, Image.new('RGB', (WD, HT), WHITE), cl)
@@ -472,7 +501,7 @@ def frame(i):
             dd.ellipse([x - 6, y - 9, x + 6, y + 9], fill=(120, 170, 230))
     if L == 4:   # «Стоп» поверх всего
         G2 = Image.new('RGBA', (WD, HT), (0, 0, 0, 0))
-        plate(G2, t, T['stop'] - 0.05, 'СТОП.\nТУТ ТЫ ТУПИШЬ', 490, 780, 84, OR, INK, rot=-4, ss=1)
+        plate(G2, t, T['stop'] - 0.05, 'СТОП.\nТУТ ТЫ ТУПИШЬ', 540, 780, 84, YEL, INK, rot=-4, ss=1)
         img.paste(G2, (0, 0), G2)
     z = zoom(t)
     if z != 1:
