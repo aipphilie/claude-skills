@@ -286,14 +286,16 @@ def subs(img, t, y0):
 DF = ImageFont.truetype(FX, 25)
 def disclaimer(img, t):
     L = line_of(t)
-    lines = ['Не является индивидуальной инвестиционной рекомендацией']
-    if 11 <= L <= 14: lines = ['Расчёт условный: 12% годовых. Доходность не гарантирована.'] + lines
+    lines = []; a = 1.0
+    if t < 5.3: lines = ['Не является индивидуальной инвестиционной рекомендацией']; a = 1 - clamp((t - 5.0) / 0.3)   # первые 5 сек, потом гаснет
+    if 11 <= L <= 14: lines = ['Расчёт условный: 12% годовых. Доходность не гарантирована.']
+    if not lines or a <= 0: return
     ov = Image.new('RGBA', (WD, HT), (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
     y = 1528 - 32 * len(lines)
     for ln in lines:
         bb = d.textbbox((0, 0), ln, font=DF); w = bb[2] - bb[0]
-        d.rounded_rectangle([(WD - w) / 2 - 12, y - 3, (WD + w) / 2 + 12, y + 29], radius=8, fill=(255, 255, 255, 190))
-        d.text(((WD - w) / 2, y), ln, font=DF, fill=(110, 110, 110, 255)); y += 32
+        d.rounded_rectangle([(WD - w) / 2 - 12, y - 3, (WD + w) / 2 + 12, y + 29], radius=8, fill=(255, 255, 255, int(190 * a)))
+        d.text(((WD - w) / 2, y), ln, font=DF, fill=(110, 110, 110, int(255 * a))); y += 32
     img.paste(ov, (0, 0), ov)
 
 CH_CROP = (0, 60, 1080, 1660)
@@ -398,7 +400,7 @@ def frame(i):
     G = graphics(t)
     if gs != 1: G = G.resize((int(WD * gs), int(GH * gs)), Image.LANCZOS)
     bg.paste(G, (int((WD - G.width) / 2), int(gy)), G)
-    subs(bg, t, SUB_Y - (28 if 11 <= L <= 14 else 0))
+    subs(bg, t, SUB_Y)
     if L != 15:
         x0, y0, cw, chh = char_box(i, cx, feet, s)
         ch = Image.open(f'kadry/main/{i:03d}.png').convert('RGB').crop(CH_CROP).resize((cw, chh), Image.LANCZOS)
