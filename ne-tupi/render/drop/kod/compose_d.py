@@ -678,10 +678,10 @@ def depth(C, fn, u):
 SHIFT = 70   # сцены рисовались вокруг x=470; сдвиг ставит их строго по центру кадра (540)
 def center(C):
     out = Image.new('RGBA', (CW, CH)); out.paste(C, (SHIFT, 0))
-    bg = C.getpixel((0, 4)); ImageDraw.Draw(out).rectangle([0, 0, SHIFT, CH], fill=bg)
-    for y in range(FEET, FEET + 14):   # продлить линию пола, если она есть
-        p = C.getpixel((CW - 1, y))
-        if p != bg: ImageDraw.Draw(out).line([0, y, SHIFT, y], fill=p)
+    bg = C.getpixel((0, 4)); col = C.crop((0, 0, 1, CH)).load()
+    d = ImageDraw.Draw(out)
+    for y in range(CH):   # полоса = левый край сцены (пол, фон), без тёмных объектов
+        p = col[0, y]; d.line([0, y, SHIFT - 1, y], fill=bg if sum(p[:3]) < 200 else p)
     return out
 def card_of(j, t):
     sh = SHOTS[j]; u = max(0.0, t - sh['t']); tt = max(t, sh['t'])
