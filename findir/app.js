@@ -75,15 +75,24 @@ const GROUPS = {
   save:   { n: 'Будущее',     c: 'var(--c-save)',   hint: 'Подушка безопасности и инвестиции — платишь сначала себе' },
   income: { n: 'Доход',       c: 'var(--good)' },
 };
-const GROUP_RGB = { needs: '246,241,234', wants: '255,91,20', buffer: '255,181,71', save: '212,255,92', income: '212,255,92' };
+const soft = (c, p = 16) => `color-mix(in srgb, ${c} ${p}%, transparent)`;
 const catColor = k => GROUPS[(CATS[k] || CATS.other).g].c;
-const catBg = k => `rgba(${GROUP_RGB[(CATS[k] || CATS.other).g]},.16)`;
+const catBg = k => soft(catColor(k));
 
 const PRESETS = {
   '50-30-20': { n: '50/30/20', needs: .5, wants: .3, save: .2, d: 'Классика сенатора Элизабет Уоррен: 50% — необходимое, 30% — желания, 20% — будущее. Подходит большинству.' },
   '60-20-20': { n: '60/20/20', needs: .6, wants: .2, save: .2, d: 'Для большого города и дорогой аренды: больше на быт, накопления не трогаем.' },
   '70-20-10': { n: '70/20/10', needs: .7, wants: .2, save: .1, d: 'Мягкий старт, если доход пока небольшой. Цель — со временем перейти на 50/30/20.' },
   '50-20-30': { n: '50/20/30', needs: .5, wants: .2, save: .3, d: 'Ускоренный: треть дохода в капитал. Для тех, кто строит финансовую независимость.' },
+};
+const PALETTES = {
+  orange: { n: 'Оранж',   bg: '#050505', ac: '#ff5b14' },
+  lime:   { n: 'Кислота', bg: '#050505', ac: '#c8ff2e' },
+  blue:   { n: 'Электрик', bg: '#04060d', ac: '#4d7cff' },
+  pink:   { n: 'Фуксия',  bg: '#070406', ac: '#ff2e88' },
+  mint:   { n: 'Деньги',  bg: '#030806', ac: '#1fe08f' },
+  mono:   { n: 'Монохром', bg: '#050505', ac: '#f6f1ea' },
+  paper:  { n: 'Бумага',  bg: '#f2eee6', ac: '#ff5b14', light: true },
 };
 const RISK = {
   cons: { n: 'Спокойный',     rate: .10, shift: -20 },
@@ -100,7 +109,7 @@ const defaultState = () => ({
     name: (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) || '',
     salary: 120000, extra: 0, advPct: 40, advDay: 20, salDay: 5,
     rent: 35000, age: 28, fundMonths: 6, emergency: 0, invested: 0,
-    preset: '50-30-20', risk: 'mod', hours: 168, impulsePct: 3, theme: 'auto', inflation: 7,
+    preset: '50-30-20', risk: 'mod', hours: 168, impulsePct: 3, theme: 'auto', inflation: 7, palette: 'orange',
   },
   tx: [], wishes: [], willpower: 0, proj: { years: 10, monthly: null, real: false },
 });
@@ -368,7 +377,7 @@ function vHome() {
   const pay = nextPayment(), al = payAllocation(pay.amount, P);
   const spentPct = P.spendPlan ? m.spent / P.spendPlan : 0;
   const tips = insights(T);
-  const toneBg = { good: 'rgba(212,255,92,.12)', warn: 'rgba(255,181,71,.14)', bad: 'rgba(255,77,77,.14)', info: 'rgba(255,91,20,.14)' };
+  const toneBg = { good: 'color-mix(in srgb, var(--good) 14%, transparent)', warn: 'color-mix(in srgb, var(--warn) 14%, transparent)', bad: 'color-mix(in srgb, var(--bad) 14%, transparent)', info: 'var(--accent-soft)' };
   const toneFg = { good: 'var(--good)', warn: 'var(--warn)', bad: 'var(--bad)', info: 'var(--accent)' };
   const recent = S.tx.slice().sort((a, b) => b.date.localeCompare(a.date) || b.ts - a.ts).slice(0, 5);
   return `<section class="screen stack">
@@ -437,12 +446,12 @@ function vBudget() {
         ${donut(['needs', 'wants', 'buffer', 'save'].map(g => ({ v: P.groups[g], c: GROUPS[g].c })), `<span class="tiny muted">Доход</span><b>${short(P.income)}</b>`)}
         <div class="legend">${['needs', 'wants', 'buffer', 'save'].map(g => `<div class="li"><span class="dot" style="background:${GROUPS[g].c}"></span><span>${GROUPS[g].n}</span><b>${pct(P.groups[g])}%</b></div>`).join('')}</div>
       </div>
-      ${P.shifted > 0 ? `<div class="tip" style="margin-top:16px"><span class="ic" style="background:rgba(255,195,92,.16);color:var(--warn)">${ic('alert')}</span><p>Аренда ${pct(P.cats.rent)}% дохода не влезает в формулу, поэтому я перенёс <b>${money(P.shifted)}</b> из желаний${P.groups.save < P.income * PRESETS[p.preset].save ? ' и накоплений' : ''} на необходимое.</p></div>` : ''}
+      ${P.shifted > 0 ? `<div class="tip" style="margin-top:16px"><span class="ic" style="background:color-mix(in srgb, var(--warn) 16%, transparent);color:var(--warn)">${ic('alert')}</span><p>Аренда ${pct(P.cats.rent)}% дохода не влезает в формулу, поэтому я перенёс <b>${money(P.shifted)}</b> из желаний${P.groups.save < P.income * PRESETS[p.preset].save ? ' и накоплений' : ''} на необходимое.</p></div>` : ''}
     </div>
 
     ${['needs', 'wants', 'buffer', 'save'].map(g => `
       <div class="glass card">
-        <div class="group-h"><span class="dot" style="background:${GROUPS[g].c}"></span><h3>${GROUPS[g].n}</h3><span class="pct" style="background:rgba(${GROUP_RGB[g]},.16);color:${GROUPS[g].c}">${pct(P.groups[g])}% · ${short(P.groups[g])}</span></div>
+        <div class="group-h"><span class="dot" style="background:${GROUPS[g].c}"></span><h3>${GROUPS[g].n}</h3><span class="pct" style="background:${soft(GROUPS[g].c)};color:${GROUPS[g].c}">${pct(P.groups[g])}% · ${short(P.groups[g])}</span></div>
         <div class="tiny faint" style="margin-bottom:6px">${GROUPS[g].hint}</div>
         ${groupCats(g).map(k => {
           const plan = P.cats[k], fact = m.byCat[k] || 0, r = plan ? fact / plan : 0;
@@ -496,9 +505,9 @@ function vWishes() {
     <div class="glass card">
       <div class="card-h"><h3>Правило остывания</h3>${ic('hourglass')}</div>
       <div class="tips">
-        <div class="tip"><span class="ic" style="background:rgba(124,242,166,.16);color:var(--good)">24ч</span><p>До <b>${money(P.income * 0.03)}</b> (3% дохода) — подожди сутки.</p></div>
-        <div class="tip"><span class="ic" style="background:rgba(255,195,92,.16);color:var(--warn)">72ч</span><p>До <b>${money(P.income * 0.1)}</b> (10% дохода) — три дня.</p></div>
-        <div class="tip"><span class="ic" style="background:rgba(255,107,125,.16);color:var(--bad)">30д</span><p>Дороже — правило 30 дней. Если через месяц всё ещё хочется, покупка осознанная.</p></div>
+        <div class="tip"><span class="ic" style="background:color-mix(in srgb, var(--good) 16%, transparent);color:var(--good)">24ч</span><p>До <b>${money(P.income * 0.03)}</b> (3% дохода) — подожди сутки.</p></div>
+        <div class="tip"><span class="ic" style="background:color-mix(in srgb, var(--warn) 16%, transparent);color:var(--warn)">72ч</span><p>До <b>${money(P.income * 0.1)}</b> (10% дохода) — три дня.</p></div>
+        <div class="tip"><span class="ic" style="background:color-mix(in srgb, var(--bad) 16%, transparent);color:var(--bad)">30д</span><p>Дороже — правило 30 дней. Если через месяц всё ещё хочется, покупка осознанная.</p></div>
       </div>
     </div>
 
@@ -531,10 +540,10 @@ function allocation() {
   const gold = 10, cash = p.risk === 'cons' ? 10 : 5;
   const bonds = Math.max(0, 100 - stocks - gold - cash);
   return [
-    { n: 'Акции', v: stocks, c: '#ff5b14', d: 'Фонды (БПИФ) на индекс Мосбиржи — сразу десятки крупнейших компаний, низкая комиссия.' },
-    { n: 'Облигации', v: bonds, c: '#f6f1ea', d: 'ОФЗ и надёжные корпоративные облигации (рейтинг от AA). Стабильный купон.' },
-    { n: 'Золото', v: gold, c: '#ffb547', d: 'Фонд на золото — страховка от девальвации рубля и кризисов.' },
-    { n: 'Деньги', v: cash, c: '#d4ff5c', d: 'Фонд денежного рынка: доходность около ключевой ставки, «сухой порох» для докупок.' },
+    { n: 'Акции', v: stocks, c: 'var(--accent)', d: 'Фонды (БПИФ) на индекс Мосбиржи — сразу десятки крупнейших компаний, низкая комиссия.' },
+    { n: 'Облигации', v: bonds, c: 'var(--c-needs)', d: 'ОФЗ и надёжные корпоративные облигации (рейтинг от AA). Стабильный купон.' },
+    { n: 'Золото', v: gold, c: 'var(--c-buffer)', d: 'Фонд на золото — страховка от девальвации рубля и кризисов.' },
+    { n: 'Деньги', v: cash, c: 'var(--c-save)', d: 'Фонд денежного рынка: доходность около ключевой ставки, «сухой порох» для докупок.' },
   ];
 }
 function project(start, monthly, rate, yrs) {
@@ -578,7 +587,7 @@ function vCapital() {
         <div><div style="font-size:22px;font-weight:700;letter-spacing:-.02em">${Math.round(fundPct * 100)}%</div>
         <div class="muted small">Покрывает ${covered.toFixed(1).replace('.', ',')} из ${p.fundMonths} мес. обязательных расходов. Цель — ${money(P.fundTarget)}.</div></div>
       </div>
-      ${fundPct < 1 && P.cats.safety > 0 ? `<div class="tip" style="margin-top:14px"><span class="ic" style="background:rgba(124,242,166,.16);color:var(--good)">${ic('flag')}</span><p>Откладывая <b>${money(P.cats.safety)}</b> в месяц, соберёшь подушку за <b>${months(Math.ceil((P.fundTarget - bal.safety) / P.cats.safety))}</b>. Храни её на накопительном счёте или в фонде денежного рынка, не в акциях.</p></div>` : ''}
+      ${fundPct < 1 && P.cats.safety > 0 ? `<div class="tip" style="margin-top:14px"><span class="ic" style="background:color-mix(in srgb, var(--good) 16%, transparent);color:var(--good)">${ic('flag')}</span><p>Откладывая <b>${money(P.cats.safety)}</b> в месяц, соберёшь подушку за <b>${months(Math.ceil((P.fundTarget - bal.safety) / P.cats.safety))}</b>. Храни её на накопительном счёте или в фонде денежного рынка, не в акциях.</p></div>` : ''}
     </div>
 
     <div class="glass card" id="proj">
@@ -598,24 +607,24 @@ function vCapital() {
     <div class="glass card">
       <div class="card-h"><h3>Куда вкладывать</h3><span class="chip">${p.age} лет · ${r.n.toLowerCase()}</span></div>
       <div class="alloc-bar">${al.map(a => `<i style="flex:${a.v};background:${a.c}"></i>`).join('')}</div>
-      <div class="tips">${al.map(a => `<div class="tip"><span class="ic" style="background:${a.c}22;color:${a.c};font-weight:700;font-size:12px">${a.v}%</span><p><b>${a.n}.</b> ${a.d}</p></div>`).join('')}</div>
+      <div class="tips">${al.map(a => `<div class="tip"><span class="ic" style="background:${soft(a.c)};color:${a.c};font-weight:700;font-size:12px">${a.v}%</span><p><b>${a.n}.</b> ${a.d}</p></div>`).join('')}</div>
       <p class="disclaimer" style="margin-top:12px">Доля акций по правилу «100 минус возраст» с поправкой на твой риск-профиль. Ребалансируй раз в год: продай то, что выросло сверх доли, докупи отстающее.</p>
     </div>
 
     <div class="glass card">
       <div class="card-h"><h3>Цели</h3>${ic('flag')}</div>
       <div class="list">
-        <div class="row"><span class="cat-ic" style="background:rgba(255,91,20,.14);color:#ff8a3d">${ic('gem')}</span><div class="mid"><div class="name">Первый миллион</div><div class="meta">в инвестициях</div></div><div class="amt">${millionYears === 0 ? 'есть ✓' : millionYears ? '≈ ' + years(Math.ceil(millionYears)) : '—'}</div></div>
-        <div class="row"><span class="cat-ic" style="background:rgba(124,242,166,.16);color:var(--good)">${ic('flag')}</span><div class="mid"><div class="name">Финансовая независимость</div><div class="meta">${short(fire)} — жить на 4% в год</div></div><div class="amt">${fireYears === 0 ? 'есть ✓' : fireYears ? '≈ ' + years(Math.ceil(fireYears)) : '> 60 лет'}</div></div>
+        <div class="row"><span class="cat-ic" style="background:var(--accent-soft);color:var(--accent-2)">${ic('gem')}</span><div class="mid"><div class="name">Первый миллион</div><div class="meta">в инвестициях</div></div><div class="amt">${millionYears === 0 ? 'есть ✓' : millionYears ? '≈ ' + years(Math.ceil(millionYears)) : '—'}</div></div>
+        <div class="row"><span class="cat-ic" style="background:color-mix(in srgb, var(--good) 16%, transparent);color:var(--good)">${ic('flag')}</span><div class="mid"><div class="name">Финансовая независимость</div><div class="meta">${short(fire)} — жить на 4% в год</div></div><div class="amt">${fireYears === 0 ? 'есть ✓' : fireYears ? '≈ ' + years(Math.ceil(fireYears)) : '> 60 лет'}</div></div>
       </div>
     </div>
 
     <div class="glass card">
       <div class="card-h"><h3>Лайфхаки</h3>${ic('star')}</div>
       <div class="tips">
-        <div class="tip"><span class="ic" style="background:rgba(255,91,20,.14);color:var(--accent)">${ic('coins')}</span><p><b>ИИС третьего типа</b> — налоговый вычет 13% со взносов до 400&nbsp;000&nbsp;₽ в год, то есть до 52&nbsp;000&nbsp;₽ возврата. Плюс освобождение от налога на доход при долгом сроке.</p></div>
-        <div class="tip"><span class="ic" style="background:rgba(255,91,20,.14);color:var(--accent)">${ic('calendar')}</span><p><b>Автопополнение в день зарплаты.</b> Настрой автоперевод в банке — тогда инвестиции происходят без участия воли.</p></div>
-        <div class="tip"><span class="ic" style="background:rgba(255,91,20,.14);color:var(--accent)">${ic('up')}</span><p><b>Повысили зарплату — повысь взнос.</b> Отправляй половину прибавки в инвестиции, и уровень жизни всё равно вырастет.</p></div>
+        <div class="tip"><span class="ic" style="background:var(--accent-soft);color:var(--accent)">${ic('coins')}</span><p><b>ИИС третьего типа</b> — налоговый вычет 13% со взносов до 400&nbsp;000&nbsp;₽ в год, то есть до 52&nbsp;000&nbsp;₽ возврата. Плюс освобождение от налога на доход при долгом сроке.</p></div>
+        <div class="tip"><span class="ic" style="background:var(--accent-soft);color:var(--accent)">${ic('calendar')}</span><p><b>Автопополнение в день зарплаты.</b> Настрой автоперевод в банке — тогда инвестиции происходят без участия воли.</p></div>
+        <div class="tip"><span class="ic" style="background:var(--accent-soft);color:var(--accent)">${ic('up')}</span><p><b>Повысили зарплату — повысь взнос.</b> Отправляй половину прибавки в инвестиции, и уровень жизни всё равно вырастет.</p></div>
       </div>
       <p class="disclaimer" style="margin-top:12px">Не является индивидуальной инвестиционной рекомендацией. Доходность в прогнозе условная (${Math.round(r.rate * 100)}% годовых), инфляция — ${pctStr(infl() * 100)}%. Прошлая доходность не гарантирует будущую.</p>
     </div>
@@ -639,8 +648,8 @@ function projBody(monthly) {
   const ticks = [0, Math.round(yrs / 2), yrs].filter((v, i, a) => a.indexOf(v) === i);
   return `
     <svg class="chart" viewBox="0 0 ${W} ${Hh + 16}" preserveAspectRatio="none">
-      <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5b14" stop-opacity=".4"/><stop offset="1" stop-color="#ff5b14" stop-opacity="0"/></linearGradient>
-      <linearGradient id="pl" x1="0" x2="1"><stop offset="0" stop-color="#ff8a3d"/><stop offset="1" stop-color="#ff5b14"/></linearGradient></defs>
+      <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--accent);stop-opacity:.4"/><stop offset="1" style="stop-color:var(--accent);stop-opacity:0"/></linearGradient>
+      <linearGradient id="pl" x1="0" x2="1"><stop offset="0" style="stop-color:var(--accent-2)"/><stop offset="1" style="stop-color:var(--accent)"/></linearGradient></defs>
       <path d="${line}L${W},${Hh}L0,${Hh}Z" fill="url(#pg)"/>
       <path d="${cl}" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="4 4"/>
       <path d="${line}" fill="none" stroke="url(#pl)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
@@ -858,6 +867,7 @@ function openSettings() {
     <div class="row2">
       <div class="field"><label>Риск-профиль</label><select data-f="risk">${Object.entries(RISK).map(([k, v]) => `<option value="${k}" ${p.risk === k ? 'selected' : ''}>${v.n}</option>`).join('')}</select></div>
     </div>
+    <div class="field"><label>Оформление</label><div class="pal-grid">${Object.entries(PALETTES).map(([k, v]) => `<button class="pal ${(p.palette || 'orange') === k ? 'on' : ''}" data-action="palette" data-k="${k}" style="--pb:${v.bg};--pa:${v.ac}"><i></i><span>${v.n}</span></button>`).join('')}</div></div>
     <div class="actions"><button class="btn primary full" data-action="settings-save">Сохранить</button></div>
     <div class="actions"><button class="btn ghost full" data-action="export">Экспорт данных</button><button class="btn danger full" data-action="reset">Сбросить всё</button></div>`);
 }
@@ -874,16 +884,19 @@ function openTx(id) {
   const c = CATS[t.cat] || CATS.other;
   openSheet(`<div style="display:flex;gap:14px;align-items:center;margin-bottom:8px">${catIcon(t.cat)}<div><h2>${money(t.amount)}</h2><div class="muted small">${c.n} · ${relDay(t.date)}</div></div></div>
     ${t.note ? `<p class="lead" style="margin-top:10px">${esc(t.note)}</p>` : ''}
-    ${t.type === 'expense' && hourly() ? `<div class="tip" style="margin-top:10px"><span class="ic" style="background:rgba(255,91,20,.14);color:var(--accent)">${ic('hourglass')}</span><p>Это <b>${(t.amount / hourly()).toFixed(1).replace('.', ',')} ч</b> твоей работы.</p></div>` : ''}
+    ${t.type === 'expense' && hourly() ? `<div class="tip" style="margin-top:10px"><span class="ic" style="background:var(--accent-soft);color:var(--accent)">${ic('hourglass')}</span><p>Это <b>${(t.amount / hourly()).toFixed(1).replace('.', ',')} ч</b> твоей работы.</p></div>` : ''}
     <div class="actions"><button class="btn danger full" data-action="tx-del" data-id="${t.id}">${ic('trash')} Удалить</button></div>`);
 }
 
 /* ---------- тема ---------- */
 function applyTheme() {
   const pref = S.profile.theme;
-  const theme = 'dark'; void pref;
+  void pref;
+  const pal = PALETTES[S.profile.palette] ? S.profile.palette : 'orange';
+  const theme = PALETTES[pal].light ? 'light' : 'dark';
+  document.documentElement.dataset.palette = pal;
   document.documentElement.dataset.theme = theme;
-  const bg = '#050505';
+  const bg = PALETTES[pal].bg;
   document.querySelector('meta[name="theme-color"]').content = bg;
   try { if (can('6.1')) { tg.setHeaderColor(bg); tg.setBackgroundColor(bg); } if (can('7.10')) tg.setBottomBarColor(bg); } catch (e) {}
 }
@@ -911,6 +924,7 @@ document.addEventListener('click', e => {
       if (inTelegram && can('6.2')) tg.showConfirm('Удалить все данные и начать заново?', doReset); else doReset(confirm('Удалить все данные и начать заново?'));
       break;
     }
+    case 'palette': haptic.sel(); S.profile.palette = el.dataset.k; persist(); applyTheme(); document.querySelectorAll('.pal').forEach(b => b.classList.toggle('on', b === el)); render(); break;
     case 'preset': haptic.sel(); S.profile.preset = el.dataset.k; persist(); render(); break;
     case 'risk': haptic.sel(); S.profile.risk = el.dataset.k; persist(); render(); break;
     case 'proj-real': haptic.sel(); S.proj.real = el.dataset.v === '1'; persist(); el.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === el)); refreshProj(); break;
