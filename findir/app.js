@@ -90,7 +90,6 @@ const RISK = {
   mod:  { n: 'Баланс',        rate: .13, shift: 0 },
   aggr: { n: 'Смелый',        rate: .16, shift: 10 },
 };
-const INFLATION = 0.07;
 const SWR = 0.04; // правило 4% безопасного изъятия
 
 /* ---------- состояние ---------- */
@@ -101,9 +100,9 @@ const defaultState = () => ({
     name: (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) || '',
     salary: 120000, extra: 0, advPct: 40, advDay: 20, salDay: 5,
     rent: 35000, age: 28, fundMonths: 6, emergency: 0, invested: 0,
-    preset: '50-30-20', risk: 'mod', hours: 168, impulsePct: 3, theme: 'auto',
+    preset: '50-30-20', risk: 'mod', hours: 168, impulsePct: 3, theme: 'auto', inflation: 7,
   },
-  tx: [], wishes: [], willpower: 0, proj: { years: 10, monthly: null },
+  tx: [], wishes: [], willpower: 0, proj: { years: 10, monthly: null, real: false },
 });
 let S = load() || defaultState();
 
@@ -585,11 +584,15 @@ function vCapital() {
     <div class="glass card" id="proj">
       <div class="card-h"><h3>Прогноз роста</h3>${ic('trend')}</div>
       <div class="seg" style="background:rgba(127,127,160,.1)">${Object.entries(RISK).map(([k, v]) => `<button class="${p.risk === k ? 'on' : ''}" data-action="risk" data-k="${k}">${v.n}</button>`).join('')}</div>
+      <div class="seg" style="background:rgba(127,127,160,.1);margin-top:8px"><button class="${S.proj.real ? '' : 'on'}" data-action="proj-real" data-v="0">В будущих рублях</button><button class="${S.proj.real ? 'on' : ''}" data-action="proj-real" data-v="1">С учётом инфляции</button></div>
       <div id="proj-body">${projBody(monthly)}</div>
       <div class="slider-h"><span>Срок</span><b id="yrs-l">${years(S.proj.years)}</b></div>
       <input class="range" type="range" min="1" max="30" step="1" value="${S.proj.years}" data-input="years" style="--p:${(S.proj.years - 1) / 29 * 100}%">
       <div class="slider-h"><span>Инвестирую в месяц</span><b id="mon-l">${money(monthly)}</b></div>
       <input class="range" type="range" min="0" max="${Math.max(10000, Math.ceil(P.income * 0.5 / 1000) * 1000)}" step="500" value="${monthly}" data-input="monthly" style="--p:${monthly / Math.max(10000, Math.ceil(P.income * 0.5 / 1000) * 1000) * 100}%">
+      <div class="slider-h"><span>Инфляция в год</span><b id="inf-l">${pctStr(infl() * 100)}%</b></div>
+      <input class="range" type="range" min="0" max="30" step="0.5" value="${Math.round(infl() * 1000) / 10}" data-input="inflation" style="--p:${infl() * 100 / 30 * 100}%">
+      <div class="tiny faint">Официальная инфляция часто ниже личной. Поставь свою: цены на то, что покупаешь именно ты.</div>
     </div>
 
     <div class="glass card">
@@ -614,15 +617,21 @@ function vCapital() {
         <div class="tip"><span class="ic" style="background:rgba(143,124,255,.18);color:var(--accent)">${ic('calendar')}</span><p><b>Автопополнение в день зарплаты.</b> Настрой автоперевод в банке — тогда инвестиции происходят без участия воли.</p></div>
         <div class="tip"><span class="ic" style="background:rgba(143,124,255,.18);color:var(--accent)">${ic('up')}</span><p><b>Повысили зарплату — повысь взнос.</b> Отправляй половину прибавки в инвестиции, и уровень жизни всё равно вырастет.</p></div>
       </div>
-      <p class="disclaimer" style="margin-top:12px">Не является индивидуальной инвестиционной рекомендацией. Доходность в прогнозе условная (${Math.round(r.rate * 100)}% годовых), инфляция — ${Math.round(INFLATION * 100)}%. Прошлая доходность не гарантирует будущую.</p>
+      <p class="disclaimer" style="margin-top:12px">Не является индивидуальной инвестиционной рекомендацией. Доходность в прогнозе условная (${Math.round(r.rate * 100)}% годовых), инфляция — ${pctStr(infl() * 100)}%. Прошлая доходность не гарантирует будущую.</p>
     </div>
   </section>`;
 }
 
+function pctStr(v) { return String(Math.round(v * 10) / 10).replace('.', ','); }
+function infl() { const v = num(S.profile.inflation); return clamp(isFinite(v) ? v : 7, 0, 30) / 100; }
+
 function projBody(monthly) {
-  const r = (RISK[S.profile.risk] || RISK.mod).rate, yrs = S.proj.years, bal = balances();
-  const pts = project(bal.invest, monthly, r, yrs);
-  const last = pts[pts.length - 1], real = last.v / Math.pow(1 + INFLATION, yrs);
+  const r = (RISK[S.profile.risk] || RISK.mod).rate, yrs = S.proj.years, bal = balances(), i = infl(), isReal = !!S.proj.real;
+  const nom = project(bal.invest, monthly, r, yrs);
+  const defl = y => isReal ? Math.pow(1 + i, y) : 1;
+  const pts = nom.map(p => ({ y: p.y, v: p.v / defl(p.y), c: p.c / defl(p.y) }));
+  const last = pts[pts.length - 1], nomLast = nom[nom.length - 1], realLast = nomLast.v / Math.pow(1 + i, yrs);
+  const realRate = (1 + r) / (1 + i) - 1;
   const W = 320, Hh = 150, max = Math.max(...pts.map(p => p.v), 1);
   const x = i => (i / (pts.length - 1 || 1)) * W, y = v => Hh - (v / max) * (Hh - 12);
   const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join('');
@@ -638,11 +647,13 @@ function projBody(monthly) {
       ${ticks.map(t => `<text x="${clamp(x(t), 8, W - 8)}" y="${Hh + 14}" text-anchor="${t === 0 ? 'start' : t === yrs ? 'end' : 'middle'}">${t ? t + ' ' + plural(t, ['год', 'года', 'лет']) : 'сейчас'}</text>`).join('')}
     </svg>
     <div class="kpis">
-      <div class="kpi"><div class="t">Будет</div><div class="v grad-text">${short(last.v)}</div></div>
+      <div class="kpi"><div class="t">${isReal ? 'Будет, по ценам сегодня' : 'Будет'}</div><div class="v grad-text">${short(last.v)}</div></div>
       <div class="kpi"><div class="t">Вложишь</div><div class="v">${short(last.c)}</div></div>
-      <div class="kpi"><div class="t">Доход</div><div class="v" style="color:var(--c-save)">+${short(last.v - last.c)}</div></div>
+      <div class="kpi"><div class="t">${isReal ? 'Реальный доход' : 'Доход'}</div><div class="v" style="color:${last.v - last.c >= 0 ? 'var(--c-save)' : 'var(--bad)'}">${last.v - last.c >= 0 ? '+' : '−'}${short(Math.abs(last.v - last.c))}</div></div>
     </div>
-    <p class="disclaimer" style="margin-top:10px">В сегодняшних деньгах (за вычетом инфляции) — около ${short(real)}. Пунктир — сколько вложено своих.</p>`;
+    <p class="disclaimer" style="margin-top:10px">${isReal
+      ? `Все суммы пересчитаны в сегодняшние цены. В будущих рублях на счёте будет ${short(nomLast.v)}, но купить на них можно столько же, сколько сейчас на ${short(last.v)}. Реальная доходность ≈ ${(realRate * 100).toFixed(1).replace('.', ',')}% в год.`
+      : `С учётом инфляции ${pctStr(i * 100)}% это как ${short(realLast)} сегодня. Переключи «С учётом инфляции», чтобы видеть реальные суммы.`} Пунктир — сколько вложено своих.</p>`;
 }
 
 const VIEWS = { home: vHome, budget: vBudget, wishes: vWishes, capital: vCapital };
@@ -743,7 +754,6 @@ function openSheet(html, onClose) {
   sheetOnClose = onClose || null;
   requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('open')));
   try { can('6.1') && tg.BackButton.show(); } catch (e) {}
-  enableSheetDrag(root.querySelector('.sheet'));
 }
 function setSheet(html) { const s = $('#sheet-root .sheet'); if (s) { s.innerHTML = `<div class="grabber"></div>${html}`; s.scrollTop = 0; } }
 function closeSheet() {
@@ -754,22 +764,18 @@ function closeSheet() {
   try { can('6.1') && tg.BackButton.hide(); } catch (e) {}
   const cb = sheetOnClose; sheetOnClose = null; cb && cb();
 }
-function enableSheetDrag(sheet) {
-  let y0 = null, dy = 0;
-  sheet.addEventListener('touchstart', e => { if (sheet.scrollTop > 0 || e.target.closest('input,select,.range')) return; y0 = e.touches[0].clientY; dy = 0; sheet.style.transition = 'none'; }, { passive: true });
-  sheet.addEventListener('touchmove', e => { if (y0 == null) return; dy = Math.max(0, e.touches[0].clientY - y0); sheet.style.transform = `translateY(${dy}px)`; }, { passive: true });
-  sheet.addEventListener('touchend', () => { if (y0 == null) return; sheet.style.transition = ''; sheet.style.transform = ''; if (dy > 110) closeSheet(); y0 = null; });
-}
 
 let toastT;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
 
 /* ---------- добавление операции ---------- */
 let draft = null;
+function sizeAmt(el) { el.style.width = Math.max(1, (el.value || el.placeholder).length) + 0.3 + 'ch'; }
+function refreshProj() { const b = $('#proj-body'); if (b) b.innerHTML = projBody(S.proj.monthly != null ? S.proj.monthly : Math.round(buildPlan().cats.invest)); }
 function openAdd(type = 'expense') {
   draft = { type, amount: '', cat: type === 'expense' ? 'food' : type === 'income' ? 'salary' : 'invest', note: '', date: todayIso() };
   openSheet(addHtml());
-  setTimeout(() => { const a = $('#amt'); a && a.focus(); }, 380);
+  setTimeout(() => { const a = $('#amt'); if (a) { sizeAmt(a); a.focus(); } }, 380);
 }
 function addHtml() {
   const cats = Object.keys(CATS).filter(k => {
@@ -908,10 +914,11 @@ document.addEventListener('click', e => {
     }
     case 'preset': haptic.sel(); S.profile.preset = el.dataset.k; persist(); render(); break;
     case 'risk': haptic.sel(); S.profile.risk = el.dataset.k; persist(); render(); break;
+    case 'proj-real': haptic.sel(); S.proj.real = el.dataset.v === '1'; persist(); el.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === el)); refreshProj(); break;
     case 'all-tx': openAllTx(); break;
     case 'tx': openTx(el.dataset.id); break;
     case 'tx-del': S.tx = S.tx.filter(t => t.id !== el.dataset.id); persist(); haptic.tap(); closeSheet(); render(); toast('Удалено'); break;
-    case 'draft-type': haptic.sel(); draft.type = el.dataset.k; draft.cat = draft.type === 'expense' ? 'food' : draft.type === 'income' ? 'salary' : 'invest'; setSheet(addHtml()); break;
+    case 'draft-type': haptic.sel(); draft.type = el.dataset.k; draft.cat = draft.type === 'expense' ? 'food' : draft.type === 'income' ? 'salary' : 'invest'; setSheet(addHtml()); { const a = $('#amt'); a && sizeAmt(a); } break;
     case 'draft-cat': haptic.sel(); draft.cat = el.dataset.k; document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('on', b.dataset.k === draft.cat)); break;
     case 'draft-save': saveDraft(false); break;
     case 'stop-force': saveDraft(true); break;
@@ -951,13 +958,14 @@ document.addEventListener('click', e => {
 
 document.addEventListener('input', e => {
   const el = e.target;
-  if (el.dataset.draft && draft) { draft[el.dataset.draft] = el.value; return; }
+  if (el.dataset.draft && draft) { draft[el.dataset.draft] = el.value; if (el.id === 'amt') sizeAmt(el); return; }
   if (el.dataset.input) {
     const v = num(el.value);
     el.style.setProperty('--p', ((v - el.min) / (el.max - el.min)) * 100 + '%');
     if (el.dataset.input === 'years') { S.proj.years = v; $('#yrs-l').textContent = years(v); }
+    else if (el.dataset.input === 'inflation') { S.profile.inflation = v; $('#inf-l').textContent = String(v).replace('.', ',') + '%'; }
     else { S.proj.monthly = v; $('#mon-l').textContent = money(v); }
-    $('#proj-body').innerHTML = projBody(S.proj.monthly != null ? S.proj.monthly : Math.round(buildPlan().cats.invest));
+    refreshProj();
     clearTimeout(el._t); el._t = setTimeout(persist, 400);
   }
 });
