@@ -441,7 +441,7 @@ def s_podvoh(C, u, t):
 def s_mln(C, u, t):
     d = ImageDraw.Draw(C); n = int(clamp(u / 1.6) * 900); rnd = random.Random(5)
     for j in range(n):
-        x = 40 + (j % 60) * 15.5 + rnd.random() * 4; y = 300 + (j // 60) * 24
+        x = 5 + (j % 60) * 15.5 + rnd.random() * 4; y = 300 + (j // 60) * 24
         if y > 690: break
         d.rounded_rectangle([x - 5, y, x + 5, y + 7], radius=2, fill=(40, 40, 44)); d.rectangle([x - 3, y + 2, x - 1, y + 4], fill=YEL)
     v = t - T('миллион'); val = roll(v, 0, 1_200_000, 0.9) if v > 0 else 0
@@ -556,8 +556,8 @@ def disc_img(text):
 D1 = 'ВСЕ ПЕРСОНАЖИ ВЫМЫШЛЕНЫ. РОЛИК ОСНОВАН НА ОТКРЫТЫХ\nИСТОЧНИКАХ И НЕ ЯВЛЯЕТСЯ ИНСТРУКЦИЕЙ'
 D2 = 'ВИДЕО ПРЕДУПРЕЖДАЕТ О МОШЕННИЧЕСКИХ СХЕМАХ.\nИСТОЧНИКИ — В ОПИСАНИИ'
 def disclaimer(F, t):
-    if t < 5.0: a = clamp(t / 0.3) * clamp((5.0 - t) / 0.4); put(F, disc_img(D1), 490, 1478, 1, 0, a)
-    elif t > DUR - 3.0: a = clamp((t - DUR + 3.0) / 0.3); put(F, disc_img(D2), 490, 1478, 1, 0, a)
+    if t < 5.0: a = clamp(t / 0.3) * clamp((5.0 - t) / 0.4); put(F, disc_img(D1), 540, 1478, 1, 0, a)
+    elif t > DUR - 3.0: a = clamp((t - DUR + 3.0) / 0.3); put(F, disc_img(D2), 540, 1478, 1, 0, a)
 def shot_at(t):
     i = max(j for j in range(len(SHOTS)) if SHOTS[j]['t'] <= t); return i, SHOTS[i]
 def render_card(t):
@@ -675,9 +675,13 @@ def depth(C, fn, u):
         w, h = int(CW * z), int(CH * z); ox, oy = (w - CW) // 2, (h - CH) // 2
         fg = fg.resize((w, h), Image.BILINEAR).crop((ox, oy, ox + CW, oy + CH)); shadow = shadow.resize((w, h), Image.BILINEAR).crop((ox, oy, ox + CW, oy + CH))
     out.alpha_composite(shadow, (14, 16)); out.alpha_composite(fg); return out
+SHIFT = 70   # сцены рисовались вокруг x=470; сдвиг ставит их строго по центру кадра (540)
+def center(C):
+    out = Image.new('RGBA', (CW, CH)); out.paste(C, (SHIFT, 0))
+    out.paste(C.crop((0, 0, 1, CH)).resize((SHIFT, CH)), (0, 0)); return out
 def card_of(j, t):
     sh = SHOTS[j]; u = max(0.0, t - sh['t']); tt = max(t, sh['t'])
-    C = Image.new('RGBA', (CW, CH), CARD + (255,)); sh['fn'](C, u, tt); return depth(C, sh['fn'], u)
+    C = Image.new('RGBA', (CW, CH), CARD + (255,)); sh['fn'](C, u, tt); return depth(center(C), sh['fn'], u)
 
 def tr_push(A, B, k, t):
     e = eio(k); v = s_(math.pi * k); out = Image.new('RGBA', (CW, CH), CARD + (255,)); x = int(CW * (1 - e))
