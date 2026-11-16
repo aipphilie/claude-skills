@@ -16,5 +16,5 @@ for k, (t, name) in enumerate(J['ev']):
     inp += ['-i', z(files[i % len(files)])]; ms = int(max(0, t - lead) * 1000)
     fl.append(f'[{k+1}:a]atrim=0:{cut},afade=t=out:st={cut-0.15}:d=0.15,volume={v*0.5},adelay={ms}|{ms}[s{k}]'); lab.append(f'[s{k}]')
 fl.append(''.join(lab) + f'amix=inputs={len(lab)}:normalize=0,apad,atrim=0:{DUR},loudnorm=I=-14:TP=-1.5[out]')
-subprocess.run(['ffmpeg', '-y', '-loglevel', 'error'] + inp + ['-filter_complex', ';'.join(fl), '-map', '[out]', '-ar', '44100', '-c:a', 'aac', '-b:a', '192k', '../mix-v1.m4a'], check=True)
+subprocess.run(['ffmpeg', '-y', '-loglevel', 'error'] + inp + ['-filter_complex', ';'.join(fl), '-map', '[out]', '-ar', '44100', '-c:a', 'aac', '-b:a', '192k', '../mix-v2.m4a'], check=True)
 print('ok', DUR, len(J['ev']))

@@ -5,4 +5,4 @@ for i in 0 1 2 3; do F0=$((N*i/4)) F1=$((N*(i+1)/4)) OUT=part$i.mp4 python3 comp
 printf "file part0.mp4\nfile part1.mp4\nfile part2.mp4\nfile part3.mp4\n" > parts.txt
 ffmpeg -y -loglevel error -f concat -i parts.txt -c copy video_noaudio.mp4
 python3 mix_kr.py
-ffmpeg -y -loglevel error -i video_noaudio.mp4 -i ../mix-v1.m4a -c:v copy -c:a copy -shortest -movflags +faststart ../kredit-v1.mp4
+ffmpeg -y -loglevel error -i video_noaudio.mp4 -i ../mix-v2.m4a -c:v copy -c:a copy -shortest -movflags +faststart ../kredit-v2.mp4

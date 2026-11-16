@@ -6,3 +6,6 @@
 - Новые клипы: g_idle/g_sad/g_shock/g_cheer (девушка), v_idle/v_sad/v_cheer (сварщик), d_shock/d_sad/d_cheer (отец), *_walkR, cheer, box (несёт коробку).
 - Порядок: из kod/ python3 -m http.server 8777 → tts.py → clips.py → node 3d/frames.js clips.json kadry flat → compose_kr.py sheet 0.6 → ./run_kr.sh → cover_kr.py.
 - Обложки: oblozhka/ (A «НИКТО НЕ ПЛАТИТ» — рекомендую, B «ДОЛГ НЕ СГОРИТ»).
+
+## v2 (2026-11-16)
+- kredit-v2.mp4 — 67 сек, 39 сцен. Хук с криком и матом в первые 3,4 сек, мат в субтитрах через звёздочку (CENS в compose_kr.py), голос с тегами [shouting]/[excited]/[serious]. Новые сцены s_hook1, s_hook2, s_bolno, s_pizdec, pickets() — толпа с плакатами. Обложки oblozhka-v2-A «МЫ БОЛЬШЕ НЕ ПЛАТИМ!» (реком.) / B.

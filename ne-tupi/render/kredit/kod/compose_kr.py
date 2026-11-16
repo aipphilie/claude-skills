@@ -304,22 +304,22 @@ def s_predstav(C, u, t):
     if v > -0.1:
         k = back((v + 0.1) / 0.2); L = layer(); calendar(L, 770, 900, 0.8, ' ', '', 1, 6); txt(L, 'ЗАВТРА', 772, 940, 92, INK, 1, 6); put(C, L.crop((520, 620, 1020, 1180)), 770, 900, k)
 def s_razom(C, u, t):
-    sky(C); bank(C, 820, G + 6, 0.62); v = t - T('перестают')
+    sky(C); bank(C, 820, G + 6, 0.62); v = t - T('Ни')
     for j in range(4):
         x = 110 + j * 130; clip = ['idle', 'g_idle', 'd_idle', 'v_idle'][j] if v < 0 else ['hips', 'g_idle', 'd_hips', 'v_idle'][j]
         man(C, clip, u + j * 0.3, x, G + 6, 0.2)
     coinflow(C, u, 300, 980, 700, 1000, 6, 28, 200, None if v < 0 else u)
-    if v > 0: xcross(C, v, 500, 860, 90); plate(C, v, 'ПЕРЕСТАЛИ ПЛАТИТЬ', 540, 560, 84, RED, WHITE, -3)
-    slam(C, u, 'ВСЕ РАЗОМ', 540, 400, 140)
+    if v > 0: xcross(C, v, 500, 860, 90); plate(C, v, 'НИ РУБЛЯ', 540, 560, 110, RED, WHITE, -3)
+    slam(C, u, 'РАЗОМ', 540, 400, 160)
 def s_razor(C, u, t):
     sky(C); k = clamp((u - 0.25) / 0.9); bank(C, 540, G + 6, 1.15, clamp(u / 0.3), 260 * ei(k), 6 * k)
     for j in range(6):
         q = (u * 1.5 + j * 0.17) % 1; d = D(C); x = 300 + j * 95; d.ellipse([x - 40 - 60 * q, G - 30 - 140 * q, x + 40 + 60 * q, G + 10 - 100 * q], fill=(200 + int(40 * q),) * 3) if u > 0.3 else None
-    slam(C, u, 'БАНКИ', 540, 380, 150); plate(C, t - T('разоряются'), 'РАЗОРЯЮТСЯ', 540, 530, 100, RED, WHITE)
+    slam(C, u, 'БАНКИ', 540, 380, 150); plate(C, t - T('разорились'), 'РАЗОРИЛИСЬ', 540, 530, 100, RED, WHITE)
 def s_sgorayut(C, u, t):
     k = clamp(u / 1.0); doc(C, 540, 880 + 60 * k, 520, 640 * (1 - 0.55 * k), 'ДОЛГ', -4, 1, '2 400 000 ₽', False, 150)
     flames(C, 540, 880 + 60 * k + 320 * (1 - 0.55 * k), 640, 420 + 120 * k, u)
-    slam(C, u, 'ДОЛГИ', 540, 380, 150); plate(C, t - T('сгорают'), 'СГОРАЮТ', 540, 530, 100)
+    slam(C, u, 'ДОЛГИ', 540, 380, 150); plate(C, t - T('сгорели'), 'СГОРЕЛИ', 540, 530, 100)
 def s_svobodny(C, u, t):
     ground(C); crowd(C, u, 540, G, 7, 0.24, 'cheer', 920, 3)
     for j in range(26):
@@ -327,9 +327,40 @@ def s_svobodny(C, u, t):
         D(C).rectangle([x, y, x + 18, y + 30], fill=[YEL, RED, PINK, GREEN, BLUE][j % 5])
     slam(C, u, 'ВСЕ', 540, 360, 130); plate(C, t - T('свободны'), 'СВОБОДНЫ!', 540, 520, 120)
 def s_krasota(C, u, t):
-    ground(C); burst(C, 540, 860, 330, u, n=16); man(C, 'armsup', u, 540, G, 0.5)
-    slam(C, u, 'КРАСОТА?', 540, TY, 190)
+    ground(C); burst(C, 540, 960, 280, u, n=16); man(C, 'armsup', u, 540, G, 0.46)
+    slam(C, u, 'ОХ*ЕННО', 540, 390, 180); plate(C, t - T('же'), 'ЖЕ?', 540, 560, 110)
     for j, (x, y) in enumerate([(170, 760), (900, 700), (210, 1110), (880, 1080)]): pop(C, u - 0.2 - j * 0.1, '✦', x, y, 120, YEL, j * 20, stroke=INK, sw=6)
+def pickets(C, u, cx, by, n, s, labels, spread=900, seed=5):
+    rnd = random.Random(seed)
+    for j in range(n):
+        x = cx - spread / 2 + spread * (j + 0.5) / n; k = ['', 'g_', 'd_', 'v_'][j % 4]; clip = 'cheer' if k == '' else k + 'cheer'
+        man(C, clip, u + j * 0.27, x, by + (j % 2) * 12, s, flip=j % 2 == 1)
+        if j % 2 == 0:
+            yy = by - 1040 * s - 90 + 14 * s_(u * 14 + j); D(C).line([x, yy, x, yy + 170], fill=INK, width=10)
+            put(C, plate_img(labels[(j // 2) % len(labels)], 40, WHITE, INK, pad=12, r=6, border=INK, bw=5), x, yy, 1, 8 * s_(u * 9 + j))
+def s_hook1(C, u, t):
+    sky(C, col=(240, 214, 210)); sh = 10 * s_(u * 60) if u > 0.3 else 0
+    bank(C, 540 + sh, 1150, 0.75, clamp((u - 0.4) / 0.6))
+    for j in range(4):
+        q = (u * 0.9 + j / 4) % 1; doc(C, [110, 970, 160, 920][j], 1150 - 500 * q, 110, 140, 'КРЕДИТ', q * 500 + j * 50, 1, None, False, 28)
+    pickets(C, u, 540, G + 6, 6, 0.22, ['НЕ ПЛАТИМ', 'ХВАТИТ', 'НЕТ КРЕДИТАМ'])
+    slam(C, u, 'БАНКИ,', 540, 380, 170)
+    v = t - T('идите')
+    if v > 0: plate(C, v, 'ИДИТЕ НА Х*Й!', 540 + (6 * s_(v * 70) if v > 0.2 else 0), 560, 104, RED, WHITE, -4)
+def s_hook2(C, u, t):
+    C.paste(YEL, [0, 0, CW, CH]); speedlines(C, 540, 900, u, r0=560, col=(246, 200, 0)); man(C, 'stop', u, 540, G + 40, 0.5)
+    slam(C, u, 'МЫ БОЛЬШЕ', 540, 360, 140)
+    for j, (x, y, r) in enumerate([(170, 900, -20), (910, 860, 18)]):
+        k = clamp(u / 0.4); doc(C, x - 50 * k, y, 160 * (1 - 0.5 * k) + 10, 200, 'КРЕДИТ', r - 30 * k, 1, None, False, 34); doc(C, x + 50 * k, y + 30 * k, 80 * k + 10, 200, ' ', r + 30 * k, 1, None, False, 34) if k > 0.05 else None
+    stamp(C, t - T('платим'), 'НЕ ПЛАТИМ!', 540, 570, 110, RED, -8)
+def s_bolno(C, u, t):
+    C.paste((150, 18, 24), [0, 0, CW, CH]); speedlines(C, 540, 900, u, r0=600, col=(130, 12, 18), seed=4)
+    man(C, 'idle_sad', u, 540, G + 40, 0.56)
+    slam(C, u, 'И СЕЙЧАС', 540, 390, 140, WHITE); plate(C, t - T('больно'), 'БУДЕТ БОЛЬНО', 540, 560, 110, YEL, INK, -3)
+def s_pizdec(C, u, t):
+    C.paste(RED, [0, 0, CW, CH]); speedlines(C, 540, 900, u, r0=520, col=(200, 30, 38), seed=6)
+    for j, x in enumerate((200, 540, 880)): man(C, ['g_shock', 'shock', 'd_shock'][j], u + j * 0.2, x, G + 40, 0.34 if j != 1 else 0.42)
+    slam(C, u, 'П*ЗДЕЦ.', 540 + 8 * s_(u * 80) * math.exp(-u * 3), 450, 230, WHITE, -4, INK, 12)
 def s_stop(C, u, t):
     C.paste(YEL, [0, 0, CW, CH]); speedlines(C, 540, 900, u, r0=620, col=(246, 200, 0)); man(C, 'stop', u, 540, G + 40, 0.6); slam(C, u, 'СТОП.', 540, 440, 280)
 def s_tupish(C, u, t):
@@ -339,7 +370,7 @@ def s_vydaet(C, u, t):
     for j in range(3): wad(C, 700 + (j - 1) * 170, 760 + 20 * s_(u * 4 + j), 150, 2, back((u - 0.2 - j * 0.08) / 0.2))
     slam(C, u, 'БАНК ВЫДАЁТ', 540, 380, 130); plate(C, t - T('кредиты'), 'КРЕДИТЫ', 540, 530, 100)
 def s_karman(C, u, t):
-    pocket(C, 540, 920, 1.25, u); v = t - T('не')
+    pocket(C, 540, 920, 1.25, u); v = t - T('не', 1)
     slam(C, u, 'НЕ ИЗ СВОЕГО', 540, 380, 120); plate(C, t - T('кармана'), 'КАРМАНА', 540, 530, 100, INK, YEL)
     tag(C, t - T('кармана') - 0.1, 'ПУСТО', 540, 1180, 60, RED, WHITE, -5)
 def s_vklady(C, u, t):
@@ -371,10 +402,10 @@ def s_utrom(C, u, t):
     for j in range(6):
         x = 700 - j * 115 + 10 * max(0, s_(u * 7 - j)); cl = ['idle', 'g_idle', 'd_shock', 'v_idle', 'shock', 'g_shock'][j]
         man(C, cl, u + j * 0.3, x, G + 6 + (j % 2) * 8, 0.24)
-    slam(C, u, 'УТРОМ', 540, 380, 150); plate(C, t - T('очереди'), 'ОЧЕРЕДИ', 540, 530, 100)
+    slam(C, u, 'УТРОМ', 540, 380, 150); plate(C, t - T('очередь'), 'ОЧЕРЕДЬ', 540, 530, 100)
 def s_dnem(C, u, t):
     sky(C, col=(196, 206, 214)); atm(C, 540, G + 6, 1.35, 'НЕТ\nНАЛИЧНЫХ', RED); man(C, 'idle_sad', u, 230, G + 6, 0.34); man(C, 'g_sad', u, 860, G + 6, 0.3, flip=True)
-    slam(C, u, 'ДНЁМ', 540, 380, 150); plate(C, t - T('пустые'), 'ПУСТЫЕ', 540, 530, 100, RED, WHITE)
+    slam(C, u, 'ДНЁМ', 540, 380, 150); plate(C, t - T('пустой'), 'ПУСТОЙ', 540, 530, 100, RED, WHITE)
 def s_gos(C, u, t):
     ground(C); d = D(C); k = back(u / 0.25)
     L = layer(); dl = D(L); dl.pieslice([240, 620, 840, 1100], 180, 360, fill=YEL, outline=INK, width=10)
@@ -391,12 +422,12 @@ def s_novymi(C, u, t):
         q = ((u * 1.3 + j / 8) % 1) if u > 0.15 else 0; bill(C, lerp(540, 140 + (j * 113) % 800, eo(q)), lerp(1010, 700 - (j % 3) * 60, eo(q)) + 500 * q * q, 140, q * 400 + j * 30) if q > 0 else None
     slam(C, u, 'СПАСАТЬ БАНКИ', 540, 380, 120); plate(C, t - T('новыми'), 'НОВЫМИ ДЕНЬГАМИ', 540, 530, 88)
 def s_ceny(C, u, t):
-    ground(C); v = t - T('рост')
+    ground(C); v = t - T('цены')
     for j, (name, a, b, x, y, r) in enumerate([('ХЛЕБ', 60, 120, 290, 820, -8), ('МОЛОКО', 110, 230, 790, 780, 6), ('БЕНЗИН', 70, 140, 300, 1110, 5), ('АРЕНДА', 40, 80, 780, 1090, -5)]):
         k = clamp(v / 0.6) if v > 0 else 0; p = lerp(a, b, eo(k)); unit = ' 000 ₽' if name == 'АРЕНДА' else ' ₽'
         pricetag(C, x, y + (6 * s_(v * 40 + j) if 0 < k < 1 else 0), 1.15, name, f'{int(p)}{unit}', r, RED if k > 0.5 else YEL, back((u - j * 0.06) / 0.2))
-    slam(C, u, 'ЛИШНИЕ ДЕНЬГИ', 540, 380, 120)
-    if v > -0.1: plate(C, v + 0.1, 'РОСТ ЦЕН ↑', 540, 530, 100, RED, WHITE); arrow(C, 120, 1250, 960, 640, RED, 18, eo(clamp(v / 0.5)))
+    slam(C, u, 'НОВЫЕ ДЕНЬГИ', 540, 380, 120)
+    if v > -0.1: plate(C, v + 0.1, 'ЦЕНЫ ВВЕРХ', 540, 530, 100, RED, WHITE); arrow(C, 120, 1250, 960, 640, RED, 18, eo(clamp(v / 0.5)))
     src(C, 'ЦЕНЫ УСЛОВНЫЕ', 1318)
 def s_nekreditu(C, u, t):
     sky(C); v = t - T('никто'); kiosk(C, 540, G + 6, 640, 520, eo(clamp(v / 0.25)) if v > 0 else 0, 'КРЕДИТЫ', u)
@@ -407,12 +438,12 @@ def s_nekreditu(C, u, t):
     if w > 0: stamp(C, w, 'ОТКАЗАНО', 540, 960, 90, RED, -8)
 def s_biznes(C, u, t):
     sky(C); factory(C, 540, G + 6, 0.95, u * 0.2); v = t - T('платить')
-    slam(C, u, 'БИЗНЕСУ', 540, 380, 140); plate(C, t - T('не', 2), 'НЕ НА ЧТО', 540, 520, 96, INK, YEL)
+    slam(C, u, 'БИЗНЕСУ', 540, 380, 140); plate(C, t - T('нечем', 1), 'НЕЧЕМ ПЛАТИТЬ', 540, 520, 90, INK, YEL)
     if v > -0.1: tag(C, v + 0.1, 'ЗАРПЛАТЫ: 0 ₽', 540, 1180, 60, RED, WHITE, -4)
 def s_uvol(C, u, t):
     sky(C); block(C, 860, G + 6, 260, 520, 3, 6, lit=0.2, door=True); man(C, 'box', u, 520 - 120 * eo(u / 0.9), G + 6, 0.4)
     d = D(C); bx = 520 - 120 * eo(u / 0.9); box(C, bx, 1060, 210, 140, 'ВЕЩИ')
-    stamp(C, u - 0.1, 'УВОЛЕН', 540, 470, 150, RED, -8)
+    slam(C, u, 'ТЕБЯ', 540, 370, 130); stamp(C, t - T('увольняют'), 'УВОЛЕН', 540, 540, 140, RED, -8)
 def s_podvoh(C, u, t):
     C.paste(INK, [0, 0, CW, CH]); slam(C, u, 'А ВОТ И', 540, 720, 130, WHITE); slam(C, t - T('подвох'), 'ПОДВОХ', 540, 930, 260, YEL)
 def s_dolg(C, u, t):
@@ -480,7 +511,7 @@ def s_sosedu(C, u, t):
     if v > -0.1: safe(C, 380, 1220, 0.45, 'ЕГО ВКЛАД'); coinflow(C, u, 560, 900, 380, 1050, 3, 26, 80)
 def s_napishi(C, u, t):
     ground(C); man(C, 'pointcam', u, 540, G, 0.44); speech(C, 540, 560, 820, 380, back(u / 0.22))
-    if u > 0.12: txt(C, 'У ТЕБЯ ЕСТЬ', 540, 480, 84); put(C, plate_img('КРЕДИТ?', 120, YEL, INK, pad=20, r=14), 540, 620, back((u - 0.12) / 0.2))
+    if u > 0.12: txt(C, 'ЧЕСТНО: ЕСТЬ', 540, 480, 84); put(C, plate_img('КРЕДИТ?', 120, YEL, INK, pad=20, r=14), 540, 620, back((u - 0.12) / 0.2))
     for j, (x, y, lab, bg) in enumerate([(200, 980, 'ДА', YEL), (880, 980, 'НЕТ', WHITE)]): put(C, plate_img(lab, 80, bg, INK, pad=22, r=16, border=INK, bw=6), x, y + 8 * s_(u * 5 + j), back((u - 0.4 - j * 0.12) / 0.2))
 def s_chestno(C, u, t):
     ground(C); man(C, 'hips', u, 540, G, 0.44)
@@ -495,33 +526,35 @@ PUSH_FLIP = False
 
 def SH(t0, fn, tr='zoom', sfx='whoosh', p=None): return dict(t=t0, fn=fn, tr=tr, sfx=sfx, p=p)
 SHOTS = [
- SH(0.0, s_50mln, 'none', 'boom'), SH(T('с') - 0.05, s_skreditami, 'whipL', 'whoosh'),
- SH(T('Представь') - 0.05, s_predstav, 'zoom', 'bass'), SH(T('они') - 0.05, s_razom, 'push', 'bass'),
- SH(T('Банки') - 0.05, s_razor, 'drop', 'thud'), SH(T('долги') - 0.05, s_sgorayut, 'whipR', 'whoosh'), SH(T('все', 1) - 0.05, s_svobodny, 'zoomthru', 'bass', (540, 900)),
- SH(T('Красота') - 0.05, s_krasota, 'zoom', 'shine'),
- SH(T('Стоп') - 0.05, s_stop, 'shake', 'scratch'), SH(T('Тут') - 0.05, s_tupish, 'zoom', 'error'),
- SH(T('Банк') - 0.05, s_vydaet, 'whipL', 'whoosh'), SH(T('не') - 0.05, s_karman, 'zoomthru', 'bass', (700, 760)),
+ SH(0.0, s_hook1, 'none', 'boom'), SH(T('Мы') - 0.05, s_hook2, 'shake', 'scratch'),
+ SH(T('Пятьдесят') - 0.05, s_50mln, 'zoom', 'bass'), SH(T('Разом') - 0.05, s_razom, 'whipL', 'whoosh'),
+ SH(T('Банки', 1) - 0.05, s_razor, 'drop', 'thud'), SH(T('долги') - 0.05, s_sgorayut, 'whipR', 'whoosh'), SH(T('все') - 0.05, s_svobodny, 'zoomthru', 'bass', (540, 900)),
+ SH(T('Охуенно') - 0.05, s_krasota, 'zoom', 'shine'),
+ SH(T('Стоп') - 0.05, s_stop, 'shake', 'scratch'), SH(T('Тут') - 0.05, s_tupish, 'zoom', 'error'), SH(T('И', 0) - 0.05, s_bolno, 'glitch', 'drop'),
+ SH(T('Банк') - 0.05, s_vydaet, 'whipL', 'whoosh'), SH(T('не', 1) - 0.05, s_karman, 'zoomthru', 'bass', (700, 760)),
  SH(T('А', 0) - 0.05, s_vklady, 'push', 'bass'), SH(T('Твоих') - 0.05, s_tvoih, 'door', 'thud'),
  SH(T('Нет') - 0.05, s_netplat, 'drop', 'thud'), SH(T('нечем') - 0.05, s_nechem, 'zoom', 'drop'),
- SH(T('Утром') - 0.05, s_utrom, 'whipR', 'whoosh'), SH(T('Днём') - 0.05, s_dnem, 'zoomthru', 'bass', (880, 900)),
+ SH(T('Утром') - 0.05, s_utrom, 'whipR', 'whoosh'), SH(T('Днём') - 0.05, s_dnem, 'zoomthru', 'bass', (880, 900)), SH(T('Пиздец') - 0.05, s_pizdec, 'shake', 'boom'),
  SH(T('Государство') - 0.05, s_gos, 'whipU', 'riser'), SH(T('Но') - 0.05, s_novymi, 'push', 'bass'),
  SH(T('А', 1) - 0.05, s_ceny, 'zoom', 'whoosh'),
- SH(T('Кредиты', 0) - 0.05, s_nekreditu, 'door', 'thud'), SH(T('Бизнесу') - 0.05, s_biznes, 'whipL', 'whoosh'), SH(T('Увольнения') - 0.05, s_uvol, 'drop', 'thud'),
+ SH(T('Кредиты') - 0.05, s_nekreditu, 'door', 'thud'), SH(T('Бизнесу') - 0.05, s_biznes, 'whipL', 'whoosh'), SH(T('Тебя') - 0.05, s_uvol, 'drop', 'thud'),
  SH(T('А', 2) - 0.03, s_podvoh, 'glitch', 'scratch'),
- SH(T('Долг') - 0.05, s_dolg, 'zoom', 'bass'), SH(T('Суд') - 0.05, s_sud, 'shake', 'boom'), SH(T('до', 1) - 0.05, s_polovina, 'whipR', 'whoosh'),
- SH(T('И', 0) - 0.05, s_bylo, 'spin', 'zoomin'), SH(T('Две') - 0.05, s_2008, 'zoomthru', 'bass', (540, 870)),
+ SH(T('Долг') - 0.05, s_dolg, 'shake', 'bass'), SH(T('Суд') - 0.05, s_sud, 'shake', 'boom'), SH(T('до', 1) - 0.05, s_polovina, 'whipR', 'whoosh'),
+ SH(T('И', 1) - 0.05, s_bylo, 'spin', 'zoomin'), SH(T('Две') - 0.05, s_2008, 'zoomthru', 'bass', (540, 870)),
  SH(T('Люди') - 0.05, s_ipoteka, 'push', 'bass'), SH(T('рухнул') - 0.05, s_ruhnul, 'zoom', 'whoosh'), SH(T('и', 2) - 0.03, s_mir, 'shake', 'boom'),
- SH(T('Кредит') - 0.05, s_nebanku, 'bodywipe', 'whoosh'), SH(T('Это') - 0.05, s_sosedu, 'door', 'thud'),
- SH(T('Напиши') - 0.05, s_napishi, 'bodywipe', 'bass'), SH(T('Только') - 0.05, s_chestno, 'zoom', 'whoosh'),
+ SH(T('Так') - 0.05, s_nebanku, 'bodywipe', 'whoosh'), SH(T('Это') - 0.05, s_sosedu, 'door', 'thud'),
+ SH(T('Напиши') - 0.05, s_napishi, 'bodywipe', 'bass'),
  SH(T('Всё') - 0.05, s_netupi, 'zoomthru', 'final', (540, 800)),
 ]
-ACC = [(0.35, 'tick2'), (T('кредитами'), 'kassa'), (T('завтра'), 'pop'), (T('перестают'), 'error'), (T('разоряются') + 0.3, 'crack'),
-       (T('сгорают'), 'whoosh'), (T('свободны'), 'ok'), (T('тупишь'), 'stamp'), (T('кредиты'), 'coins'), (T('кармана'), 'boing'),
+ACC = [(T('идите'), 'alarm'), (T('хуй'), 'boom'), (T('платим'), 'stamp'), (T('Пятьдесят') + 0.1, 'tick2'), (T('человек'), 'kassa'), (T('Ни'), 'error'),
+       (T('разорились') + 0.3, 'crack'), (T('сгорели'), 'whoosh'), (T('свободны'), 'ok'), (T('же'), 'boing'), (T('тупишь'), 'stamp'), (T('больно'), 'drop'),
+       (T('кредиты'), 'coins'), (T('кармана'), 'boing'),
        (T('вкладов'), 'kassa'), (T('Твоих'), 'pop'), (T('мамы'), 'pop'), (T('соседа'), 'pop'), (T('платежей'), 'error'), (T('вклады'), 'drop'),
-       (T('очереди'), 'tick'), (T('пустые'), 'error'), (T('до') - 0.1, 'ding'), (T('новыми'), 'kassa'), (T('рост'), 'riser'), (T('никто'), 'clang'), (T('даёт'), 'stamp'),
-       (T('платить', 1), 'error'), (T('Увольнения') + 0.1, 'stamp'), (T('подвох'), 'boom'), (T('никуда'), 'alarm'), (T('Суд') + 0.3, 'thud'), (T('приставы'), 'clang'),
+       (T('очередь'), 'tick'), (T('пустой'), 'error'), (T('до') - 0.1, 'ding'), (T('новыми'), 'kassa'), (T('цены'), 'riser'), (T('никто'), 'clang'), (T('даёт'), 'stamp'),
+       (T('платить'), 'error'), (T('увольняют'), 'stamp'), (T('подвох'), 'boom'), (T('никуда'), 'alarm'), (T('Суд') + 0.3, 'thud'), (T('приставы'), 'clang'),
        (T('половины') + 0.15, 'scratch'), (T('уже'), 'pop'), (T('Америка'), 'pop'), (T('ипотеку'), 'error'), (T('рухнул') + 0.6, 'boom'), (T('накрыл'), 'crack'),
-       (T('не', 4), 'error'), (T('соседу'), 'pop'), (T('кредит'), 'msg'), (T('честно'), 'boing'), (T('тупи'), 'stamp')]
+       (T('не', 4), 'error'), (T('соседу'), 'pop'), (T('кредит', 1), 'msg'), (T('тупи'), 'stamp')]
+
 # ================= движок: глубина, переходы через действие, субтитры, кадр =================
 ACTION = {'push', 'zoomthru', 'door', 'bodywipe', 'drop'}; PRE, POST = 0.10, 0.30
 CARD_RGB = Image.new('RGB', (CW, CH), CARD)
@@ -625,7 +658,11 @@ CHK = chunks(); SUB_Y = 1432; REFH = text_img('Н', 88, INK, WHITE, 8).height
 def sub_img(w, hl=False):
     f = font(88); wd = int(ImageDraw.Draw(Image.new('RGBA', (1, 1))).textlength(w, font=f)) + 20
     im = Image.new('RGBA', (wd, 150), (0, 0, 0, 0)); ImageDraw.Draw(im).text((10, 8), w, font=f, fill=INK, stroke_width=8, stroke_fill=YEL if hl else WHITE); return im
-def clean(w): return w.replace('«', '').replace('»', '').upper()
+CENS = {'ХУЙ': 'Х*Й', 'ОХУЕННО': 'ОХ*ЕННО', 'ПИЗДЕЦ': 'П*ЗДЕЦ', 'СУКА': 'С*КА'}
+def clean(w):
+    w = w.replace('«', '').replace('»', '').upper()
+    for a, b in CENS.items(): w = w.replace(a, b)
+    return w
 def subs(F, t):
     for ci, ch in enumerate(CHK):
         t1 = CHK[ci + 1][0][1] if ci + 1 < len(CHK) else ch[-1][2] + 0.6
