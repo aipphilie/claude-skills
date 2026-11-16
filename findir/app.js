@@ -89,7 +89,7 @@ const PALETTES = {
   orange: { n: 'Оранж',   bg: '#050505', ac: '#ff5b14' },
   lime:   { n: 'Кислота', bg: '#050505', ac: '#c8ff2e' },
   blue:   { n: 'Электрик', bg: '#04060d', ac: '#4d7cff' },
-  pink:   { n: 'Фуксия',  bg: '#070406', ac: '#ff2e88' },
+  pink:   { n: 'Фуксия',  bg: '#070406', ac: '#f0146e' },
   mint:   { n: 'Деньги',  bg: '#030806', ac: '#1fe08f' },
   mono:   { n: 'Монохром', bg: '#050505', ac: '#f6f1ea' },
   paper:  { n: 'Бумага',  bg: '#f2eee6', ac: '#ff5b14', light: true },
