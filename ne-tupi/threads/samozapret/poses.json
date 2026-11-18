@@ -1,0 +1,12 @@
+{"p": [
+ {"la":[140,-25],"ra":[140,-25],"mouth":"wow","yaw":-10},
+ {"la":[55,-100],"ra":[55,-100],"head":-3,"mouth":"smile","yaw":-10},
+ {"ra":[118,100],"head":8,"head_dy":0.08,"lean":2,"mouth":"sad","yaw":-10},
+ {"la":[45,95],"ra":[45,95],"head":10,"head_dy":0.06,"mouth":"sad","yaw":-10},
+ {"ra":[155,10],"head":-5,"mouth":"O","yaw":-10},
+ {"ra":[92,-4],"head":6,"lean":-2,"mouth":"A","yaw":-10},
+ {"la":[92,-4],"head":-6,"lean":2,"mouth":"A","yaw":10},
+ {"la":[75,35],"ra":[75,35],"head":-4,"mouth":"E","yaw":-10},
+ {"ra":[110,35],"head":-6,"mouth":"smile","yaw":-10},
+ {"la":[45,95],"ra":[45,95],"head":10,"head_dy":0.06,"mouth":"wow","yaw":-10}
+]}
