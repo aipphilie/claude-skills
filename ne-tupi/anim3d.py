@@ -7,7 +7,7 @@ import sys, os, json, subprocess
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import anim
 
-anim.BASE.update(yaw=0, laF=0, raF=0, lsw=0, rsw=0)
+anim.BASE.update(yaw=0, laF=0, raF=0, lsw=0, rsw=0, pitch=0)
 YAW = -10   # лёгкий поворот на 3/4, чтобы был виден объём
 
 
@@ -26,16 +26,41 @@ def a_shag_profil():
     return anim.timeline(keys, n), anim.mouths_const(n)
 
 
+def a_tashit_v_goru():
+    """Тащит тяжёлый груз в гору: профиль вправо, корпус наклонён вперёд, руки за спиной держат мешок,
+    короткий медленный шаг с проседанием. Мешок рисуется в монтаже по точке anchors.json["back"]."""
+    n = 40
+    arms = dict(la=(28, 125), ra=(22, 130), laF=-1.6, raF=-1.6)
+    A = dict(arms, yaw=90, pitch=28, lsw=-18, rsw=14, sink=10)
+    mid = dict(lsw=-2, rsw=-2, sink=2)
+    B = dict(lsw=14, rsw=-18, sink=10)
+    keys = [(0, A), (10, mid), (20, B), (30, mid), (39, A)]
+    return anim.timeline(keys, n), anim.mouths_const(n)
+
+
+def a_tashit_legko():
+    """Тот же груз, но легко: корпус почти прямой, быстрый шаг с подскоком."""
+    n = 24
+    arms = dict(la=(25, 120), ra=(20, 125), laF=-1.4, raF=-1.4)
+    A = dict(arms, yaw=90, pitch=6, lsw=-24, rsw=22, sink=4, dy=0)
+    mid = dict(lsw=0, rsw=0, sink=-2, dy=18)
+    B = dict(lsw=22, rsw=-24, sink=4, dy=0)
+    keys = [(0, A), (6, mid), (12, B), (18, mid), (23, A)]
+    return anim.timeline(keys, n), anim.mouths_const(n, "smile")
+
+
 ANIMS = {k: v for k, v in anim.ANIMS.items()}
+ANIMS["tashit-v-goru"] = ("Тащит груз в гору", a_tashit_v_goru)
+ANIMS["tashit-legko"] = ("Несёт груз легко", a_tashit_legko)
 ANIMS["povorot"] = ("Поворот в профиль", a_povorot)
 ANIMS["shag-profil"] = ("Шаг в профиль", a_shag_profil)
-OWN_YAW = {"povorot", "shag-profil"}
+OWN_YAW = {"povorot", "shag-profil", "tashit-v-goru", "tashit-legko"}
 
 
 def to3d(p, m, name):
     q = dict(la=list(p["la"]), ra=list(p["ra"]), head=p["head"], head_dy=p["head_dy"] / 100, lean=p["lean"],
              dy=-p["dy"] / 100, sink=p["sink"] / 100, llift=p["llift"] / 100, rlift=p["rlift"] / 100,
-             yaw=p["yaw"] + (0 if name in OWN_YAW else YAW), laF=p["laF"], raF=p["raF"], lsw=p["lsw"], rsw=p["rsw"], mouth=m)
+             yaw=p["yaw"] + (0 if name in OWN_YAW else YAW), laF=p["laF"], raF=p["raF"], lsw=p["lsw"], rsw=p["rsw"], pitch=p.get("pitch", 0), mouth=m)
     return q
 
 

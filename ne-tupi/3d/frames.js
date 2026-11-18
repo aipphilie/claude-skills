@@ -12,10 +12,12 @@ const jobs = JSON.parse(fs.readFileSync(file));
   await pg.evaluate(s => window.setStyle(s), style);
   for (const [name, frames] of Object.entries(jobs)) {
     fs.mkdirSync(`${out}/${name}`, {recursive: true});
+    const anchors = [];
     for (let i = 0; i < frames.length; i++) {
-      await pg.evaluate(p => window.pose(p), frames[i]);
+      anchors.push(await pg.evaluate(p => window.pose(p), frames[i]));
       await pg.screenshot({path: `${out}/${name}/${String(i).padStart(3, '0')}.png`});
     }
+    fs.writeFileSync(`${out}/${name}/anchors.json`, JSON.stringify(anchors));
     console.log(name, frames.length);
   }
   await b.close();

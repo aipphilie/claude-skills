@@ -117,7 +117,7 @@ window.setStyle = function (s) {
   return true;
 };
 window.pose = function (p = {}) {
-  p = Object.assign({la: [20, 2], ra: [20, 2], head: 0, mouth: 'rest', yaw: 0, lean: 0, laF: 0, raF: 0, dy: 0, sink: 0, llift: 0, rlift: 0, lsw: 0, rsw: 0, head_dy: 0}, p);
+  p = Object.assign({la: [20, 2], ra: [20, 2], head: 0, mouth: 'rest', yaw: 0, lean: 0, laF: 0, raF: 0, dy: 0, sink: 0, llift: 0, rlift: 0, lsw: 0, rsw: 0, head_dy: 0, pitch: 0}, p);
   if (fig) scene.remove(fig);
   fig = new THREE.Group();
   const crotchY = LEG_L + LEG_R + p.dy - p.sink;
@@ -134,6 +134,7 @@ window.pose = function (p = {}) {
   const upper = new THREE.Group();
   upper.position.y = crotchY;
   upper.rotation.z = rad(-p.lean);
+  upper.rotation.x = rad(p.pitch);   // наклон вперёд (виден в профиль)
   fig.add(upper);
 
   // корпус: цилиндр + купол сверху, сплющенный по глубине
@@ -178,7 +179,11 @@ window.pose = function (p = {}) {
   camera.position.set(0, 6.4, 34);
   camera.lookAt(0, 5.6, 0);
   renderer.render(scene, camera);
-  return true;
+  // экранные координаты точки на спине (для груза, рюкзака и т.п.)
+  fig.updateMatrixWorld(true);
+  const v = new THREE.Vector3(0, TORSO_H * 0.62, -r * DEPTH).applyMatrix4(upper.matrixWorld).project(camera);
+  const top = new THREE.Vector3(0, TORSO_H + HEAD_R * 2 - 0.18, 0).applyMatrix4(upper.matrixWorld).project(camera);
+  return {back: [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H], top: [(top.x + 1) / 2 * W, (1 - top.y) / 2 * H]};
 };
 window.ready = true;
 </script>
