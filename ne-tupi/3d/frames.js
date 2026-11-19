@@ -7,7 +7,7 @@ const jobs = JSON.parse(fs.readFileSync(file));
   const b = await chromium.launch({args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader']});
   const pg = await b.newPage({viewport: {width: +w, height: +h}});
   pg.on('pageerror', e => console.log('err:', e.message));
-  await pg.goto(`http://localhost:${port}/3d/index.html`);
+  await pg.goto(port === 'file' ? `file://${__dirname}/index.html` : `http://localhost:${port}/3d/index.html`);  // port=file — без сервера
   await pg.waitForFunction(() => window.ready);
   await pg.evaluate(s => window.setStyle(s), style);
   for (const [name, frames] of Object.entries(jobs)) {

@@ -149,12 +149,13 @@ window.pose = function (p = {}) {
   upper.add(torso);
 
   // руки от плеч, вписанных в купол
+  const hands = [];
   for (const [side, [a1, a2], f] of [[-1, p.la, p.laF], [1, p.ra, p.raF]]) {
     const d = r - ARM_R, a = rad(62);
     const sh = new THREE.Vector3(side * d * Math.sin(a), cylH + d * Math.cos(a) - 0.18, 0);
     const el = sh.clone().add(dir(a1, side, f * 0.5).multiplyScalar(UPPER));
     const ha = el.clone().add(dir(a1 + a2, side, f).multiplyScalar(FORE));
-    upper.add(segment(sh, el, ARM_R), segment(el, ha, ARM_R));
+    upper.add(segment(sh, el, ARM_R), segment(el, ha, ARM_R)); hands.push(ha);
   }
 
   // голова
@@ -183,7 +184,8 @@ window.pose = function (p = {}) {
   fig.updateMatrixWorld(true);
   const v = new THREE.Vector3(0, TORSO_H * 0.62, -r * DEPTH).applyMatrix4(upper.matrixWorld).project(camera);
   const top = new THREE.Vector3(0, TORSO_H + HEAD_R * 2 - 0.18, 0).applyMatrix4(upper.matrixWorld).project(camera);
-  return {back: [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H], top: [(top.x + 1) / 2 * W, (1 - top.y) / 2 * H]};
+  const hp = hands.map(h => { const q = h.clone().applyMatrix4(upper.matrixWorld).project(camera); return [(q.x + 1) / 2 * W, (1 - q.y) / 2 * H]; });
+  return {hands: hp, back: [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H], top: [(top.x + 1) / 2 * W, (1 - top.y) / 2 * H]};
 };
 window.ready = true;
 </script>
